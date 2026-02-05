@@ -26,22 +26,19 @@ export function StatusDropdown<T extends string>({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className={cn(
-            "inline-flex items-center gap-2 px-3 py-1.5 text-sm rounded-[10px] border bg-background hover:bg-muted/50 transition-colors",
-            currentColor
-          )}
+          className="inline-flex items-center gap-2 px-3 py-1 text-xs font-medium rounded-[10px] border border-border bg-background hover:bg-muted/50 transition-colors"
         >
           <span
             className={cn(
-              "w-2 h-2 rounded-full border-2",
-              currentColor.replace("text-", "border-")
+              "w-2 h-2 rounded-full",
+              currentColor
             )}
           />
-          <span>{value}</span>
-          <ChevronDown className="h-3 w-3 opacity-50" />
+          <span className="text-foreground">{value}</span>
+          <ChevronDown className="h-3 w-3 text-muted-foreground" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="min-w-[160px] bg-background">
+      <DropdownMenuContent align="start" className="min-w-[180px]">
         {options.map((option) => {
           const optionColor = colorMap[option];
           return (
@@ -49,17 +46,17 @@ export function StatusDropdown<T extends string>({
               key={option}
               onClick={() => onChange(option)}
               className={cn(
-                "flex items-center gap-2 cursor-pointer",
+                "flex items-center gap-2 cursor-pointer text-sm",
                 value === option && "bg-muted"
               )}
             >
               <span
                 className={cn(
-                  "w-2 h-2 rounded-full border-2",
-                  optionColor.replace("text-", "border-")
+                  "w-2 h-2 rounded-full",
+                  optionColor
                 )}
               />
-              <span className={optionColor.split(" ")[1]}>{option}</span>
+              <span>{option}</span>
             </DropdownMenuItem>
           );
         })}
