@@ -11,6 +11,9 @@ import Infrastructure from "./pages/Infrastructure";
 import Engagement from "./pages/Engagement";
 import Personas from "./pages/Personas";
 import Leads from "./pages/Leads";
+import Settings from "./pages/Settings";
+import SettingsTeam from "./pages/SettingsTeam";
+import SettingsIntegrations from "./pages/SettingsIntegrations";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +31,9 @@ const App = () => (
           <Route path="/engagement" element={<Engagement />} />
           <Route path="/personas" element={<Personas />} />
           <Route path="/leads" element={<Leads />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/settings/team" element={<SettingsTeam />} />
+          <Route path="/settings/integrations" element={<SettingsIntegrations />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
