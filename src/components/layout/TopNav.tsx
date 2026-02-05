@@ -36,7 +36,7 @@ const TopNav = () => {
 
   return (
     <nav className="border-b border-border bg-card">
-      <div className="px-6 lg:px-8">
+      <div className="px-4 lg:px-6">
         <div className="flex h-14 items-center justify-between">
           <div className="flex items-center gap-4">
             <Link to="/" className="flex items-center">
