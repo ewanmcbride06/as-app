@@ -12,7 +12,7 @@ const DashboardLayout = ({ children, isExpanded = false }: DashboardLayoutProps)
       <TopNav />
       <main className={cn(
         "flex-1 overflow-hidden transition-all duration-300 ease-out",
-        isExpanded ? "px-0 pt-0" : "px-[75px] pt-[75px]"
+        isExpanded ? "px-0 pt-0" : "px-[75px] pt-[50px]"
       )}>
         {children}
       </main>
