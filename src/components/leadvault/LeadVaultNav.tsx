@@ -1,12 +1,10 @@
 import { Link, useLocation } from "react-router-dom";
-import { Users, Building2, List, Settings } from "lucide-react";
+import { Database, List } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { label: "Contacts", icon: Users, path: "/leads" },
-  { label: "Companies", icon: Building2, path: "/leads/companies" },
+  { label: "Database", icon: Database, path: "/leads" },
   { label: "Lists", icon: List, path: "/leads/lists" },
-  { label: "Settings", icon: Settings, path: "/leads/settings" },
 ];
 
 export default function LeadVaultNav() {
@@ -18,7 +16,7 @@ export default function LeadVaultNav() {
         {navItems.map((item) => {
           const isActive = 
             item.path === "/leads" 
-              ? location.pathname === "/leads" || location.pathname.startsWith("/leads/contacts")
+              ? location.pathname === "/leads" || location.pathname.startsWith("/leads/contacts") || location.pathname.startsWith("/leads/companies")
               : location.pathname.startsWith(item.path);
           
           return (

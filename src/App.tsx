@@ -16,13 +16,11 @@ import SettingsTeam from "./pages/SettingsTeam";
 import SettingsIntegrations from "./pages/SettingsIntegrations";
 
 // LeadVault pages
-import LeadVaultContacts from "./pages/leadvault/LeadVaultContacts";
-import LeadVaultCompanies from "./pages/leadvault/LeadVaultCompanies";
+import LeadVaultDatabase from "./pages/leadvault/LeadVaultDatabase";
 import LeadVaultLists from "./pages/leadvault/LeadVaultLists";
 import LeadVaultListDetail from "./pages/leadvault/LeadVaultListDetail";
 import LeadVaultCompanyDetail from "./pages/leadvault/LeadVaultCompanyDetail";
 import LeadVaultContactDetail from "./pages/leadvault/LeadVaultContactDetail";
-import LeadVaultSettings from "./pages/leadvault/LeadVaultSettings";
 
 const queryClient = new QueryClient();
 
@@ -42,13 +40,11 @@ const App = () => (
           <Route path="/personas" element={<Personas />} />
           
           {/* LeadVault Routes */}
-          <Route path="/leads" element={<LeadVaultContacts />} />
-          <Route path="/leads/companies" element={<LeadVaultCompanies />} />
+          <Route path="/leads" element={<LeadVaultDatabase />} />
           <Route path="/leads/companies/:id" element={<LeadVaultCompanyDetail />} />
           <Route path="/leads/contacts/:id" element={<LeadVaultContactDetail />} />
           <Route path="/leads/lists" element={<LeadVaultLists />} />
           <Route path="/leads/lists/:id" element={<LeadVaultListDetail />} />
-          <Route path="/leads/settings" element={<LeadVaultSettings />} />
           
           <Route path="/settings" element={<Settings />} />
           <Route path="/settings/team" element={<SettingsTeam />} />
