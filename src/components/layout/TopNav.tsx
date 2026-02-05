@@ -112,7 +112,7 @@ const TopNav = () => {
                 <img 
                   src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" 
                   alt="Profile" 
-                  className="h-full w-auto rounded-r-[10px] object-cover"
+                  className="h-full w-auto rounded-[10px] object-cover"
                 />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 rounded-[10px]">
