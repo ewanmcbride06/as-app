@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MoreHorizontal, ChevronDown, Columns, Table as TableIcon, LayoutList, Linkedin, Plus, Search, Upload, Download } from "lucide-react";
+import { MoreHorizontal, ChevronDown, Columns, Table as TableIcon, LayoutList, Linkedin, Plus, Search, Upload, Download, Maximize2, Minimize2 } from "lucide-react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import LeadVaultNav from "@/components/leadvault/LeadVaultNav";
 import FilterSidebar from "@/components/leadvault/FilterSidebar";
@@ -35,6 +35,7 @@ export default function LeadVaultContacts() {
   const [previewContact, setPreviewContact] = useState<Contact | null>(null);
   const [viewMode, setViewMode] = useState<'table' | 'compact'>('table');
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const [isExpanded, setIsExpanded] = useState(false);
   
   const contacts = mockContacts;
   const totalCount = 12493;
@@ -58,37 +59,39 @@ export default function LeadVaultContacts() {
   return (
     <DashboardLayout>
       <div className="flex flex-col h-full overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between py-4">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Leads</h1>
-            <p className="text-muted-foreground">Search and manage your contacts and companies</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search leads..." className="pl-9 h-9" />
+        {/* Header - hidden when expanded */}
+        {!isExpanded && (
+          <div className="flex items-center justify-between py-4">
+            <div>
+              <h1 className="text-2xl font-semibold tracking-tight">Leads</h1>
+              <p className="text-muted-foreground">Search and manage your contacts and companies</p>
             </div>
-            <Button variant="outline" size="sm" className="gap-2">
-              <Upload className="h-4 w-4" />
-              Import
-            </Button>
-            <Button variant="outline" size="sm" className="gap-2">
-              <Download className="h-4 w-4" />
-              Export
-            </Button>
-            <Button size="sm" className="gap-2">
-              <Plus className="h-4 w-4" />
-              Create List
-            </Button>
+            <div className="flex items-center gap-2">
+              <div className="relative w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input placeholder="Search leads..." className="pl-9 h-9" />
+              </div>
+              <Button variant="outline" size="sm" className="gap-2">
+                <Upload className="h-4 w-4" />
+                Import
+              </Button>
+              <Button variant="outline" size="sm" className="gap-2">
+                <Download className="h-4 w-4" />
+                Export
+              </Button>
+              <Button size="sm" className="gap-2">
+                <Plus className="h-4 w-4" />
+                Create List
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* LeadVault Navigation */}
-        <LeadVaultNav />
+        {/* LeadVault Navigation - hidden when expanded */}
+        {!isExpanded && <LeadVaultNav />}
 
         {/* Main Content - fills remaining height */}
-        <div className="flex flex-1 min-h-0 overflow-hidden border border-border rounded-[10px]">
+        <div className={`flex flex-1 min-h-0 overflow-hidden border border-border rounded-[10px] ${isExpanded ? 'mt-2' : ''}`}>
           {/* Filter Sidebar */}
           <FilterSidebar 
             type="contacts" 
@@ -163,6 +166,18 @@ export default function LeadVaultContacts() {
                 <Button size="sm" className="gap-2">
                   <Plus className="h-4 w-4" />
                   Add to List
+                </Button>
+
+                <div className="w-px h-5 bg-border" />
+
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="gap-2"
+                  onClick={() => setIsExpanded(!isExpanded)}
+                >
+                  {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                  {isExpanded ? 'Collapse' : 'Expand'}
                 </Button>
               </div>
             </div>
