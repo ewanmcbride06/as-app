@@ -1,5 +1,6 @@
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Search, Info } from "lucide-react";
 import {
@@ -82,6 +83,7 @@ const InfoIcon = () => (
 );
 
 const Campaigns = () => {
+  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -158,7 +160,11 @@ const Campaigns = () => {
               </thead>
               <tbody className="divide-y divide-border">
                 {filteredCampaigns.map((campaign) => (
-                  <tr key={campaign.id} className="hover:bg-muted/50 transition-colors">
+                  <tr 
+                    key={campaign.id} 
+                    className="hover:bg-muted/50 transition-colors cursor-pointer"
+                    onClick={() => navigate(`/campaigns/${campaign.id}`)}
+                  >
                     <td className="px-6 py-4">
                       <div>
                         <p className="text-sm font-medium text-foreground">{campaign.name}</p>
