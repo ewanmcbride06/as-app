@@ -6,9 +6,9 @@ interface DashboardLayoutProps {
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-screen flex flex-col overflow-hidden bg-background">
       <TopNav />
-      <main className="px-6 py-6 lg:px-8">
+      <main className="flex-1 px-6 lg:px-8 overflow-hidden">
         {children}
       </main>
     </div>

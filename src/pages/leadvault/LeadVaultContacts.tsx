@@ -57,9 +57,9 @@ export default function LeadVaultContacts() {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col gap-4 h-[calc(100vh-104px)] overflow-hidden">
+      <div className="flex flex-col h-full overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between py-4">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Leads</h1>
             <p className="text-muted-foreground">Search and manage your contacts and companies</p>
@@ -87,8 +87,8 @@ export default function LeadVaultContacts() {
         {/* LeadVault Navigation */}
         <LeadVaultNav />
 
-        {/* Main Content */}
-        <div className="flex flex-1 min-h-0 overflow-hidden gap-0 -mx-6 lg:-mx-8">
+        {/* Main Content - fills remaining height */}
+        <div className="flex flex-1 min-h-0 overflow-hidden -mx-6 lg:-mx-8 border-t">
           {/* Filter Sidebar */}
           <FilterSidebar 
             type="contacts" 
@@ -97,7 +97,7 @@ export default function LeadVaultContacts() {
           />
 
           {/* Table Area */}
-          <div className="flex-1 flex flex-col min-w-0 min-h-0">
+          <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
             {/* Toolbar */}
             <div className="border-b p-3 flex items-center justify-between bg-background">
               <div className="flex items-center gap-3">
