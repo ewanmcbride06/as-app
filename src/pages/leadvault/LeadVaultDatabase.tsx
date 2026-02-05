@@ -76,10 +76,9 @@ export default function LeadVaultDatabase() {
   const companyColumns = ['Company', 'Domain', 'Industry', 'Employees', 'Revenue', 'Location', 'Tech Stack'];
 
   return (
-    <DashboardLayout>
+    <DashboardLayout isExpanded={isExpanded}>
       <div className={cn(
-        "flex flex-col h-full overflow-hidden transition-all duration-300 ease-out",
-        isExpanded && "pt-2"
+        "flex flex-col h-full overflow-hidden transition-all duration-300 ease-out"
       )}>
         {/* Header - animated slide up when expanded */}
         <div className={cn(
@@ -122,8 +121,8 @@ export default function LeadVaultDatabase() {
 
         {/* Main Content - fills remaining height with animation */}
         <div className={cn(
-          "flex flex-1 min-h-0 overflow-hidden border border-border rounded-[10px] transition-all duration-300 ease-out",
-          isExpanded && "rounded-[10px]"
+          "flex flex-1 min-h-0 overflow-hidden transition-all duration-300 ease-out",
+          isExpanded ? "border-0 rounded-none" : "border border-border rounded-[10px]"
         )}>
           {/* Filter Sidebar */}
           <FilterSidebar 
