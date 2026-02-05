@@ -14,7 +14,7 @@ const Analytics = () => {
     <DashboardLayout>
       <div className="flex flex-col h-full overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between py-4">
+        <div className="flex items-center justify-between pb-4 shrink-0">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Analytics</h1>
             <p className="text-muted-foreground">Track your performance metrics and campaign insights</p>

@@ -125,9 +125,9 @@ const Personas = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-4">
+      <div className="flex flex-col h-full overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between pb-4 shrink-0">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Personas</h1>
             <p className="text-muted-foreground">Define and manage your ideal customer profiles</p>
@@ -149,116 +149,121 @@ const Personas = () => {
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-4 gap-4">
-          <div className="p-4 rounded-lg border bg-card">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Personas</p>
-            <p className="text-2xl font-semibold mt-2">{personas.length}</p>
-          </div>
-          <div className="p-4 rounded-lg border bg-card">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Matched Contacts</p>
-            <p className="text-2xl font-semibold mt-2">{totalContacts.toLocaleString()}</p>
-          </div>
-          <div className="p-4 rounded-lg border bg-card">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Matched Companies</p>
-            <p className="text-2xl font-semibold mt-2">{totalCompanies.toLocaleString()}</p>
-          </div>
-          <div className="p-4 rounded-lg border bg-card">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Avg Conversion</p>
-            <p className="text-2xl font-semibold mt-2">{avgConversion}%</p>
-          </div>
-        </div>
+        {/* Main Content */}
+        <div className="flex-1 min-h-0 overflow-hidden border border-border rounded-[10px]">
+          <div className="flex flex-col h-full">
+            {/* Stats Toolbar */}
+            <div className="border-b p-3 flex items-center gap-6 bg-background shrink-0">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Personas</span>
+                <span className="text-sm font-semibold">{personas.length}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Matched Contacts</span>
+                <span className="text-sm font-semibold">{totalContacts.toLocaleString()}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Matched Companies</span>
+                <span className="text-sm font-semibold">{totalCompanies.toLocaleString()}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Avg Conversion</span>
+                <span className="text-sm font-semibold">{avgConversion}%</span>
+              </div>
+            </div>
 
-        {/* Table */}
-        <div className="border rounded-lg">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Persona</TableHead>
-                <TableHead>Titles</TableHead>
-                <TableHead>Industries</TableHead>
-                <TableHead>Company Size</TableHead>
-                <TableHead className="text-right">Contacts</TableHead>
-                <TableHead className="text-right">Companies</TableHead>
-                <TableHead className="text-right">Avg Deal</TableHead>
-                <TableHead className="text-right">Conversion</TableHead>
-                <TableHead>Updated</TableHead>
-                <TableHead className="w-10"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredPersonas.map((persona) => (
-                <TableRow key={persona.id} className="hover:bg-muted/50">
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 rounded-lg bg-muted flex items-center justify-center text-lg">
-                        {persona.icon}
-                      </div>
-                      <div>
-                        <p className="font-medium">{persona.name}</p>
-                        <p className="text-xs text-muted-foreground">{persona.description}</p>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1">
-                      {persona.titles.slice(0, 2).map((title) => (
-                        <Badge key={title} variant="outline" className="text-xs">{title}</Badge>
-                      ))}
-                      {persona.titles.length > 2 && (
-                        <Badge variant="secondary" className="text-xs">+{persona.titles.length - 2}</Badge>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1">
-                      {persona.industries.slice(0, 2).map((ind) => (
-                        <Badge key={ind} variant="outline" className="text-xs">{ind}</Badge>
-                      ))}
-                      {persona.industries.length > 2 && (
-                        <Badge variant="secondary" className="text-xs">+{persona.industries.length - 2}</Badge>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">{persona.companySize}</TableCell>
-                  <TableCell className="text-right font-medium">{persona.contactsMatched.toLocaleString()}</TableCell>
-                  <TableCell className="text-right text-muted-foreground">{persona.companiesMatched.toLocaleString()}</TableCell>
-                  <TableCell className="text-right font-medium">${persona.avgDealSize.toLocaleString()}</TableCell>
-                  <TableCell className="text-right">
-                    <Badge variant="secondary" className="font-mono">{persona.conversionRate}%</Badge>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground text-sm">{persona.lastUpdated}</TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-7 w-7">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem className="gap-2">
-                          <Target className="h-4 w-4" />
-                          View Matches
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="gap-2">
-                          <Edit className="h-4 w-4" />
-                          Edit Persona
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="gap-2">
-                          <Copy className="h-4 w-4" />
-                          Duplicate
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="gap-2 text-destructive">
-                          <Trash2 className="h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+            {/* Table */}
+            <div className="flex-1 overflow-auto">
+              <Table>
+                <TableHeader className="sticky top-0 bg-background z-10">
+                  <TableRow>
+                    <TableHead>Persona</TableHead>
+                    <TableHead>Titles</TableHead>
+                    <TableHead>Industries</TableHead>
+                    <TableHead>Company Size</TableHead>
+                    <TableHead className="text-right">Contacts</TableHead>
+                    <TableHead className="text-right">Companies</TableHead>
+                    <TableHead className="text-right">Avg Deal</TableHead>
+                    <TableHead className="text-right">Conversion</TableHead>
+                    <TableHead>Updated</TableHead>
+                    <TableHead className="w-10"></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredPersonas.map((persona) => (
+                    <TableRow key={persona.id} className="hover:bg-muted/50">
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className="h-9 w-9 rounded-lg bg-muted flex items-center justify-center text-lg">
+                            {persona.icon}
+                          </div>
+                          <div>
+                            <p className="font-medium">{persona.name}</p>
+                            <p className="text-xs text-muted-foreground">{persona.description}</p>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {persona.titles.slice(0, 2).map((title) => (
+                            <Badge key={title} variant="outline" className="text-xs">{title}</Badge>
+                          ))}
+                          {persona.titles.length > 2 && (
+                            <Badge variant="secondary" className="text-xs">+{persona.titles.length - 2}</Badge>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {persona.industries.slice(0, 2).map((ind) => (
+                            <Badge key={ind} variant="outline" className="text-xs">{ind}</Badge>
+                          ))}
+                          {persona.industries.length > 2 && (
+                            <Badge variant="secondary" className="text-xs">+{persona.industries.length - 2}</Badge>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">{persona.companySize}</TableCell>
+                      <TableCell className="text-right font-medium">{persona.contactsMatched.toLocaleString()}</TableCell>
+                      <TableCell className="text-right text-muted-foreground">{persona.companiesMatched.toLocaleString()}</TableCell>
+                      <TableCell className="text-right font-medium">${persona.avgDealSize.toLocaleString()}</TableCell>
+                      <TableCell className="text-right">
+                        <Badge variant="secondary" className="font-mono">{persona.conversionRate}%</Badge>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground text-sm">{persona.lastUpdated}</TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-7 w-7">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem className="gap-2">
+                              <Target className="h-4 w-4" />
+                              View Matches
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="gap-2">
+                              <Edit className="h-4 w-4" />
+                              Edit Persona
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="gap-2">
+                              <Copy className="h-4 w-4" />
+                              Duplicate
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="gap-2 text-destructive">
+                              <Trash2 className="h-4 w-4" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
         </div>
       </div>
     </DashboardLayout>
