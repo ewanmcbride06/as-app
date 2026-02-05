@@ -109,6 +109,15 @@ const SettingsLayout = ({ children }: SettingsLayoutProps) => {
       <div className="flex flex-1">
         {/* Sidebar */}
         <aside className="w-64 border-r border-border bg-card flex flex-col">
+          <div className="p-4 border-b border-border">
+            <Link
+              to="/"
+              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-[10px] hover:bg-muted transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Dashboard
+            </Link>
+          </div>
           <nav className="flex-1 p-4 space-y-1">
             {settingsNavItems.map((item) => {
               const isActive = location.pathname === item.path;
@@ -128,16 +137,6 @@ const SettingsLayout = ({ children }: SettingsLayoutProps) => {
               );
             })}
           </nav>
-
-          <div className="p-4 border-t border-border">
-            <Link
-              to="/"
-              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-[10px] hover:bg-muted transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to Dashboard
-            </Link>
-          </div>
         </aside>
 
         {/* Main Content */}
