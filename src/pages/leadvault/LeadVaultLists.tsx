@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { MoreHorizontal, Plus, Users, Building2, Calendar, User } from "lucide-react";
+import { MoreHorizontal, Plus, Users, Building2, Calendar, User, Search } from "lucide-react";
 import { Link } from "react-router-dom";
-import LeadVaultLayout from "@/components/leadvault/LeadVaultLayout";
-import { mockLists, LeadList } from "@/components/leadvault/mockData";
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import LeadVaultNav from "@/components/leadvault/LeadVaultNav";
+import { mockLists } from "@/components/leadvault/mockData";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -28,7 +30,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -44,62 +45,70 @@ export default function LeadVaultLists() {
   const lists = mockLists;
 
   return (
-    <LeadVaultLayout>
-      <div className="h-[calc(100vh-3.5rem)] flex flex-col">
+    <DashboardLayout>
+      <div className="space-y-4">
         {/* Header */}
-        <div className="border-b p-4 flex items-center justify-between bg-background">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-semibold">Lists</h1>
-            <p className="text-sm text-muted-foreground">Organize your leads and companies into lists</p>
+            <h1 className="text-2xl font-semibold tracking-tight">Leads</h1>
+            <p className="text-muted-foreground">Search and manage your contacts and companies</p>
           </div>
-
-          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-            <DialogTrigger asChild>
-              <Button className="gap-2">
-                <Plus className="h-4 w-4" />
-                Create List
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create New List</DialogTitle>
-                <DialogDescription>
-                  Create a list to organize your contacts and companies.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">List Name</Label>
-                  <Input id="name" placeholder="e.g., Q4 Enterprise Prospects" />
+          <div className="flex items-center gap-2">
+            <div className="relative w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Search lists..." className="pl-9 h-9" />
+            </div>
+            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="gap-2">
+                  <Plus className="h-4 w-4" />
+                  Create List
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create New List</DialogTitle>
+                  <DialogDescription>
+                    Create a list to organize your contacts and companies.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">List Name</Label>
+                    <Input id="name" placeholder="e.g., Q4 Enterprise Prospects" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea id="description" placeholder="What is this list for?" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="type">List Type</Label>
+                    <Select defaultValue="mixed">
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="contacts">Contacts Only</SelectItem>
+                        <SelectItem value="companies">Companies Only</SelectItem>
+                        <SelectItem value="mixed">Mixed (Both)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea id="description" placeholder="What is this list for?" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="type">List Type</Label>
-                  <Select defaultValue="mixed">
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="contacts">Contacts Only</SelectItem>
-                      <SelectItem value="companies">Companies Only</SelectItem>
-                      <SelectItem value="mixed">Mixed (Both)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setIsCreateOpen(false)}>Cancel</Button>
-                <Button onClick={() => setIsCreateOpen(false)}>Create List</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setIsCreateOpen(false)}>Cancel</Button>
+                  <Button onClick={() => setIsCreateOpen(false)}>Create List</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
+        {/* LeadVault Navigation */}
+        <LeadVaultNav />
+
         {/* Table */}
-        <div className="flex-1 overflow-auto p-4">
+        <div className="border rounded-lg">
           <Table>
             <TableHeader>
               <TableRow>
@@ -171,6 +180,6 @@ export default function LeadVaultLists() {
           </Table>
         </div>
       </div>
-    </LeadVaultLayout>
+    </DashboardLayout>
   );
 }

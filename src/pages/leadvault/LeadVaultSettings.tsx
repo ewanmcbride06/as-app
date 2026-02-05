@@ -1,4 +1,5 @@
-import LeadVaultLayout from "@/components/leadvault/LeadVaultLayout";
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import LeadVaultNav from "@/components/leadvault/LeadVaultNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -8,14 +9,19 @@ import { Separator } from "@/components/ui/separator";
 
 export default function LeadVaultSettings() {
   return (
-    <LeadVaultLayout>
-      <div className="h-[calc(100vh-3.5rem)] overflow-auto">
-        <div className="max-w-3xl mx-auto p-6 space-y-6">
-          <div>
-            <h1 className="text-xl font-semibold">Settings</h1>
-            <p className="text-sm text-muted-foreground">Manage your LeadVault preferences</p>
-          </div>
+    <DashboardLayout>
+      <div className="space-y-4">
+        {/* Header */}
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Leads</h1>
+          <p className="text-muted-foreground">Search and manage your contacts and companies</p>
+        </div>
 
+        {/* LeadVault Navigation */}
+        <LeadVaultNav />
+
+        {/* Settings Content */}
+        <div className="max-w-3xl space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Account</CardTitle>
@@ -100,6 +106,6 @@ export default function LeadVaultSettings() {
           </Card>
         </div>
       </div>
-    </LeadVaultLayout>
+    </DashboardLayout>
   );
 }
