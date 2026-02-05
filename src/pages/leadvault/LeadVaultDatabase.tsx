@@ -122,7 +122,7 @@ export default function LeadVaultDatabase() {
         {/* Main Content - fills remaining height with animation */}
         <div className={cn(
           "flex flex-1 min-h-0 overflow-hidden transition-all duration-300 ease-out",
-          isExpanded ? "border-0 rounded-none" : "border border-border rounded-[10px]"
+          isExpanded ? "border-0 rounded-none" : "border border-border rounded-[10px] mt-[10px]"
         )}>
           {/* Filter Sidebar */}
           <FilterSidebar 
