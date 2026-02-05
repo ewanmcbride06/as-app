@@ -88,7 +88,7 @@ export default function LeadVaultCompanies() {
         <LeadVaultNav />
 
         {/* Main Content - fills remaining height */}
-        <div className="flex flex-1 min-h-0 overflow-hidden -mx-6 lg:-mx-8 border-t">
+        <div className="flex flex-1 min-h-0 overflow-hidden border border-border rounded-[10px]">
           {/* Filter Sidebar */}
           <FilterSidebar 
             type="companies" 

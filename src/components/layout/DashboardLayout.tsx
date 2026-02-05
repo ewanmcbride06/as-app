@@ -8,7 +8,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-background">
       <TopNav />
-      <main className="flex-1 px-6 lg:px-8 overflow-hidden">
+      <main className="flex-1 px-4 lg:px-6 overflow-hidden">
         {children}
       </main>
     </div>
