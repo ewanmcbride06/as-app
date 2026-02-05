@@ -87,8 +87,8 @@ export default function LeadVaultContacts() {
         {/* LeadVault Navigation */}
         <LeadVaultNav />
 
-        {/* Main Content */}
-        <div className="flex gap-0 -mx-6 lg:-mx-8">
+        {/* Main Content - Fixed height container */}
+        <div className="flex gap-0 -mx-6 lg:-mx-8 h-[calc(100vh-180px)]">
           {/* Filter Sidebar */}
           <FilterSidebar 
             type="contacts" 
@@ -180,7 +180,7 @@ export default function LeadVaultContacts() {
             )}
 
             {/* Table */}
-            <div className="flex-1 overflow-auto max-h-[calc(100vh-320px)]">
+            <div className="flex-1 overflow-auto">
               <Table>
                 <TableHeader className="sticky top-0 bg-background z-10">
                   <TableRow>
