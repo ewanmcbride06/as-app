@@ -39,6 +39,8 @@ import {
   takenStatusColors,
   billingStatusColors,
 } from "@/components/pipeline/types";
+import { updateDealStage, updateMeetingShowStatus } from "@/services/pipelineApi";
+import { useToast } from "@/hooks/use-toast";
 
 const leadStatusOptions: LeadStatus[] = [
   "Potential",
@@ -71,6 +73,7 @@ const Pipeline = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMeetings, setSelectedMeetings] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<"booked" | "analytics" | "connections">("booked");
+  const { toast } = useToast();
 
   // Filter meetings by search
   const filteredMeetings = useMemo(() => {
@@ -101,14 +104,45 @@ const Pipeline = () => {
       }));
   }, [filteredMeetings]);
 
-  const handleUpdateStatus = (
+  const handleUpdateStatus = async (
     id: string,
     field: "leadStatus" | "callStatus" | "takenStatus" | "billingStatus",
     value: string
   ) => {
+    // Optimistically update local state
     setMeetings((prev) =>
       prev.map((m) => (m.id === id ? { ...m, [field]: value } : m))
     );
+
+    // Call API for lead status (deal stage) changes
+    if (field === "leadStatus") {
+      const success = await updateDealStage({
+        deal_id: id,
+        new_stage: value,
+      });
+      if (!success) {
+        toast({
+          title: "Sync failed",
+          description: "Failed to update deal stage on the server. Changes saved locally.",
+          variant: "destructive",
+        });
+      }
+    }
+
+    // Call API for taken status (meeting show status) changes
+    if (field === "takenStatus") {
+      const success = await updateMeetingShowStatus({
+        meeting_id: id,
+        show_status: value,
+      });
+      if (!success) {
+        toast({
+          title: "Sync failed",
+          description: "Failed to update meeting status on the server. Changes saved locally.",
+          variant: "destructive",
+        });
+      }
+    }
   };
 
   const toggleSelectAll = () => {
