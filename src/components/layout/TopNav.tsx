@@ -61,17 +61,13 @@ const TopNav = () => {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="rounded-[10px] bg-background border-border"
-            >
+            <button className="flex h-9 items-center rounded-[10px] border border-border bg-background px-3 text-sm font-medium transition-colors hover:bg-muted">
               Documentation
-            </Button>
+            </button>
             
             {/* Company Switcher */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-2 rounded-[10px] border border-border px-3 py-1.5 transition-colors hover:bg-muted focus:outline-none">
+              <DropdownMenuTrigger className="flex h-9 items-center gap-2 rounded-[10px] border border-border bg-background px-3 text-sm font-medium transition-colors hover:bg-muted focus:outline-none">
                 <div className="flex h-6 w-6 items-center justify-center rounded-[6px] bg-foreground text-xs font-medium text-background">
                   {currentCompany.initials}
                 </div>
