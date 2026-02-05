@@ -1,5 +1,14 @@
  import { Link, useLocation } from "react-router-dom";
- import { LayoutDashboard, BarChart3, Settings, Users } from "lucide-react";
+ import { LayoutDashboard, BarChart3, Settings, Users, ChevronDown, Check } from "lucide-react";
+ import { useState } from "react";
+ import {
+   DropdownMenu,
+   DropdownMenuContent,
+   DropdownMenuItem,
+   DropdownMenuLabel,
+   DropdownMenuSeparator,
+   DropdownMenuTrigger,
+ } from "@/components/ui/dropdown-menu";
  
  const navItems = [
    { name: "Dashboard", path: "/", icon: LayoutDashboard },
@@ -8,8 +17,15 @@
    { name: "Settings", path: "/settings", icon: Settings },
  ];
  
+ const profiles = [
+   { id: 1, name: "Alex Morgan", email: "alex@example.com", initials: "AM" },
+   { id: 2, name: "Jordan Lee", email: "jordan@example.com", initials: "JL" },
+   { id: 3, name: "Sam Wilson", email: "sam@example.com", initials: "SW" },
+ ];
+ 
  const TopNav = () => {
    const location = useLocation();
+   const [currentProfile, setCurrentProfile] = useState(profiles[0]);
  
    return (
      <nav className="border-b border-border bg-card">
@@ -41,7 +57,44 @@
              </div>
            </div>
            <div className="flex items-center gap-4">
-             <div className="h-8 w-8 rounded-full bg-muted" />
+             <DropdownMenu>
+               <DropdownMenuTrigger className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-muted focus:outline-none">
+                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground text-xs font-medium text-background">
+                   {currentProfile.initials}
+                 </div>
+                 <div className="hidden text-left sm:block">
+                   <p className="text-sm font-medium text-foreground">{currentProfile.name}</p>
+                   <p className="text-xs text-muted-foreground">{currentProfile.email}</p>
+                 </div>
+                 <ChevronDown className="h-4 w-4 text-muted-foreground" />
+               </DropdownMenuTrigger>
+               <DropdownMenuContent align="end" className="w-56">
+                 <DropdownMenuLabel>Switch profile</DropdownMenuLabel>
+                 <DropdownMenuSeparator />
+                 {profiles.map((profile) => (
+                   <DropdownMenuItem
+                     key={profile.id}
+                     onClick={() => setCurrentProfile(profile)}
+                     className="flex items-center gap-3 cursor-pointer"
+                   >
+                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground text-xs font-medium text-background">
+                       {profile.initials}
+                     </div>
+                     <div className="flex-1">
+                       <p className="text-sm font-medium">{profile.name}</p>
+                       <p className="text-xs text-muted-foreground">{profile.email}</p>
+                     </div>
+                     {currentProfile.id === profile.id && (
+                       <Check className="h-4 w-4 text-foreground" />
+                     )}
+                   </DropdownMenuItem>
+                 ))}
+                 <DropdownMenuSeparator />
+                 <DropdownMenuItem className="cursor-pointer text-muted-foreground">
+                   Add another account
+                 </DropdownMenuItem>
+               </DropdownMenuContent>
+             </DropdownMenu>
            </div>
          </div>
        </div>
