@@ -13,7 +13,7 @@ export default function LeadVaultNav() {
   const location = useLocation();
 
   return (
-    <div className="flex items-center gap-1 border-b mb-4">
+    <div className="flex shrink-0 items-center gap-1 border-b">
       {navItems.map((item) => {
         const isActive = 
           item.path === "/leads" 
