@@ -47,7 +47,7 @@ const Engagement = () => {
     <DashboardLayout>
       <div className="flex flex-col h-full overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between py-4 shrink-0">
+        <div className="flex items-center justify-between pb-4 shrink-0">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Engagement</h1>
             <p className="text-muted-foreground">Reply analytics and ESP performance metrics</p>

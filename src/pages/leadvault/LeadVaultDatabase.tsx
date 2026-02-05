@@ -83,7 +83,7 @@ export default function LeadVaultDatabase() {
         {/* Header - animated slide up when expanded */}
         <div className={cn(
           "transition-all duration-300 ease-out overflow-hidden",
-          isExpanded ? "max-h-0 opacity-0 py-0" : "max-h-24 opacity-100 py-4"
+          isExpanded ? "max-h-0 opacity-0 py-0" : "max-h-24 opacity-100 pb-4"
         )}>
           <div className="flex items-center justify-between">
             <div>
