@@ -1,15 +1,8 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { 
-  Search, Plus, ChevronDown, MoreHorizontal, Mail, MessageSquare, Phone,
-  TrendingUp, TrendingDown, Calendar, Clock, Users
-} from "lucide-react";
+import { Calendar, ChevronDown, ArrowLeft, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,205 +10,268 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-
-interface EngagementRecord {
-  id: string;
-  contact: string;
-  contactAvatar: string;
-  company: string;
-  emailsSent: number;
-  emailsOpened: number;
-  replies: number;
-  calls: number;
-  meetings: number;
-  lastTouch: string;
-  engagementScore: number;
-  status: "Hot" | "Warm" | "Cold" | "Unresponsive";
-}
-
-const engagementData: EngagementRecord[] = [
-  { id: "1", contact: "Sarah Chen", contactAvatar: "SC", company: "Acme Corp", emailsSent: 12, emailsOpened: 8, replies: 3, calls: 2, meetings: 1, lastTouch: "2h ago", engagementScore: 85, status: "Hot" },
-  { id: "2", contact: "Michael Brown", contactAvatar: "MB", company: "TechFlow", emailsSent: 8, emailsOpened: 5, replies: 2, calls: 1, meetings: 0, lastTouch: "1d ago", engagementScore: 65, status: "Warm" },
-  { id: "3", contact: "Jessica Lee", contactAvatar: "JL", company: "DataSync", emailsSent: 15, emailsOpened: 4, replies: 1, calls: 0, meetings: 0, lastTouch: "3d ago", engagementScore: 35, status: "Cold" },
-  { id: "4", contact: "David Kim", contactAvatar: "DK", company: "CloudNine", emailsSent: 6, emailsOpened: 4, replies: 2, calls: 1, meetings: 1, lastTouch: "5h ago", engagementScore: 78, status: "Hot" },
-  { id: "5", contact: "Emily Davis", contactAvatar: "ED", company: "Innovex", emailsSent: 10, emailsOpened: 6, replies: 2, calls: 0, meetings: 0, lastTouch: "2d ago", engagementScore: 52, status: "Warm" },
-  { id: "6", contact: "James Wilson", contactAvatar: "JW", company: "Nextera", emailsSent: 20, emailsOpened: 2, replies: 0, calls: 0, meetings: 0, lastTouch: "1w ago", engagementScore: 15, status: "Unresponsive" },
-  { id: "7", contact: "Amanda Martinez", contactAvatar: "AM", company: "Quantum Labs", emailsSent: 7, emailsOpened: 5, replies: 3, calls: 2, meetings: 1, lastTouch: "3h ago", engagementScore: 92, status: "Hot" },
-  { id: "8", contact: "Robert Taylor", contactAvatar: "RT", company: "Velocity", emailsSent: 11, emailsOpened: 3, replies: 1, calls: 0, meetings: 0, lastTouch: "4d ago", engagementScore: 28, status: "Cold" },
-];
-
-const statusColors = {
-  Hot: "bg-emerald-100 text-emerald-700",
-  Warm: "bg-amber-100 text-amber-700",
-  Cold: "bg-blue-100 text-blue-700",
-  Unresponsive: "bg-red-100 text-red-700",
-};
-
-const metrics = [
-  { label: "Total Touches", value: "2,847", change: "+12%", trend: "up" },
-  { label: "Avg Response Time", value: "4.2h", change: "-18%", trend: "up" },
-  { label: "Reply Rate", value: "24.3%", change: "+5%", trend: "up" },
-  { label: "Meeting Rate", value: "8.7%", change: "-2%", trend: "down" },
-];
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  Legend,
+} from "recharts";
+import {
+  weekdayReplyData,
+  hourlyReplyData,
+  dailyReplyTypeData,
+  hourlyReplyTypeData,
+  espReplyRates,
+} from "@/components/engagement/mockData";
 
 const Engagement = () => {
-  const [selected, setSelected] = useState<string[]>([]);
-  const [statusFilter, setStatusFilter] = useState<string>("All");
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
+  const [selectedReplyTypeDay, setSelectedReplyTypeDay] = useState<string | null>(null);
 
-  const filteredData = engagementData.filter(record => 
-    statusFilter === "All" || record.status === statusFilter
-  );
+  const handleDayClick = (data: { day: string }) => {
+    setSelectedDay(data.day);
+  };
+
+  const handleReplyTypeDayClick = (data: { date: string }) => {
+    if (hourlyReplyTypeData[data.date]) {
+      setSelectedReplyTypeDay(data.date);
+    }
+  };
 
   return (
     <DashboardLayout>
-      <div className="space-y-4">
+      <div className="flex flex-col h-full overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between py-4 shrink-0">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Engagement</h1>
-            <p className="text-muted-foreground">Track contact interactions and engagement levels</p>
+            <p className="text-muted-foreground">Reply analytics and ESP performance metrics</p>
           </div>
           <div className="flex items-center gap-2">
-            <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search contacts..." className="pl-9 h-9" />
-            </div>
-            <Button size="sm" className="gap-2">
-              <Plus className="h-4 w-4" />
-              Log Activity
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Last 10 Days
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem>Last 7 Days</DropdownMenuItem>
+                <DropdownMenuItem>Last 10 Days</DropdownMenuItem>
+                <DropdownMenuItem>Last 30 Days</DropdownMenuItem>
+                <DropdownMenuItem>Last 90 Days</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button variant="outline" size="sm" className="gap-2">
+              <Download className="h-4 w-4" />
+              Export
             </Button>
           </div>
         </div>
 
-        {/* Metrics */}
-        <div className="grid grid-cols-4 gap-4">
-          {metrics.map((metric) => (
-            <div key={metric.label} className="p-4 rounded-lg border bg-card">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{metric.label}</p>
-              <div className="flex items-baseline gap-2 mt-2">
-                <span className="text-2xl font-semibold">{metric.value}</span>
-                <span className={`text-xs font-medium flex items-center gap-0.5 ${metric.trend === 'up' ? 'text-emerald-600' : 'text-red-500'}`}>
-                  {metric.trend === 'up' ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                  {metric.change}
-                </span>
+        {/* Scrollable Content */}
+        <ScrollArea className="flex-1 min-h-0">
+          <div className="space-y-6 pr-4 pb-6">
+            {/* Section 1: Replies by Time */}
+            <div className="border border-border rounded-[10px] p-5">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-base font-semibold">Replies by Time</h2>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedDay
+                      ? `Hourly breakdown for ${selectedDay}`
+                      : "Average reply times by weekday • Click a bar to drill down"}
+                  </p>
+                </div>
+                {selectedDay && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedDay(null)}
+                    className="gap-1"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    Back to weekly
+                  </Button>
+                )}
+              </div>
+              <div className="h-[280px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  {selectedDay ? (
+                    <BarChart data={hourlyReplyData[selectedDay]} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                      <XAxis dataKey="hour" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+                      <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} width={40} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "hsl(var(--background))",
+                          border: "1px solid hsl(var(--border))",
+                          borderRadius: "8px",
+                          fontSize: "12px",
+                        }}
+                      />
+                      <Bar dataKey="replies" fill="hsl(var(--foreground))" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  ) : (
+                    <BarChart data={weekdayReplyData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                      <XAxis dataKey="day" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+                      <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} width={40} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "hsl(var(--background))",
+                          border: "1px solid hsl(var(--border))",
+                          borderRadius: "8px",
+                          fontSize: "12px",
+                        }}
+                      />
+                      <Bar
+                        dataKey="replies"
+                        fill="hsl(var(--foreground))"
+                        radius={[4, 4, 0, 0]}
+                        cursor="pointer"
+                        onClick={(data) => handleDayClick(data)}
+                      />
+                    </BarChart>
+                  )}
+                </ResponsiveContainer>
               </div>
             </div>
-          ))}
-        </div>
 
-        {/* Filter Tabs */}
-        <div className="flex items-center gap-1 border-b">
-          {["All", "Hot", "Warm", "Cold", "Unresponsive"].map((status) => (
-            <button
-              key={status}
-              onClick={() => setStatusFilter(status)}
-              className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
-                statusFilter === status ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {status}
-            </button>
-          ))}
-        </div>
+            {/* Section 2: Automated vs Human Replies */}
+            <div className="border border-border rounded-[10px] p-5">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-base font-semibold">Automated vs Human Replies</h2>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedReplyTypeDay
+                      ? `Hour by hour for ${selectedReplyTypeDay}`
+                      : "Day by day comparison • Click a point to see hourly breakdown"}
+                  </p>
+                </div>
+                {selectedReplyTypeDay && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedReplyTypeDay(null)}
+                    className="gap-1"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    Back to daily
+                  </Button>
+                )}
+              </div>
+              <div className="h-[280px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  {selectedReplyTypeDay ? (
+                    <BarChart
+                      data={hourlyReplyTypeData[selectedReplyTypeDay]}
+                      margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                      <XAxis dataKey="hour" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+                      <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} width={40} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "hsl(var(--background))",
+                          border: "1px solid hsl(var(--border))",
+                          borderRadius: "8px",
+                          fontSize: "12px",
+                        }}
+                      />
+                      <Legend wrapperStyle={{ fontSize: "12px" }} />
+                      <Bar dataKey="automated" name="Automated" fill="hsl(var(--foreground))" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="human" name="Human" fill="hsl(var(--muted-foreground))" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  ) : (
+                    <LineChart data={dailyReplyTypeData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                      <XAxis dataKey="date" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+                      <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} width={40} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "hsl(var(--background))",
+                          border: "1px solid hsl(var(--border))",
+                          borderRadius: "8px",
+                          fontSize: "12px",
+                        }}
+                      />
+                      <Legend wrapperStyle={{ fontSize: "12px" }} />
+                      <Line
+                        type="monotone"
+                        dataKey="automated"
+                        name="Automated"
+                        stroke="hsl(var(--foreground))"
+                        strokeWidth={2}
+                        dot={{ r: 4, cursor: "pointer" }}
+                        activeDot={{
+                          r: 6,
+                          onClick: (e: unknown, payload: unknown) => {
+                            const p = payload as { payload?: { date: string } };
+                            if (p.payload?.date) handleReplyTypeDayClick(p.payload);
+                          },
+                        }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="human"
+                        name="Human"
+                        stroke="hsl(var(--muted-foreground))"
+                        strokeWidth={2}
+                        dot={{ r: 4 }}
+                      />
+                    </LineChart>
+                  )}
+                </ResponsiveContainer>
+              </div>
+            </div>
 
-        {/* Table */}
-        <div className="border rounded-lg">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-10">
-                  <Checkbox />
-                </TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead>Company</TableHead>
-                <TableHead className="text-center">
-                  <div className="flex items-center justify-center gap-1">
-                    <Mail className="h-3.5 w-3.5" />
-                    Emails
-                  </div>
-                </TableHead>
-                <TableHead className="text-center">
-                  <div className="flex items-center justify-center gap-1">
-                    <MessageSquare className="h-3.5 w-3.5" />
-                    Replies
-                  </div>
-                </TableHead>
-                <TableHead className="text-center">
-                  <div className="flex items-center justify-center gap-1">
-                    <Phone className="h-3.5 w-3.5" />
-                    Calls
-                  </div>
-                </TableHead>
-                <TableHead className="text-center">
-                  <div className="flex items-center justify-center gap-1">
-                    <Users className="h-3.5 w-3.5" />
-                    Meetings
-                  </div>
-                </TableHead>
-                <TableHead>Engagement</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Last Touch</TableHead>
-                <TableHead className="w-10"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredData.map((record) => (
-                <TableRow key={record.id} className="hover:bg-muted/50">
-                  <TableCell>
-                    <Checkbox />
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Avatar className="h-7 w-7">
-                        <AvatarFallback className="text-xs">{record.contactAvatar}</AvatarFallback>
-                      </Avatar>
-                      <span className="font-medium">{record.contact}</span>
+            {/* Section 3: Reply Rate by ESP */}
+            <div>
+              <h2 className="text-base font-semibold mb-4">Reply Rate by ESP</h2>
+              <div className="grid grid-cols-2 gap-4">
+                {espReplyRates.map((esp) => (
+                  <div key={esp.name} className="border border-border rounded-[10px] p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-sm font-medium">{esp.name}</h3>
+                      <span className="text-lg font-semibold">{esp.avgRate}%</span>
                     </div>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">{record.company}</TableCell>
-                  <TableCell className="text-center">
-                    <span className="text-muted-foreground">{record.emailsOpened}/{record.emailsSent}</span>
-                  </TableCell>
-                  <TableCell className="text-center text-muted-foreground">{record.replies}</TableCell>
-                  <TableCell className="text-center text-muted-foreground">{record.calls}</TableCell>
-                  <TableCell className="text-center text-muted-foreground">{record.meetings}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Progress value={record.engagementScore} className="w-16 h-1.5" />
-                      <span className="text-sm font-medium">{record.engagementScore}</span>
+                    <div className="h-[140px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={esp.data} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
+                          <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} hide />
+                          <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} width={30} domain={[0, 40]} />
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: "hsl(var(--background))",
+                              border: "1px solid hsl(var(--border))",
+                              borderRadius: "8px",
+                              fontSize: "12px",
+                            }}
+                            formatter={(value: number) => [`${value}%`, "Reply Rate"]}
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey="rate"
+                            stroke="hsl(var(--foreground))"
+                            strokeWidth={2}
+                            dot={false}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={statusColors[record.status]}>{record.status}</Badge>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground text-sm">{record.lastTouch}</TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-7 w-7">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>View History</DropdownMenuItem>
-                        <DropdownMenuItem>Log Call</DropdownMenuItem>
-                        <DropdownMenuItem>Send Email</DropdownMenuItem>
-                        <DropdownMenuItem>Schedule Meeting</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </ScrollArea>
       </div>
     </DashboardLayout>
   );
