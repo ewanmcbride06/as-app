@@ -29,7 +29,7 @@ All colors MUST be HSL.
     --border: 0 0% 90%;
     --input: 0 0% 90%;
     --ring: 0 0% 4%;
-    --radius: 0.5rem;
+    --radius: 10px;
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 0 0% 26%;
     --sidebar-primary: 0 0% 10%;
@@ -84,18 +84,33 @@ All colors MUST be HSL.
 
 @layer components {
   .nav-tab {
-    @apply px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground;
+    @apply px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground rounded-[10px];
   }
   
   .nav-tab-active {
-    @apply bg-foreground text-background rounded-md;
+    @apply bg-foreground text-background rounded-[10px];
   }
   
   .stat-card {
-    @apply rounded-lg border border-border bg-card p-6 transition-shadow hover:shadow-md;
+    @apply rounded-[10px] border border-border bg-card p-6 transition-shadow hover:shadow-md;
   }
   
   .dashboard-container {
     @apply min-h-screen bg-background;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.7;
+      transform: scale(1.1);
+    }
+  }
+
+  .pulse-dot {
+    animation: pulse-dot 2s ease-in-out infinite;
   }
 }
