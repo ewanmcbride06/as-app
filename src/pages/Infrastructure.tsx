@@ -1,11 +1,10 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { 
-  Search, Plus, MoreHorizontal, Server, Mail, Globe, Shield, 
-  CheckCircle2, XCircle, AlertCircle, RefreshCw, Settings, Zap
+  Plus, MoreHorizontal, Mail, Globe, 
+  CheckCircle2, XCircle, AlertCircle, RefreshCw, Download, Upload
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -89,14 +88,22 @@ const Infrastructure = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-4">
+      <div className="flex flex-col h-full overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between py-4">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Infrastructure</h1>
             <p className="text-muted-foreground">Manage your sending domains and mailboxes</p>
           </div>
           <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" className="gap-2">
+              <Upload className="h-4 w-4" />
+              Import
+            </Button>
+            <Button variant="outline" size="sm" className="gap-2">
+              <Download className="h-4 w-4" />
+              Export
+            </Button>
             <Button variant="outline" size="sm" className="gap-2">
               <RefreshCw className="h-4 w-4" />
               Refresh Status
@@ -108,199 +115,194 @@ const Infrastructure = () => {
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-5 gap-4">
-          <div className="p-4 rounded-lg border bg-card">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Domains</p>
-            <p className="text-2xl font-semibold mt-2">{domains.length}</p>
-          </div>
-          <div className="p-4 rounded-lg border bg-card">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Active Mailboxes</p>
-            <p className="text-2xl font-semibold mt-2">{activeMailboxes}/{mailboxes.length}</p>
-          </div>
-          <div className="p-4 rounded-lg border bg-card">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Sent Today</p>
-            <p className="text-2xl font-semibold mt-2">{totalSentToday}</p>
-          </div>
-          <div className="p-4 rounded-lg border bg-card">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Daily Capacity</p>
-            <p className="text-2xl font-semibold mt-2">{totalDailyLimit}</p>
-          </div>
-          <div className="p-4 rounded-lg border bg-card">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Capacity Used</p>
-            <div className="flex items-center gap-2 mt-2">
-              <Progress value={(totalSentToday / totalDailyLimit) * 100} className="h-2" />
-              <span className="text-sm font-medium">{Math.round((totalSentToday / totalDailyLimit) * 100)}%</span>
-            </div>
-          </div>
-        </div>
-
         {/* Tabs */}
-        <div className="flex items-center gap-1 border-b">
+        <div className="flex items-center gap-1 mb-4">
           <button
             onClick={() => setActiveTab("domains")}
-            className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors flex items-center gap-2 ${
-              activeTab === "domains" ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
-            }`}
+            className={`nav-tab flex items-center gap-2 ${activeTab === "domains" ? "nav-tab-active" : ""}`}
           >
             <Globe className="h-4 w-4" />
             Domains
           </button>
           <button
             onClick={() => setActiveTab("mailboxes")}
-            className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors flex items-center gap-2 ${
-              activeTab === "mailboxes" ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
-            }`}
+            className={`nav-tab flex items-center gap-2 ${activeTab === "mailboxes" ? "nav-tab-active" : ""}`}
           >
             <Mail className="h-4 w-4" />
             Mailboxes
           </button>
         </div>
 
-        {/* Domains Table */}
-        {activeTab === "domains" && (
-          <div className="border rounded-lg">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Domain</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Health</TableHead>
-                  <TableHead className="text-center">DKIM</TableHead>
-                  <TableHead className="text-center">SPF</TableHead>
-                  <TableHead className="text-center">DMARC</TableHead>
-                  <TableHead className="text-right">Emails Sent</TableHead>
-                  <TableHead>Last Checked</TableHead>
-                  <TableHead className="w-10"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {domains.map((domain) => (
-                  <TableRow key={domain.id} className="hover:bg-muted/50">
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Globe className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-medium">{domain.domain}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="capitalize">{domain.type}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={statusColors[domain.status]}>{domain.status}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Progress value={domain.health} className="w-16 h-1.5" />
-                        <span className="text-sm">{domain.health}%</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {domain.dkim ? <CheckCircle2 className="h-4 w-4 text-emerald-600 mx-auto" /> : <XCircle className="h-4 w-4 text-red-500 mx-auto" />}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {domain.spf ? <CheckCircle2 className="h-4 w-4 text-emerald-600 mx-auto" /> : <XCircle className="h-4 w-4 text-red-500 mx-auto" />}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {domain.dmarc ? <CheckCircle2 className="h-4 w-4 text-emerald-600 mx-auto" /> : <AlertCircle className="h-4 w-4 text-amber-500 mx-auto" />}
-                    </TableCell>
-                    <TableCell className="text-right text-muted-foreground">{domain.emailsSent.toLocaleString()}</TableCell>
-                    <TableCell className="text-muted-foreground text-sm">{domain.lastChecked}</TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-7 w-7">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>View DNS Settings</DropdownMenuItem>
-                          <DropdownMenuItem>Check Health</DropdownMenuItem>
-                          <DropdownMenuItem>Manage Mailboxes</DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">Remove Domain</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        )}
+        {/* Main Content */}
+        <div className="flex-1 min-h-0 overflow-hidden border border-border rounded-[10px]">
+          <div className="flex flex-col h-full">
+            {/* Toolbar */}
+            <div className="border-b p-3 flex items-center justify-between bg-background shrink-0">
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-muted-foreground">
+                  <strong className="text-foreground">{domains.length}</strong> domains
+                  {" • "}
+                  <strong className="text-foreground">{activeMailboxes}/{mailboxes.length}</strong> active mailboxes
+                  {" • "}
+                  <strong className="text-foreground">{totalSentToday}/{totalDailyLimit}</strong> daily capacity used
+                </span>
+              </div>
 
-        {/* Mailboxes Table */}
-        {activeTab === "mailboxes" && (
-          <div className="border rounded-lg">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Domain</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Health</TableHead>
-                  <TableHead>Warmup</TableHead>
-                  <TableHead>Reputation</TableHead>
-                  <TableHead className="text-right">Sent Today</TableHead>
-                  <TableHead className="text-right">Daily Limit</TableHead>
-                  <TableHead>Last Activity</TableHead>
-                  <TableHead className="w-10"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {mailboxes.map((mailbox) => (
-                  <TableRow key={mailbox.id} className="hover:bg-muted/50">
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Mail className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-medium">{mailbox.email}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">{mailbox.domain}</TableCell>
-                    <TableCell>
-                      <Badge className={statusColors[mailbox.status]}>{mailbox.status}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Progress value={mailbox.health} className="w-16 h-1.5" />
-                        <span className="text-sm">{mailbox.health}%</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Progress value={mailbox.warmupProgress} className="w-16 h-1.5" />
-                        <span className="text-sm">{mailbox.warmupProgress}%</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className={`font-medium capitalize ${reputationColors[mailbox.reputation]}`}>
-                        {mailbox.reputation}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right font-medium">{mailbox.sentToday}</TableCell>
-                    <TableCell className="text-right text-muted-foreground">{mailbox.dailyLimit}</TableCell>
-                    <TableCell className="text-muted-foreground text-sm">{mailbox.lastActivity}</TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-7 w-7">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>View Details</DropdownMenuItem>
-                          <DropdownMenuItem>Adjust Limits</DropdownMenuItem>
-                          <DropdownMenuItem>Pause Sending</DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">Remove Mailbox</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="text-muted-foreground">Capacity:</span>
+                  <Progress value={(totalSentToday / totalDailyLimit) * 100} className="w-24 h-2" />
+                  <span className="font-medium">{Math.round((totalSentToday / totalDailyLimit) * 100)}%</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Domains Table */}
+            {activeTab === "domains" && (
+              <div className="flex-1 overflow-auto">
+                <Table>
+                  <TableHeader className="sticky top-0 bg-background z-10">
+                    <TableRow>
+                      <TableHead>Domain</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Health</TableHead>
+                      <TableHead className="text-center">DKIM</TableHead>
+                      <TableHead className="text-center">SPF</TableHead>
+                      <TableHead className="text-center">DMARC</TableHead>
+                      <TableHead className="text-right">Emails Sent</TableHead>
+                      <TableHead>Last Checked</TableHead>
+                      <TableHead className="w-10"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {domains.map((domain) => (
+                      <TableRow key={domain.id} className="hover:bg-muted/50">
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Globe className="h-4 w-4 text-muted-foreground" />
+                            <span className="font-medium">{domain.domain}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="capitalize">{domain.type}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={statusColors[domain.status]}>{domain.status}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Progress value={domain.health} className="w-16 h-1.5" />
+                            <span className="text-sm">{domain.health}%</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {domain.dkim ? <CheckCircle2 className="h-4 w-4 text-emerald-600 mx-auto" /> : <XCircle className="h-4 w-4 text-red-500 mx-auto" />}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {domain.spf ? <CheckCircle2 className="h-4 w-4 text-emerald-600 mx-auto" /> : <XCircle className="h-4 w-4 text-red-500 mx-auto" />}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {domain.dmarc ? <CheckCircle2 className="h-4 w-4 text-emerald-600 mx-auto" /> : <AlertCircle className="h-4 w-4 text-amber-500 mx-auto" />}
+                        </TableCell>
+                        <TableCell className="text-right text-muted-foreground">{domain.emailsSent.toLocaleString()}</TableCell>
+                        <TableCell className="text-muted-foreground text-sm">{domain.lastChecked}</TableCell>
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-7 w-7">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem>View DNS Settings</DropdownMenuItem>
+                              <DropdownMenuItem>Check Health</DropdownMenuItem>
+                              <DropdownMenuItem>Manage Mailboxes</DropdownMenuItem>
+                              <DropdownMenuItem className="text-destructive">Remove Domain</DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+
+            {/* Mailboxes Table */}
+            {activeTab === "mailboxes" && (
+              <div className="flex-1 overflow-auto">
+                <Table>
+                  <TableHeader className="sticky top-0 bg-background z-10">
+                    <TableRow>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Domain</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Health</TableHead>
+                      <TableHead>Warmup</TableHead>
+                      <TableHead>Reputation</TableHead>
+                      <TableHead className="text-right">Sent Today</TableHead>
+                      <TableHead className="text-right">Daily Limit</TableHead>
+                      <TableHead>Last Activity</TableHead>
+                      <TableHead className="w-10"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {mailboxes.map((mailbox) => (
+                      <TableRow key={mailbox.id} className="hover:bg-muted/50">
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Mail className="h-4 w-4 text-muted-foreground" />
+                            <span className="font-medium">{mailbox.email}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">{mailbox.domain}</TableCell>
+                        <TableCell>
+                          <Badge className={statusColors[mailbox.status]}>{mailbox.status}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Progress value={mailbox.health} className="w-16 h-1.5" />
+                            <span className="text-sm">{mailbox.health}%</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Progress value={mailbox.warmupProgress} className="w-16 h-1.5" />
+                            <span className="text-sm">{mailbox.warmupProgress}%</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <span className={`font-medium capitalize ${reputationColors[mailbox.reputation]}`}>
+                            {mailbox.reputation}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right font-medium">{mailbox.sentToday}</TableCell>
+                        <TableCell className="text-right text-muted-foreground">{mailbox.dailyLimit}</TableCell>
+                        <TableCell className="text-muted-foreground text-sm">{mailbox.lastActivity}</TableCell>
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-7 w-7">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem>View Details</DropdownMenuItem>
+                              <DropdownMenuItem>Adjust Limits</DropdownMenuItem>
+                              <DropdownMenuItem>Pause Sending</DropdownMenuItem>
+                              <DropdownMenuItem className="text-destructive">Remove Mailbox</DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </DashboardLayout>
   );
