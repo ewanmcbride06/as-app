@@ -64,9 +64,8 @@ const TopNav = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              className="rounded-[10px] bg-background shadow-md border-border"
+              className="rounded-[10px] bg-background border-border"
             >
-              <span className="h-2 w-2 rounded-full bg-foreground pulse-dot mr-2" />
               Documentation
             </Button>
             
