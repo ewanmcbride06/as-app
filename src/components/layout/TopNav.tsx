@@ -107,15 +107,13 @@ const TopNav = () => {
 
             {/* Profile */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-3 rounded-[10px] bg-muted px-3 py-1.5 transition-colors hover:bg-muted/80 focus:outline-none">
+              <DropdownMenuTrigger className="flex h-[38px] items-center gap-2 overflow-hidden rounded-[10px] bg-muted pl-3 transition-colors hover:bg-muted/80 focus:outline-none">
                 <span className="text-sm font-medium text-foreground">Benjamin Loki</span>
-                <div className="h-8 w-8 overflow-hidden rounded-[10px] bg-muted-foreground">
-                  <img 
-                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" 
-                    alt="Profile" 
-                    className="h-full w-full object-cover"
-                  />
-                </div>
+                <img 
+                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" 
+                  alt="Profile" 
+                  className="h-full w-auto rounded-r-[10px] object-cover"
+                />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 rounded-[10px]">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
