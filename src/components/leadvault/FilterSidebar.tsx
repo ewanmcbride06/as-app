@@ -4,127 +4,105 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
-
 interface FilterSectionProps {
   title: string;
   defaultOpen?: boolean;
   children: React.ReactNode;
 }
-
-function FilterSection({ title, defaultOpen = true, children }: FilterSectionProps) {
+function FilterSection({
+  title,
+  defaultOpen = true,
+  children
+}: FilterSectionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
-
-  return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="border-b">
+  return <Collapsible open={isOpen} onOpenChange={setIsOpen} className="border-b">
       <CollapsibleTrigger className="flex items-center justify-between w-full py-3 px-4 text-sm font-medium hover:bg-muted/50">
         {title}
         <ChevronDown className={cn("h-4 w-4 transition-transform", isOpen && "rotate-180")} />
       </CollapsibleTrigger>
-      <CollapsibleContent className="px-4 pb-4">
+      <CollapsibleContent className="px-0 py-0 pl-0 pt-0 pr-0 pb-0">
         {children}
       </CollapsibleContent>
-    </Collapsible>
-  );
+    </Collapsible>;
 }
-
 interface MultiSelectFilterProps {
   options: string[];
   selected: string[];
   onChange: (selected: string[]) => void;
 }
-
-function MultiSelectFilter({ options, selected, onChange }: MultiSelectFilterProps) {
+function MultiSelectFilter({
+  options,
+  selected,
+  onChange
+}: MultiSelectFilterProps) {
   const toggleOption = (option: string) => {
     if (selected.includes(option)) {
-      onChange(selected.filter((s) => s !== option));
+      onChange(selected.filter(s => s !== option));
     } else {
       onChange([...selected, option]);
     }
   };
-
-  return (
-    <div className="space-y-2 max-h-40 overflow-y-auto">
-      {options.map((option) => (
-        <label key={option} className="flex items-center gap-2 text-sm cursor-pointer">
-          <Checkbox
-            checked={selected.includes(option)}
-            onCheckedChange={() => toggleOption(option)}
-          />
+  return <div className="space-y-2 max-h-40 overflow-y-auto mx-[16px] my-[16px]">
+      {options.map(option => <label key={option} className="flex items-center gap-2 text-sm cursor-pointer">
+          <Checkbox checked={selected.includes(option)} onCheckedChange={() => toggleOption(option)} />
           {option}
-        </label>
-      ))}
-    </div>
-  );
+        </label>)}
+    </div>;
 }
-
 interface ChipSelectProps {
   options: string[];
   selected: string[];
   onChange: (selected: string[]) => void;
 }
-
-function ChipSelect({ options, selected, onChange }: ChipSelectProps) {
+function ChipSelect({
+  options,
+  selected,
+  onChange
+}: ChipSelectProps) {
   const toggleOption = (option: string) => {
     if (selected.includes(option)) {
-      onChange(selected.filter((s) => s !== option));
+      onChange(selected.filter(s => s !== option));
     } else {
       onChange([...selected, option]);
     }
   };
-
-  return (
-    <div className="flex flex-wrap gap-1.5">
-      {options.map((option) => (
-        <Badge
-          key={option}
-          variant={selected.includes(option) ? "default" : "outline"}
-          className="cursor-pointer text-xs"
-          onClick={() => toggleOption(option)}
-        >
+  return <div className="flex flex-wrap gap-1.5">
+      {options.map(option => <Badge key={option} variant={selected.includes(option) ? "default" : "outline"} className="cursor-pointer text-xs" onClick={() => toggleOption(option)}>
           {option}
-        </Badge>
-      ))}
-    </div>
-  );
+        </Badge>)}
+    </div>;
 }
-
 interface FilterSidebarProps {
   type: 'contacts' | 'companies';
   activeFilters: string[];
   onClearFilters: () => void;
 }
-
-export default function FilterSidebar({ type, activeFilters, onClearFilters }: FilterSidebarProps) {
+export default function FilterSidebar({
+  type,
+  activeFilters,
+  onClearFilters
+}: FilterSidebarProps) {
   const [industries, setIndustries] = useState<string[]>([]);
   const [companyTypes, setCompanyTypes] = useState<string[]>([]);
   const [employeeRange, setEmployeeRange] = useState<string[]>([]);
   const [seniority, setSeniority] = useState<string[]>([]);
   const [department, setDepartment] = useState<string[]>([]);
   const [emailStatus, setEmailStatus] = useState<string[]>([]);
-
   const industryOptions = ['SaaS', 'Fintech', 'Healthcare', 'E-commerce', 'Marketing', 'HR Tech', 'Cybersecurity', 'AI/ML', 'EdTech'];
   const companyTypeOptions = ['Startup', 'SMB', 'Mid-Market', 'Enterprise', 'Agency'];
   const employeeOptions = ['1-10', '11-50', '51-200', '201-500', '501-1000', '1000+'];
   const seniorityOptions = ['C-level', 'VP', 'Head', 'Director', 'Manager', 'IC'];
   const departmentOptions = ['Sales', 'Marketing', 'RevOps', 'Product', 'Operations', 'Finance', 'HR', 'Engineering'];
   const emailStatusOptions = ['Verified', 'Guessed', 'Unknown'];
-
-  return (
-    <div className="w-64 border-r bg-background flex flex-col h-full">
+  return <div className="w-64 border-r bg-background flex flex-col h-full">
       {/* Header */}
       <div className="p-4 border-b flex items-center justify-between">
         <h3 className="font-semibold text-sm">Filters</h3>
-        {activeFilters.length > 0 && (
-          <Badge variant="secondary" className="text-xs">
+        {activeFilters.length > 0 && <Badge variant="secondary" className="text-xs">
             {activeFilters.length} active
-          </Badge>
-        )}
+          </Badge>}
       </div>
 
       {/* Scrollable Filter Content */}
@@ -157,8 +135,7 @@ export default function FilterSidebar({ type, activeFilters, onClearFilters }: F
         </div>
 
         {/* Contact Filters - Only show for contacts */}
-        {type === 'contacts' && (
-          <div>
+        {type === 'contacts' && <div>
             <div className="px-4 py-2 bg-muted/50">
               <span className="text-xs font-semibold uppercase text-muted-foreground">Contact</span>
             </div>
@@ -178,8 +155,7 @@ export default function FilterSidebar({ type, activeFilters, onClearFilters }: F
             <FilterSection title="Email Status">
               <MultiSelectFilter options={emailStatusOptions} selected={emailStatus} onChange={setEmailStatus} />
             </FilterSection>
-          </div>
-        )}
+          </div>}
       </div>
 
       {/* Footer Actions */}
@@ -192,6 +168,5 @@ export default function FilterSidebar({ type, activeFilters, onClearFilters }: F
           Save Search
         </Button>
       </div>
-    </div>
-  );
+    </div>;
 }
