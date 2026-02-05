@@ -119,9 +119,15 @@ const TopNav = () => {
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild className="cursor-pointer rounded-[6px]">
-                  <Link to="/settings/team">
+                  <Link to="/settings">
                     <Settings className="h-4 w-4 mr-2" />
                     Settings
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer rounded-[6px]">
+                  <Link to="/settings/team">
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Invite Team
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
