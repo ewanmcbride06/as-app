@@ -29,22 +29,22 @@ export function ConversationDialog({
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8 rounded-[10px] hover:bg-muted"
+          className="h-7 w-7 text-muted-foreground hover:text-foreground"
         >
           <MessageSquare className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] p-0 rounded-[10px] overflow-hidden">
-        <DialogHeader className="px-4 py-3 border-b bg-muted/30">
-          <DialogTitle className="text-base font-medium">
+      <DialogContent className="sm:max-w-[480px] p-0 rounded-[10px] overflow-hidden">
+        <DialogHeader className="px-4 py-3 border-b">
+          <DialogTitle className="text-sm font-medium">
             Conversation with {inviteeName}
-            <span className="text-muted-foreground font-normal ml-2">
-              ({company})
+            <span className="text-muted-foreground font-normal ml-1.5">
+              • {company}
             </span>
           </DialogTitle>
         </DialogHeader>
-        <ScrollArea className="h-[400px] p-4">
-          <div className="space-y-3">
+        <ScrollArea className="h-[400px]">
+          <div className="p-4 space-y-3">
             {conversation.map((msg) => (
               <div
                 key={msg.id}
@@ -55,19 +55,16 @@ export function ConversationDialog({
               >
                 <div
                   className={cn(
-                    "max-w-[80%] px-4 py-2.5 rounded-2xl text-sm",
+                    "max-w-[75%] px-3 py-2 rounded-2xl text-sm",
                     msg.sender === "us"
-                      ? "bg-blue-500 text-white rounded-br-md"
-                      : "bg-muted text-foreground rounded-bl-md"
+                      ? "bg-foreground text-background rounded-br-sm"
+                      : "bg-muted text-foreground rounded-bl-sm"
                   )}
                 >
-                  <p>{msg.message}</p>
+                  <p className="leading-relaxed">{msg.message}</p>
                   <p
                     className={cn(
-                      "text-[10px] mt-1",
-                      msg.sender === "us"
-                        ? "text-blue-100"
-                        : "text-muted-foreground"
+                      "text-[10px] mt-1 opacity-60"
                     )}
                   >
                     {format(msg.timestamp, "MMM d, h:mm a")}

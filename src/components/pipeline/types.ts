@@ -35,32 +35,33 @@ export interface ConversationMessage {
   timestamp: Date;
 }
 
+// Use solid background colors for the status dots
 export const leadStatusColors: Record<LeadStatus, string> = {
-  "Potential": "border-blue-400 text-blue-600",
-  "Qualified": "border-green-400 text-green-600",
-  "Not Qualified": "border-muted-foreground text-muted-foreground",
-  "Won": "border-yellow-400 text-yellow-600",
-  "Lost - Not Interest": "border-red-400 text-red-600",
-  "Lost - Failed To Close": "border-red-400 text-red-600",
+  "Potential": "bg-blue-400",
+  "Qualified": "bg-green-500",
+  "Not Qualified": "bg-muted-foreground",
+  "Won": "bg-yellow-500",
+  "Lost - Not Interest": "bg-red-500",
+  "Lost - Failed To Close": "bg-red-500",
 };
 
 export const takenStatusColors: Record<TakenStatus, string> = {
-  "Upcoming": "border-muted-foreground text-muted-foreground",
-  "Shown": "border-green-400 text-green-600",
-  "Not Shown": "border-red-400 text-red-600",
+  "Upcoming": "bg-muted-foreground",
+  "Shown": "bg-green-500",
+  "Not Shown": "bg-red-500",
 };
 
 export const callStatusColors: Record<CallStatus, string> = {
-  "Booked": "border-green-400 text-green-600",
-  "Rescheduled": "border-yellow-400 text-yellow-600",
-  "No Show": "border-red-400 text-red-600",
-  "Completed": "border-blue-400 text-blue-600",
-  "Cancelled": "border-muted-foreground text-muted-foreground",
+  "Booked": "bg-green-500",
+  "Rescheduled": "bg-yellow-500",
+  "No Show": "bg-red-500",
+  "Completed": "bg-blue-500",
+  "Cancelled": "bg-muted-foreground",
 };
 
 export const billingStatusColors: Record<BillingStatus, string> = {
-  "Not Billed": "border-red-400 text-red-600",
-  "Billed": "border-green-400 text-green-600",
-  "Pending": "border-yellow-400 text-yellow-600",
-  "Refunded": "border-muted-foreground text-muted-foreground",
+  "Not Billed": "bg-red-500",
+  "Billed": "bg-green-500",
+  "Pending": "bg-yellow-500",
+  "Refunded": "bg-muted-foreground",
 };
