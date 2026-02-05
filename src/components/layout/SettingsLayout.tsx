@@ -18,6 +18,7 @@ interface SettingsLayoutProps {
 }
 
 const settingsNavItems = [
+  { name: "Settings", path: "/settings", icon: Settings },
   { name: "Team", path: "/settings/team", icon: Users },
   { name: "Integrations", path: "/settings/integrations", icon: Puzzle },
 ];
