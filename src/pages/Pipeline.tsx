@@ -198,8 +198,13 @@ const Pipeline = () => {
 
         {/* ─── Scrollable Content ─── */}
         <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide">
+          {/* ─── Background mask to hide content behind rounded corners ─── */}
+          <div className="sticky top-0 z-40 h-0">
+            <div className="absolute top-0 left-0 right-0 h-[42px] bg-background" />
+          </div>
+
           {/* ─── Column Headers (single, sticky at top) ─── */}
-          <div className="sticky top-0 z-30 flex items-center px-5 py-2.5 text-[11px] font-medium text-muted-foreground uppercase tracking-wider bg-background border border-border rounded-t-[10px] rounded-b-none border-b-0">
+          <div className="sticky top-0 z-50 flex items-center px-5 py-2.5 text-[11px] font-medium text-muted-foreground uppercase tracking-wider bg-background border border-border rounded-t-[10px] rounded-b-none border-b-0">
             <div className="w-[300px] shrink-0">Booking Information</div>
             <div className="flex-1">Lead Status</div>
             <div className="flex-1">Call Status</div>
@@ -210,8 +215,8 @@ const Pipeline = () => {
 
           {groupedMeetings.map(({ dateKey, date, meetings: dateMeetings }) => (
             <div key={date.toISOString()}>
-              {/* ─── Date Bar (sticky below column headers) ─── */}
-              <div className="sticky top-[38px] z-20 flex items-center justify-between px-5 py-1.5 bg-secondary border border-border rounded-b-[10px] rounded-t-none">
+              {/* ─── Date Bar (sticky below column headers, flush) ─── */}
+              <div className="sticky top-[37px] z-20 flex items-center justify-between px-5 py-1.5 bg-secondary border border-border rounded-b-[10px] rounded-t-none border-t-0">
                 <span className="text-[12px] font-medium text-muted-foreground">
                   {format(date, "EEEE, dd MMMM yyyy")}
                 </span>
