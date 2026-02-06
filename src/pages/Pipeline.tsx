@@ -144,42 +144,35 @@ const Pipeline = () => {
           ))}
         </div>
 
-        {/* Main Content with optional conversation panel */}
-        <div className="flex-1 min-h-0 overflow-hidden flex gap-0">
-          {/* Table */}
-          <div
-            className={`flex-1 min-w-0 border border-border rounded-[10px] flex flex-col overflow-hidden transition-all ${
-              conversationMeeting ? "mr-0 rounded-r-none border-r-0" : ""
-            }`}
-          >
-            <PipelineToolbar
-              totalCount={filteredMeetings.length}
-              selectedCount={selectedMeetings.length}
-              onClearSelection={() => setSelectedMeetings([])}
-            />
+        {/* Main Content */}
+        <div className="flex-1 min-h-0 overflow-hidden border border-border rounded-[10px] flex flex-col">
+          <PipelineToolbar
+            totalCount={filteredMeetings.length}
+            selectedCount={selectedMeetings.length}
+            onClearSelection={() => setSelectedMeetings([])}
+          />
 
-            <PipelineTable
-              groupedMeetings={groupedMeetings}
-              filteredCount={filteredMeetings.length}
-              selectedMeetings={selectedMeetings}
-              onToggleSelectAll={toggleSelectAll}
-              onToggleSelect={toggleSelect}
-              onUpdateStatus={handleUpdateStatus}
-              onOpenConversation={setConversationMeeting}
-            />
-          </div>
-
-          {/* Conversation Side Panel */}
-          {conversationMeeting && (
-            <div className="w-[360px] shrink-0 border border-border border-l-0 rounded-r-[10px] overflow-hidden">
-              <ConversationPanel
-                meeting={conversationMeeting}
-                onClose={() => setConversationMeeting(null)}
-              />
-            </div>
-          )}
+          <PipelineTable
+            groupedMeetings={groupedMeetings}
+            filteredCount={filteredMeetings.length}
+            selectedMeetings={selectedMeetings}
+            onToggleSelectAll={toggleSelectAll}
+            onToggleSelect={toggleSelect}
+            onUpdateStatus={handleUpdateStatus}
+            onOpenConversation={setConversationMeeting}
+          />
         </div>
       </div>
+
+      {/* Full-page conversation panel — fixed to right edge, full viewport height below nav */}
+      {conversationMeeting && (
+        <div className="fixed top-0 right-0 bottom-0 w-[380px] z-50 border-l border-border bg-background shadow-lg">
+          <ConversationPanel
+            meeting={conversationMeeting}
+            onClose={() => setConversationMeeting(null)}
+          />
+        </div>
+      )}
     </DashboardLayout>
   );
 };
