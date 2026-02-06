@@ -264,41 +264,58 @@ const Engagement = () => {
 
             {activeTab === "provider" && (
               <div className="grid grid-cols-2 gap-6">
-                {espReplyRates.map((esp) => (
-                  <div key={esp.name} className="border border-border rounded-[10px] p-5">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <h2 className="text-base font-semibold">{esp.name}</h2>
-                        <p className="text-sm text-muted-foreground">Average reply rate: {esp.avgRate}%</p>
+                {[...espReplyRates]
+                  .sort((a, b) => b.avgRate - a.avgRate)
+                  .map((esp, index) => {
+                    const rank = index + 1;
+                    const medalColors: Record<number, string> = {
+                      1: "bg-yellow-500/15 text-yellow-600",
+                      2: "bg-gray-300/20 text-gray-500",
+                      3: "bg-amber-700/15 text-amber-700",
+                    };
+                    const medalClass = medalColors[rank] || "bg-muted text-muted-foreground";
+
+                    return (
+                      <div key={esp.name} className="border border-border rounded-[10px] p-5">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2.5">
+                            <span className={cn("flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold", medalClass)}>
+                              {rank}
+                            </span>
+                            <div>
+                              <h2 className="text-base font-semibold">{esp.name}</h2>
+                              <p className="text-sm text-muted-foreground">Average reply rate: {esp.avgRate}%</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="h-[280px]">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={esp.data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                              <XAxis dataKey="date" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+                              <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} width={40} domain={[0, 40]} />
+                              <Tooltip
+                                contentStyle={{
+                                  backgroundColor: "hsl(var(--background))",
+                                  border: "1px solid hsl(var(--border))",
+                                  borderRadius: "8px",
+                                  fontSize: "12px",
+                                }}
+                                formatter={(value: number) => [`${value}%`, "Reply Rate"]}
+                              />
+                              <Line
+                                type="monotone"
+                                dataKey="rate"
+                                stroke="hsl(var(--foreground))"
+                                strokeWidth={2}
+                                dot={false}
+                              />
+                            </LineChart>
+                          </ResponsiveContainer>
+                        </div>
                       </div>
-                    </div>
-                    <div className="h-[280px]">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={esp.data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                          <XAxis dataKey="date" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
-                          <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} width={40} domain={[0, 40]} />
-                          <Tooltip
-                            contentStyle={{
-                              backgroundColor: "hsl(var(--background))",
-                              border: "1px solid hsl(var(--border))",
-                              borderRadius: "8px",
-                              fontSize: "12px",
-                            }}
-                            formatter={(value: number) => [`${value}%`, "Reply Rate"]}
-                          />
-                          <Line
-                            type="monotone"
-                            dataKey="rate"
-                            stroke="hsl(var(--foreground))"
-                            strokeWidth={2}
-                            dot={false}
-                          />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </div>
-                ))}
+                    );
+                  })}
               </div>
             )}
           </div>
