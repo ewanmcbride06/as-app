@@ -269,7 +269,7 @@ const Pipeline = () => {
               )}
 
               {/* Booking Cards */}
-              <div className="space-y-4">
+              <div className="space-y-4 mt-3">
                 {dateMeetings.map((meeting) => (
                   <div key={meeting.id} className="border border-border rounded-[10px] overflow-hidden">
                     {/* Main Row */}
