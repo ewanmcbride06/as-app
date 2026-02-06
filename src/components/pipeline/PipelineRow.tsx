@@ -1,10 +1,8 @@
-import { useState } from "react";
 import { format } from "date-fns";
-import { Copy, MessageSquare, ChevronDown } from "lucide-react";
+import { Copy, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { StatusDropdown } from "./StatusDropdown";
-import { cn } from "@/lib/utils";
 
 import {
   Meeting,
@@ -61,15 +59,10 @@ export function PipelineRow({
   onUpdateStatus,
   onOpenConversation,
 }: PipelineRowProps) {
-  const [expanded, setExpanded] = useState(false);
-
   return (
     <div className="border-b border-border last:border-b-0">
       {/* Main Row */}
-      <div
-        className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-muted/30 transition-colors group"
-        onClick={() => setExpanded(!expanded)}
-      >
+      <div className="flex items-center gap-3 px-5 py-4">
         {/* Checkbox */}
         <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
           <Checkbox
@@ -79,17 +72,17 @@ export function PipelineRow({
         </div>
 
         {/* Date block */}
-        <div className="w-[52px] shrink-0 text-center">
+        <div className="w-[56px] shrink-0 text-center">
           <div className="text-[11px] text-muted-foreground leading-none">
             {format(meeting.meetingDate, "EEE")}
           </div>
-          <div className="text-base font-semibold leading-tight">
+          <div className="text-lg font-semibold leading-tight">
             {format(meeting.meetingDate, "dd")}
           </div>
         </div>
 
         {/* Name & company */}
-        <div className="min-w-[160px] flex-[1.5]">
+        <div className="min-w-[170px] flex-[1.5]">
           <div className="font-medium text-sm leading-tight">
             {meeting.inviteeName}
           </div>
@@ -152,70 +145,58 @@ export function PipelineRow({
             {meeting.meetingTime}
           </span>
         </div>
-
-        {/* Expand indicator */}
-        <div className="w-[20px] shrink-0 flex items-center justify-center">
-          <ChevronDown
-            className={cn(
-              "h-3.5 w-3.5 text-muted-foreground transition-transform",
-              expanded && "rotate-180"
-            )}
-          />
-        </div>
       </div>
 
-      {/* Expanded Detail Row */}
-      {expanded && (
-        <div className="flex items-center justify-between px-4 py-2.5 bg-muted/20 border-t border-border">
-          <div className="flex items-center gap-1.5 text-[12px] text-muted-foreground flex-wrap">
-            <span>
-              Booked on:{" "}
-              <span className="text-foreground/70">
-                {format(meeting.bookedAt, "EEEE dd MMM yyyy 'at' h:mm a")}
-              </span>
+      {/* Detail Row — always visible */}
+      <div className="flex items-center justify-between px-5 pb-4 pt-0">
+        <div className="flex items-center gap-1.5 text-[12px] text-muted-foreground flex-wrap">
+          <span>
+            Booked on:{" "}
+            <span className="text-foreground/70">
+              {format(meeting.bookedAt, "EEEE dd MMM yyyy 'at' h:mm a")}
             </span>
-            <span className="mx-1">·</span>
-            <span>
-              Invitees:{" "}
-              <span className="text-foreground/70">{meeting.inviteeEmail}</span>
+          </span>
+          <span className="mx-1">·</span>
+          <span>
+            Invitees:{" "}
+            <span className="text-foreground/70">{meeting.inviteeEmail}</span>
+          </span>
+          <span className="mx-1">·</span>
+          <span>
+            No. of Reschedules{" "}
+            <span className="text-foreground/70">
+              {meeting.rescheduleCount}
             </span>
-            <span className="mx-1">·</span>
-            <span>
-              No. of Reschedules{" "}
-              <span className="text-foreground/70">
-                {meeting.rescheduleCount}
-              </span>
-            </span>
-            <span className="mx-1">·</span>
-            <span>
-              Call Stage:{" "}
-              <span className="text-foreground/70">{meeting.callStage}</span>
-            </span>
-          </div>
-
-          {/* Actions */}
-          <div
-            className="flex items-center gap-0.5 shrink-0"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7 text-muted-foreground hover:text-foreground"
-            >
-              <Copy className="h-3.5 w-3.5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7 text-muted-foreground hover:text-foreground"
-              onClick={() => onOpenConversation(meeting)}
-            >
-              <MessageSquare className="h-3.5 w-3.5" />
-            </Button>
-          </div>
+          </span>
+          <span className="mx-1">·</span>
+          <span>
+            Call Stage:{" "}
+            <span className="text-foreground/70">{meeting.callStage}</span>
+          </span>
         </div>
-      )}
+
+        {/* Actions */}
+        <div
+          className="flex items-center gap-0.5 shrink-0"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 text-muted-foreground hover:text-foreground"
+          >
+            <Copy className="h-3.5 w-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 text-muted-foreground hover:text-foreground"
+            onClick={() => onOpenConversation(meeting)}
+          >
+            <MessageSquare className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
