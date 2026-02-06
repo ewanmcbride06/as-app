@@ -26,16 +26,16 @@ export function StatusDropdown<T extends string>({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="inline-flex items-center gap-2 px-3 py-1 text-xs font-medium rounded-[10px] border border-border bg-background hover:bg-muted/50 transition-colors"
+          className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-[10px] border border-border bg-background hover:bg-muted/50 transition-colors"
         >
           <span
             className={cn(
-              "w-2 h-2 rounded-full",
+              "w-2 h-2 rounded-full shrink-0",
               currentColor
             )}
           />
-          <span className="text-foreground">{value}</span>
-          <ChevronDown className="h-3 w-3 text-muted-foreground" />
+          <span className="text-foreground whitespace-nowrap">{value}</span>
+          <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="min-w-[180px]">
