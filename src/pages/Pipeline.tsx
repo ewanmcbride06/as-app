@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { format, isToday, isThisWeek, isThisMonth } from "date-fns";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Search, Filter, Calendar, ChevronDown, Plus, Copy, MessageSquare } from "lucide-react";
@@ -63,6 +63,31 @@ const Pipeline = () => {
   const [dateFilter, setDateFilter] = useState<DateFilter>("all");
   const { openConversation } = useConversationPanel();
   const { toast } = useToast();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeDateIndex, setActiveDateIndex] = useState(0);
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const groups = container.querySelectorAll<HTMLDivElement>("[data-date-label]");
+      let currentIndex = 0;
+
+      groups.forEach((el, i) => {
+        const rect = el.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        if (rect.top - containerRect.top <= 70) {
+          currentIndex = i;
+        }
+      });
+
+      setActiveDateIndex((prev) => (prev !== currentIndex ? currentIndex : prev));
+    };
+
+    container.addEventListener("scroll", handleScroll, { passive: true });
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const filteredMeetings = useMemo(() => {
     return meetings.filter((m) => {
@@ -197,26 +222,42 @@ const Pipeline = () => {
         </div>
 
         {/* ─── Scrollable Content ─── */}
-        <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide">
+        <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto scrollbar-hide">
           {/* ─── Background mask to hide content behind rounded corners ─── */}
           <div className="sticky top-0 z-40 h-0">
-            <div className="absolute top-0 left-0 right-0 h-[42px] bg-background" />
+            <div className="absolute top-0 left-0 right-0 h-[60px] bg-background" />
           </div>
 
-          {/* ─── Column Headers (single, sticky at top) ─── */}
-          <div className="sticky top-0 z-50 flex items-center px-5 py-2.5 text-[11px] font-medium text-muted-foreground uppercase tracking-wider bg-background border border-border rounded-t-[10px] rounded-b-none border-b-0">
-            <div className="w-[300px] shrink-0">Booking Information</div>
-            <div className="flex-1">Lead Status</div>
-            <div className="flex-1">Call Status</div>
-            <div className="flex-1">Taken Status</div>
-            <div className="flex-1">Billing Status</div>
-            <div className="w-[100px] shrink-0 text-right">Time of Call</div>
+          {/* ─── Sticky Header Block: Column Headers + Date Bar ─── */}
+          <div className="sticky top-0 z-50 border border-border rounded-[10px] overflow-hidden">
+            {/* Column Labels */}
+            <div className="flex items-center px-5 py-2.5 text-[11px] font-medium text-muted-foreground uppercase tracking-wider bg-background">
+              <div className="w-[300px] shrink-0">Booking Information</div>
+              <div className="flex-1">Lead Status</div>
+              <div className="flex-1">Call Status</div>
+              <div className="flex-1">Taken Status</div>
+              <div className="flex-1">Billing Status</div>
+              <div className="w-[100px] shrink-0 text-right">Time of Call</div>
+            </div>
+            {/* Sticky Date Bar — always shows the current group's date */}
+            <div className="flex items-center justify-between px-5 py-1.5 bg-secondary border-t border-border">
+              <span className="text-[12px] font-medium text-muted-foreground">
+                {groupedMeetings.length > 0
+                  ? format(groupedMeetings[activeDateIndex]?.date ?? groupedMeetings[0].date, "EEEE, dd MMMM yyyy")
+                  : "No meetings"}
+              </span>
+              <span className="text-[11px] text-muted-foreground tabular-nums">
+                {groupedMeetings.length > 0
+                  ? `${(groupedMeetings[activeDateIndex] ?? groupedMeetings[0]).meetings.length} ${(groupedMeetings[activeDateIndex] ?? groupedMeetings[0]).meetings.length === 1 ? "meeting" : "meetings"}`
+                  : ""}
+              </span>
+            </div>
           </div>
 
-          {groupedMeetings.map(({ dateKey, date, meetings: dateMeetings }) => (
-            <div key={date.toISOString()}>
-              {/* ─── Date Bar (sticky below column headers, flush) ─── */}
-              <div className="sticky top-[37px] z-20 flex items-center justify-between px-5 py-1.5 bg-secondary border border-border rounded-b-[10px] rounded-t-none border-t-0">
+          {groupedMeetings.map(({ dateKey, date, meetings: dateMeetings }, index) => (
+            <div key={date.toISOString()} data-date-label={format(date, "EEEE, dd MMMM yyyy")} data-date-count={`${dateMeetings.length} ${dateMeetings.length === 1 ? "meeting" : "meetings"}`}>
+              {/* ─── Inline Date Header (non-sticky, fully rounded) ─── */}
+              <div className="flex items-center justify-between px-5 py-1.5 bg-secondary border border-border rounded-[10px] mt-3 mb-2">
                 <span className="text-[12px] font-medium text-muted-foreground">
                   {format(date, "EEEE, dd MMMM yyyy")}
                 </span>
@@ -226,7 +267,7 @@ const Pipeline = () => {
               </div>
 
               {/* Booking Cards */}
-              <div className="py-3 space-y-4">
+              <div className="space-y-4">
                 {dateMeetings.map((meeting) => (
                   <div key={meeting.id} className="border border-border rounded-[10px] overflow-hidden">
                     {/* Main Row */}
