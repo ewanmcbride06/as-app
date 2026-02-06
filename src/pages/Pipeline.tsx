@@ -1,9 +1,9 @@
 import { useState, useMemo } from "react";
-import { format } from "date-fns";
+import { format, isToday, isThisWeek, isThisMonth } from "date-fns";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { PipelineToolbar } from "@/components/pipeline/PipelineToolbar";
+import { PipelineToolbar, LeadFilter, DateFilter } from "@/components/pipeline/PipelineToolbar";
 import { PipelineTable } from "@/components/pipeline/PipelineTable";
 import { mockMeetings } from "@/components/pipeline/mockData";
 import { Meeting } from "@/components/pipeline/types";
@@ -16,17 +16,35 @@ const Pipeline = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMeetings, setSelectedMeetings] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<"booked" | "analytics" | "connections">("booked");
+  const [leadFilter, setLeadFilter] = useState<LeadFilter>("all");
+  const [dateFilter, setDateFilter] = useState<DateFilter>("all");
   const { openConversation } = useConversationPanel();
   const { toast } = useToast();
 
   const filteredMeetings = useMemo(() => {
-    return meetings.filter(
-      (m) =>
+    return meetings.filter((m) => {
+      // Search filter
+      const matchesSearch =
         m.inviteeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         m.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        m.inviteeEmail.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [meetings, searchQuery]);
+        m.inviteeEmail.toLowerCase().includes(searchQuery.toLowerCase());
+
+      // Lead status filter
+      const matchesLead = leadFilter === "all" || m.leadStatus === leadFilter;
+
+      // Date filter
+      let matchesDate = true;
+      if (dateFilter === "today") {
+        matchesDate = isToday(m.meetingDate);
+      } else if (dateFilter === "this_week") {
+        matchesDate = isThisWeek(m.meetingDate, { weekStartsOn: 1 });
+      } else if (dateFilter === "this_month") {
+        matchesDate = isThisMonth(m.meetingDate);
+      }
+
+      return matchesSearch && matchesLead && matchesDate;
+    });
+  }, [meetings, searchQuery, leadFilter, dateFilter]);
 
   const groupedMeetings = useMemo(() => {
     const groups: Record<string, Meeting[]> = {};
@@ -131,12 +149,16 @@ const Pipeline = () => {
           ))}
         </div>
 
-        {/* Toolbar + Cards */}
-        <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
+        {/* Toolbar + Table */}
+        <div className="flex-1 min-h-0 overflow-hidden flex flex-col border border-border rounded-[10px]">
           <PipelineToolbar
             totalCount={filteredMeetings.length}
             selectedCount={selectedMeetings.length}
             onClearSelection={() => setSelectedMeetings([])}
+            leadFilter={leadFilter}
+            dateFilter={dateFilter}
+            onLeadFilterChange={setLeadFilter}
+            onDateFilterChange={setDateFilter}
           />
 
           <PipelineTable
