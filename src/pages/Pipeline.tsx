@@ -196,30 +196,28 @@ const Pipeline = () => {
           </div>
         </div>
 
-        {/* ─── Scrollable Content (includes sticky column headers) ─── */}
+        {/* ─── Scrollable Content ─── */}
         <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide">
+          {/* ─── Column Headers (single, sticky at top) ─── */}
+          <div className="sticky top-0 z-30 flex items-center px-5 py-2.5 text-[11px] font-medium text-muted-foreground uppercase tracking-wider bg-muted border border-border">
+            <div className="w-[300px] shrink-0">Booking Information</div>
+            <div className="flex-1">Lead Status</div>
+            <div className="flex-1">Call Status</div>
+            <div className="flex-1">Taken Status</div>
+            <div className="flex-1">Billing Status</div>
+            <div className="w-[100px] shrink-0 text-right">Time of Call</div>
+          </div>
+
           {groupedMeetings.map(({ dateKey, date, meetings: dateMeetings }) => (
             <div key={date.toISOString()}>
-              {/* ─── Unified Sticky Header: Columns + Date ─── */}
-              <div className="sticky top-0 z-20">
-                {/* Column Labels */}
-                <div className="flex items-center px-5 py-2 text-[11px] font-medium text-muted-foreground uppercase tracking-wider bg-background border-b border-border">
-                  <div className="w-[300px] shrink-0">Booking Information</div>
-                  <div className="flex-1">Lead Status</div>
-                  <div className="flex-1">Call Status</div>
-                  <div className="flex-1">Taken Status</div>
-                  <div className="flex-1">Billing Status</div>
-                  <div className="w-[100px] shrink-0 text-right">Time of Call</div>
-                </div>
-                {/* Date Bar */}
-                <div className="flex items-center justify-between px-5 py-1.5 bg-secondary border-b border-border">
-                  <span className="text-[12px] font-medium text-muted-foreground">
-                    {format(date, "EEEE, dd MMMM yyyy")}
-                  </span>
-                  <span className="text-[11px] text-muted-foreground tabular-nums">
-                    {dateMeetings.length} {dateMeetings.length === 1 ? "meeting" : "meetings"}
-                  </span>
-                </div>
+              {/* ─── Date Bar (sticky below column headers) ─── */}
+              <div className="sticky top-[37px] z-20 flex items-center justify-between px-5 py-1.5 bg-secondary border-x border-b border-border">
+                <span className="text-[12px] font-medium text-muted-foreground">
+                  {format(date, "EEEE, dd MMMM yyyy")}
+                </span>
+                <span className="text-[11px] text-muted-foreground tabular-nums">
+                  {dateMeetings.length} {dateMeetings.length === 1 ? "meeting" : "meetings"}
+                </span>
               </div>
 
               {/* Booking Cards */}
