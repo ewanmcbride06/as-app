@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { format, isToday, isThisWeek, isThisMonth } from "date-fns";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Search, Filter, Calendar, ChevronDown, MessageSquare, CalendarDays, BarChart3, Link2 } from "lucide-react";
+import { Search, Filter, Calendar, ChevronDown, MessageSquare, CalendarDays, BarChart3, Link2, Hash, X } from "lucide-react";
 import { TimezoneSelector } from "@/components/pipeline/TimezoneSelector";
 import { getLocalTimezone, formatTimeInTimezone } from "@/components/pipeline/timezones";
 import { Input } from "@/components/ui/input";
@@ -64,6 +64,8 @@ const Pipeline = () => {
   const [leadFilter, setLeadFilter] = useState<LeadFilter>("all");
   const [dateFilter, setDateFilter] = useState<DateFilter>("all");
   const [timezone, setTimezone] = useState<string>(getLocalTimezone());
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const { openConversation } = useConversationPanel();
   const { toast } = useToast();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -171,21 +173,12 @@ const Pipeline = () => {
           </div>
         </div>
 
-        {/* ─── Search & Controls Bar ─── */}
-        <div className="flex items-center gap-3 mb-5 shrink-0">
-          <div className="inline-flex items-center h-9 px-4 text-xs font-medium border border-border rounded-[10px] bg-background shrink-0">
+        {/* ─── Controls Bar ─── */}
+        <div className="flex items-center gap-2 mb-5 shrink-0">
+          <Button variant="outline" size="sm" className="gap-2 h-9 px-3 text-xs pointer-events-none">
+            <Hash className="h-3.5 w-3.5" />
             Total: {filteredMeetings.length}
-          </div>
-
-          <div className="relative flex-1 max-w-xl">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search for meetings by invitee or company name"
-              className="pl-9 h-9 text-xs"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
+          </Button>
 
           <div className="flex items-center gap-2 ml-auto">
             <TimezoneSelector value={timezone} onChange={setTimezone} />
@@ -230,6 +223,48 @@ const Pipeline = () => {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
+
+            {/* Expandable Search */}
+            <div className="relative flex items-center">
+              {searchOpen ? (
+                <div className="flex items-center gap-1 animate-fade-in">
+                  <div className="relative">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                    <Input
+                      ref={searchInputRef}
+                      placeholder="Search meetings..."
+                      className="pl-8 h-9 w-[240px] text-xs"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onBlur={() => {
+                        if (!searchQuery) setSearchOpen(false);
+                      }}
+                      autoFocus
+                    />
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9 shrink-0"
+                    onClick={() => {
+                      setSearchQuery("");
+                      setSearchOpen(false);
+                    }}
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className={cn("h-9 w-9", searchQuery && "border-foreground/30")}
+                  onClick={() => setSearchOpen(true)}
+                >
+                  <Search className="h-3.5 w-3.5" />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 
