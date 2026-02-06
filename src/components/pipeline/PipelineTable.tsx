@@ -108,15 +108,14 @@ export function PipelineTable({
                 onCheckedChange={onToggleSelectAll}
               />
             </TableHead>
-            <TableHead className="w-8" />
             <TableHead className="w-[70px]">Date</TableHead>
             <TableHead className="min-w-[180px]">Booking Info</TableHead>
             <TableHead>Lead Status</TableHead>
             <TableHead>Call Status</TableHead>
             <TableHead>Taken</TableHead>
             <TableHead>Billing</TableHead>
-            <TableHead className="w-[80px]">Time</TableHead>
-            <TableHead className="w-[70px]" />
+            <TableHead className="w-[100px]">Time</TableHead>
+            <TableHead className="w-[90px]" />
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -127,7 +126,7 @@ export function PipelineTable({
                 key={date.toISOString()}
                 className="bg-muted/30 hover:bg-muted/30"
               >
-                <TableCell colSpan={10} className="py-1.5 pl-4">
+                <TableCell colSpan={9} className="py-1.5 pl-4">
                   <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
                     {format(date, "EEEE, dd MMMM yyyy")}
                   </span>
@@ -155,13 +154,6 @@ export function PipelineTable({
                           checked={selectedMeetings.includes(meeting.id)}
                           onCheckedChange={() => onToggleSelect(meeting.id)}
                         />
-                      </TableCell>
-                      <TableCell className="px-0">
-                        {isExpanded ? (
-                          <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-                        ) : (
-                          <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
-                        )}
                       </TableCell>
                       <TableCell>
                         <div className="text-center">
@@ -224,27 +216,34 @@ export function PipelineTable({
                         />
                       </TableCell>
                       <TableCell>
-                        <span className="text-sm font-medium tabular-nums">
+                        <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium tabular-nums border border-border rounded-[10px] bg-background">
                           {meeting.meetingTime}
                         </span>
                       </TableCell>
                       <TableCell onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 text-muted-foreground hover:text-foreground"
-                          >
-                            <Copy className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 text-muted-foreground hover:text-foreground"
-                            onClick={() => onOpenConversation(meeting)}
-                          >
-                            <MessageSquare className="h-3.5 w-3.5" />
-                          </Button>
+                        <div className="flex items-center gap-0.5">
+                          <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                            >
+                              <Copy className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                              onClick={() => onOpenConversation(meeting)}
+                            >
+                              <MessageSquare className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                          {isExpanded ? (
+                            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                          ) : (
+                            <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -255,7 +254,7 @@ export function PipelineTable({
                         key={`${meeting.id}-timeline`}
                         className="hover:bg-transparent"
                       >
-                        <TableCell colSpan={10} className="p-0">
+                        <TableCell colSpan={9} className="p-0">
                           <BookingTimeline meeting={meeting} />
                         </TableCell>
                       </TableRow>
