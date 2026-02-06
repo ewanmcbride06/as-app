@@ -9,7 +9,6 @@ interface BookingTimelineProps {
 interface TimelineEvent {
   label: string;
   detail: string;
-  time: string;
   dotColor?: string;
 }
 
@@ -19,8 +18,7 @@ export function BookingTimeline({ meeting }: BookingTimelineProps) {
   // Meeting booked
   events.push({
     label: "Meeting Booked",
-    detail: `by ${meeting.bookedBy} · Calendar: ${meeting.calendar} · Closer: ${meeting.closer}`,
-    time: format(meeting.bookedAt, "dd MMM yyyy 'at' HH:mm"),
+    detail: `${format(meeting.bookedAt, "dd MMM yyyy 'at' HH:mm")} · ${meeting.bookedBy}`,
     dotColor: "bg-green-500",
   });
 
@@ -30,7 +28,6 @@ export function BookingTimeline({ meeting }: BookingTimelineProps) {
       events.push({
         label: "Meeting Rescheduled",
         detail: `Reschedule ${i + 1} of ${meeting.rescheduleCount}`,
-        time: "During booking lifecycle",
         dotColor: "bg-yellow-500",
       });
     }
@@ -41,66 +38,75 @@ export function BookingTimeline({ meeting }: BookingTimelineProps) {
     events.push({
       label: "Meeting Cancelled",
       detail: "Meeting was cancelled",
-      time: "",
       dotColor: "bg-red-500",
     });
   }
 
   // Current statuses
-  const statusChanges = [
-    { label: "Lead Status", value: meeting.leadStatus, color: "bg-blue-400" },
-    { label: "Call Status", value: meeting.callStatus, color: "bg-blue-500" },
-    { label: "Taken", value: meeting.takenStatus, color: "bg-muted-foreground" },
-    { label: "Billing", value: meeting.billingStatus, color: "bg-muted-foreground" },
-  ];
-
-  statusChanges.forEach(({ label, value, color }) => {
-    events.push({
-      label,
-      detail: value,
-      time: "Current",
-      dotColor: color,
-    });
+  events.push({
+    label: "Lead Status",
+    detail: meeting.leadStatus,
+    dotColor: "bg-blue-400",
+  });
+  events.push({
+    label: "Call Status",
+    detail: `${meeting.callStatus} · Calendar: ${meeting.calendar}`,
+    dotColor: "bg-blue-500",
+  });
+  events.push({
+    label: "Taken",
+    detail: meeting.takenStatus,
+    dotColor: "bg-muted-foreground",
+  });
+  events.push({
+    label: "Billing",
+    detail: `${meeting.billingStatus} · Closer: ${meeting.closer}`,
+    dotColor: "bg-muted-foreground",
   });
 
+  // Layout math to align with the card's flex layout:
+  // Card has p-5 (20px) with: checkbox(20px) + gap(16px) + date(50px) + gap(16px) + bookingInfo
+  // Date center = 20px + 20px + 16px + 25px = 81px from card left edge
+  // Booking info starts at = 20px + 20px + 16px + 50px + 16px = 122px from card left edge
+  const dotCenterOffset = 81; // px from left edge of card, center of date column
+  const textStartOffset = 122; // px from left edge of card, aligned with booking info
+
   return (
-    <div className="border-t border-border bg-muted/30 rounded-b-[10px] px-4 py-3">
-      {/* Offset to align under the Booking Info column: checkbox(w-8) + gap(16px) + date(w-60) + gap(16px) = ~116px */}
-      <div style={{ marginLeft: "108px" }}>
-        <div className="relative pl-5 max-w-2xl">
-          {events.map((event, idx) => (
-            <div key={idx} className="relative pb-2.5 last:pb-0">
-              {/* Vertical line */}
-              {idx < events.length - 1 && (
-                <div className="absolute left-[5px] top-4 bottom-0 w-px bg-border" />
-              )}
-              {/* Dot */}
+    <div className="border-t border-border bg-muted/30 rounded-b-[10px] py-4 relative">
+      {/* Vertical line */}
+      <div
+        className="absolute top-4 bottom-4 w-px bg-border"
+        style={{ left: `${dotCenterOffset}px` }}
+      />
+
+      {/* Events */}
+      <div className="space-y-3">
+        {events.map((event, idx) => (
+          <div key={idx} className="relative flex items-start">
+            {/* Dot — centered on date column */}
+            <div
+              className="absolute top-[3px]"
+              style={{ left: `${dotCenterOffset - 5}px` }}
+            >
               <div
                 className={cn(
-                  "absolute left-0 top-[5px] w-[10px] h-[10px] rounded-full border-2 border-muted/30",
+                  "w-[10px] h-[10px] rounded-full border-2 border-muted/30",
                   event.dotColor || "bg-muted-foreground"
                 )}
               />
-              {/* Content */}
-              <div className="ml-5 flex items-baseline gap-3">
-                <span className="text-xs font-medium text-foreground whitespace-nowrap">
-                  {event.label}
-                </span>
-                <span className="text-[11px] text-muted-foreground">
-                  {event.detail}
-                </span>
-                {event.time && (
-                  <>
-                    <span className="text-border">·</span>
-                    <span className="text-[11px] text-muted-foreground/60">
-                      {event.time}
-                    </span>
-                  </>
-                )}
+            </div>
+
+            {/* Text — aligned with booking info */}
+            <div style={{ marginLeft: `${textStartOffset}px` }}>
+              <div className="text-xs font-medium text-foreground">
+                {event.label}
+              </div>
+              <div className="text-[11px] text-muted-foreground mt-0.5">
+                {event.detail}
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </div>
   );

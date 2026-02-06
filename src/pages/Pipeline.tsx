@@ -95,14 +95,15 @@ const Pipeline = () => {
 
   return (
     <DashboardLayout>
-      <div className="flex h-full overflow-hidden">
-        {/* Main content — shrinks when panel is open */}
-        <div
-          className={cn(
-            "flex flex-col h-full overflow-hidden transition-all duration-300 ease-out",
-            isPanelOpen ? "flex-1 min-w-0" : "w-full"
-          )}
-        >
+      {/* Full-width flex — negative right margin lets conversation panel extend to viewport edge */}
+      <div
+        className={cn(
+          "flex h-full overflow-hidden transition-all duration-300 ease-out",
+          isPanelOpen && "-mr-[50px]"
+        )}
+      >
+        {/* Pipeline Content */}
+        <div className="flex flex-col h-full overflow-hidden flex-1 min-w-0">
           {/* Header */}
           <div className="flex items-center justify-between pb-4 shrink-0">
             <div>
@@ -141,8 +142,8 @@ const Pipeline = () => {
             ))}
           </div>
 
-          {/* Main Content */}
-          <div className="flex-1 min-h-0 overflow-hidden border border-border rounded-[10px] flex flex-col">
+          {/* Toolbar + Cards */}
+          <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
             <PipelineToolbar
               totalCount={filteredMeetings.length}
               selectedCount={selectedMeetings.length}
@@ -161,9 +162,9 @@ const Pipeline = () => {
           </div>
         </div>
 
-        {/* Conversation Side Panel — pushes content left */}
+        {/* Full-page Conversation Panel */}
         {isPanelOpen && (
-          <div className="w-[380px] shrink-0 h-full ml-4 animate-slide-in-right">
+          <div className="w-[400px] shrink-0 h-full border-l border-border bg-background animate-slide-in-right">
             <ConversationPanel
               meeting={conversationMeeting!}
               onClose={() => setConversationMeeting(null)}
