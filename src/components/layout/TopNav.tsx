@@ -20,7 +20,7 @@ const navItems = [
   { name: "Campaigns", path: "/campaigns" },
   { name: "Infrastructure", path: "/infrastructure" },
   { name: "Engagement", path: "/engagement" },
-  { name: "Personas", path: "/personas" },
+  
   { name: "Leads", path: "/leads" },
 ];
 
