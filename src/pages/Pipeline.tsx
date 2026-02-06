@@ -2,6 +2,8 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { format, isToday, isThisWeek, isThisMonth } from "date-fns";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Search, Filter, Calendar, ChevronDown, Plus, MessageSquare, CalendarDays, BarChart3, Link2 } from "lucide-react";
+import { TimezoneSelector } from "@/components/pipeline/TimezoneSelector";
+import { getLocalTimezone, formatTimeInTimezone } from "@/components/pipeline/timezones";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -61,6 +63,7 @@ const Pipeline = () => {
   const [activeTab, setActiveTab] = useState<"booked" | "analytics" | "connections">("booked");
   const [leadFilter, setLeadFilter] = useState<LeadFilter>("all");
   const [dateFilter, setDateFilter] = useState<DateFilter>("all");
+  const [timezone, setTimezone] = useState<string>(getLocalTimezone());
   const { openConversation } = useConversationPanel();
   const { toast } = useToast();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -222,6 +225,8 @@ const Pipeline = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
+            <TimezoneSelector value={timezone} onChange={setTimezone} />
+
             <Button variant="outline" size="sm" className="gap-2 h-9 px-3 text-xs">
               <Plus className="h-3.5 w-3.5" />
               Payout
@@ -349,7 +354,7 @@ const Pipeline = () => {
                       {/* Time */}
                       <div className="w-[100px] shrink-0 text-right">
                         <span className="inline-flex items-center px-3 py-1 text-xs font-medium tabular-nums whitespace-nowrap border border-border rounded-[10px] bg-background">
-                          {meeting.meetingTime}
+                          {formatTimeInTimezone(meeting.meetingDate, meeting.meetingTime, timezone)}
                         </span>
                       </div>
                     </div>
