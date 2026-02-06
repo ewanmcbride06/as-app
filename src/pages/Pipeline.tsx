@@ -211,7 +211,7 @@ const Pipeline = () => {
           {groupedMeetings.map(({ date, meetings: dateMeetings }) => (
             <div key={date.toISOString()}>
               {/* Date Group Header */}
-              <div className="sticky top-[34px] z-10 bg-secondary border border-border rounded-[10px] mx-0 px-5 py-2 my-1">
+              <div className="sticky top-[34px] z-10 bg-secondary border border-border border-t-0 rounded-b-[10px] rounded-t-none mx-0 px-5 py-2 mb-1">
                 <span className="text-[12px] font-medium text-muted-foreground">
                   {format(date, "dd MMMM yyyy")}
                 </span>
