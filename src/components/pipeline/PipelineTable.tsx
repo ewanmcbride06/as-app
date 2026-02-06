@@ -32,8 +32,8 @@ export function PipelineTable({
 }: PipelineTableProps) {
   return (
     <div className="flex-1 overflow-auto">
-      {/* Table Header */}
-      <div className="sticky top-0 z-10 bg-background border-b border-border">
+      {/* Table Column Header */}
+      <div className="sticky top-0 z-20 bg-background border-b border-border">
         <div className="flex items-center gap-4 px-5 py-2.5 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
           <div className="w-[20px] shrink-0" />
           <div className="w-[56px] shrink-0 text-center">Date</div>
@@ -49,8 +49,8 @@ export function PipelineTable({
       {/* Table Body */}
       {groupedMeetings.map(({ date, meetings }) => (
         <div key={date.toISOString()}>
-          {/* Date Group Header */}
-          <div className="sticky top-[41px] z-[5] px-5 py-2 bg-muted/40 border-b border-border">
+          {/* Date Group Header — solid bg, stacks below column header */}
+          <div className="sticky top-[37px] z-10 px-5 py-2 bg-secondary border-b border-border">
             <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
               {format(date, "EEEE, dd MMMM yyyy")}
             </span>
