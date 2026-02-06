@@ -109,7 +109,7 @@ const Pipeline = () => {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col h-full overflow-hidden">
+      <div className="flex flex-col h-full overflow-visible">
         {/* ─── Page Header ─── */}
         <div className="shrink-0 pb-5">
           <h1 className="text-2xl font-semibold tracking-tight">Pipeline</h1>
@@ -196,29 +196,29 @@ const Pipeline = () => {
           </div>
         </div>
 
-        {/* ─── Column Headers ─── */}
-        <div className="shrink-0 flex items-center px-1 pb-2 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
-          <div className="w-[320px] shrink-0 pl-2">Booking Information</div>
-          <div className="flex-1">Lead Status</div>
-          <div className="flex-1">Call Status</div>
-          <div className="flex-1">Taken Status</div>
-          <div className="flex-1">Billing Status</div>
-          <div className="w-[100px] shrink-0 text-right pr-2">Time of Call</div>
-        </div>
-
-        {/* ─── Scrollable Content ─── */}
+        {/* ─── Scrollable Content (includes sticky column headers) ─── */}
         <div className="flex-1 min-h-0 overflow-y-auto">
+          {/* ─── Column Headers (sticky inside scroll) ─── */}
+          <div className="sticky top-0 z-20 flex items-center px-5 pb-2 pt-1 text-[11px] font-medium text-muted-foreground uppercase tracking-wider bg-background">
+            <div className="w-[300px] shrink-0">Booking Information</div>
+            <div className="flex-1">Lead Status</div>
+            <div className="flex-1">Call Status</div>
+            <div className="flex-1">Taken Status</div>
+            <div className="flex-1">Billing Status</div>
+            <div className="w-[100px] shrink-0 text-right">Time of Call</div>
+          </div>
+
           {groupedMeetings.map(({ date, meetings: dateMeetings }) => (
             <div key={date.toISOString()}>
               {/* Date Group Header */}
-              <div className="sticky top-0 z-10 bg-secondary border-y border-border px-4 py-2">
+              <div className="sticky top-[30px] z-10 bg-secondary border-y border-border px-5 py-2">
                 <span className="text-[12px] font-medium text-muted-foreground">
                   {format(date, "dd MMMM yyyy")}
                 </span>
               </div>
 
               {/* Booking Cards */}
-              <div className="py-3 space-y-4 px-1">
+              <div className="py-3 space-y-4">
                 {dateMeetings.map((meeting) => (
                   <div key={meeting.id} className="border border-border rounded-[10px] overflow-hidden">
                     {/* Main Row */}
