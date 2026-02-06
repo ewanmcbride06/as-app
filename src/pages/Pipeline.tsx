@@ -220,81 +220,82 @@ const Pipeline = () => {
               {/* Booking Cards */}
               <div className="py-3 space-y-4 px-1">
                 {dateMeetings.map((meeting) => (
-                  <div key={meeting.id}>
-                    {/* Card */}
-                    <div className="border border-border rounded-[10px] bg-background">
-                      <div className="flex items-center px-5 py-4">
-                        {/* Booking Info: Day + Name */}
-                        <div className="w-[300px] shrink-0 flex items-center gap-4">
-                          <div className="w-[48px] shrink-0 text-center">
-                            <div className="text-[11px] text-muted-foreground leading-none font-medium">
-                              {format(meeting.meetingDate, "EEE")}
-                            </div>
-                            <div className="text-lg font-semibold leading-tight">
-                              {format(meeting.meetingDate, "dd")}
-                            </div>
+                  <div key={meeting.id} className="border border-border rounded-[10px] overflow-hidden">
+                    {/* Main Row */}
+                    <div className="flex items-center px-5 py-4 bg-background">
+                      {/* Booking Info: Day + Name */}
+                      <div className="w-[300px] shrink-0 flex items-center gap-4">
+                        <div className="w-[48px] shrink-0 text-center">
+                          <div className="text-[11px] text-muted-foreground leading-none font-medium">
+                            {format(meeting.meetingDate, "EEE")}
                           </div>
-                          <div className="min-w-0">
-                            <div className="font-medium text-sm leading-tight truncate">
-                              {meeting.inviteeName}
-                            </div>
-                            <div className="text-xs text-muted-foreground leading-tight mt-0.5 truncate">
-                              {meeting.company}
-                            </div>
+                          <div className="text-lg font-semibold leading-tight">
+                            {format(meeting.meetingDate, "dd")}
                           </div>
                         </div>
-
-                        {/* Lead Status */}
-                        <div className="flex-1" onClick={(e) => e.stopPropagation()}>
-                          <StatusDropdown
-                            value={meeting.leadStatus}
-                            options={leadStatusOptions}
-                            colorMap={leadStatusColors}
-                            onChange={(v) => handleUpdateStatus(meeting.id, "leadStatus", v)}
-                          />
+                        <div className="min-w-0">
+                          <div className="font-medium text-sm leading-tight truncate">
+                            {meeting.inviteeName}
+                          </div>
+                          <div className="text-xs text-muted-foreground leading-tight mt-0.5 truncate">
+                            {meeting.company}
+                          </div>
                         </div>
+                      </div>
 
-                        {/* Call Status */}
-                        <div className="flex-1" onClick={(e) => e.stopPropagation()}>
-                          <StatusDropdown
-                            value={meeting.callStatus}
-                            options={callStatusOptions}
-                            colorMap={callStatusColors}
-                            onChange={(v) => handleUpdateStatus(meeting.id, "callStatus", v)}
-                          />
-                        </div>
+                      {/* Lead Status */}
+                      <div className="flex-1" onClick={(e) => e.stopPropagation()}>
+                        <StatusDropdown
+                          value={meeting.leadStatus}
+                          options={leadStatusOptions}
+                          colorMap={leadStatusColors}
+                          onChange={(v) => handleUpdateStatus(meeting.id, "leadStatus", v)}
+                        />
+                      </div>
 
-                        {/* Taken Status */}
-                        <div className="flex-1" onClick={(e) => e.stopPropagation()}>
-                          <StatusDropdown
-                            value={meeting.takenStatus}
-                            options={takenStatusOptions}
-                            colorMap={takenStatusColors}
-                            onChange={(v) => handleUpdateStatus(meeting.id, "takenStatus", v)}
-                          />
-                        </div>
+                      {/* Call Status */}
+                      <div className="flex-1" onClick={(e) => e.stopPropagation()}>
+                        <StatusDropdown
+                          value={meeting.callStatus}
+                          options={callStatusOptions}
+                          colorMap={callStatusColors}
+                          onChange={(v) => handleUpdateStatus(meeting.id, "callStatus", v)}
+                        />
+                      </div>
 
-                        {/* Billing Status */}
-                        <div className="flex-1" onClick={(e) => e.stopPropagation()}>
-                          <StatusDropdown
-                            value={meeting.billingStatus}
-                            options={billingStatusOptions}
-                            colorMap={billingStatusColors}
-                            onChange={(v) => handleUpdateStatus(meeting.id, "billingStatus", v)}
-                          />
-                        </div>
+                      {/* Taken Status */}
+                      <div className="flex-1" onClick={(e) => e.stopPropagation()}>
+                        <StatusDropdown
+                          value={meeting.takenStatus}
+                          options={takenStatusOptions}
+                          colorMap={takenStatusColors}
+                          onChange={(v) => handleUpdateStatus(meeting.id, "takenStatus", v)}
+                        />
+                      </div>
 
-                        {/* Time */}
-                        <div className="w-[100px] shrink-0 text-right">
-                          <span className="inline-flex items-center px-3 py-1 text-xs font-medium tabular-nums whitespace-nowrap border border-border rounded-[10px] bg-background">
-                            {meeting.meetingTime}
-                          </span>
-                        </div>
+                      {/* Billing Status */}
+                      <div className="flex-1" onClick={(e) => e.stopPropagation()}>
+                        <StatusDropdown
+                          value={meeting.billingStatus}
+                          options={billingStatusOptions}
+                          colorMap={billingStatusColors}
+                          onChange={(v) => handleUpdateStatus(meeting.id, "billingStatus", v)}
+                        />
+                      </div>
+
+                      {/* Time */}
+                      <div className="w-[100px] shrink-0 text-right">
+                        <span className="inline-flex items-center px-3 py-1 text-xs font-medium tabular-nums whitespace-nowrap border border-border rounded-[10px] bg-background">
+                          {meeting.meetingTime}
+                        </span>
                       </div>
                     </div>
 
-                    {/* Metadata Row — beneath card */}
-                    <div className="flex items-center justify-between px-5 pt-2">
+                    {/* Separator */}
+                    <div className="border-t border-border" />
+
+                    {/* Detail Row — inside card, off-white bg, bottom corners rounded */}
+                    <div className="flex items-center justify-between px-5 py-2.5 bg-secondary">
                       <div className="flex items-center text-[12px] text-muted-foreground gap-1 flex-wrap">
                         <span>Booked on: <span className="text-foreground/60">{format(meeting.bookedAt, "EEEE dd MMM yyyy 'at' h:mm a")}</span></span>
                         <span className="mx-1.5">·</span>
