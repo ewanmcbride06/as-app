@@ -263,43 +263,43 @@ const Engagement = () => {
             )}
 
             {activeTab === "provider" && (
-              <>
-                <h2 className="text-base font-semibold">Reply Rate by ESP</h2>
-                <div className="grid grid-cols-2 gap-4">
-                  {espReplyRates.map((esp) => (
-                    <div key={esp.name} className="border border-border rounded-[10px] p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-sm font-medium">{esp.name}</h3>
-                        <span className="text-lg font-semibold">{esp.avgRate}%</span>
-                      </div>
-                      <div className="h-[140px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <LineChart data={esp.data} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
-                            <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} hide />
-                            <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} width={30} domain={[0, 40]} />
-                            <Tooltip
-                              contentStyle={{
-                                backgroundColor: "hsl(var(--background))",
-                                border: "1px solid hsl(var(--border))",
-                                borderRadius: "8px",
-                                fontSize: "12px",
-                              }}
-                              formatter={(value: number) => [`${value}%`, "Reply Rate"]}
-                            />
-                            <Line
-                              type="monotone"
-                              dataKey="rate"
-                              stroke="hsl(var(--foreground))"
-                              strokeWidth={2}
-                              dot={false}
-                            />
-                          </LineChart>
-                        </ResponsiveContainer>
+              <div className="grid grid-cols-2 gap-6">
+                {espReplyRates.map((esp) => (
+                  <div key={esp.name} className="border border-border rounded-[10px] p-5">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h2 className="text-base font-semibold">{esp.name}</h2>
+                        <p className="text-sm text-muted-foreground">Average reply rate: {esp.avgRate}%</p>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </>
+                    <div className="h-[280px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={esp.data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                          <XAxis dataKey="date" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+                          <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} width={40} domain={[0, 40]} />
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: "hsl(var(--background))",
+                              border: "1px solid hsl(var(--border))",
+                              borderRadius: "8px",
+                              fontSize: "12px",
+                            }}
+                            formatter={(value: number) => [`${value}%`, "Reply Rate"]}
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey="rate"
+                            stroke="hsl(var(--foreground))"
+                            strokeWidth={2}
+                            dot={false}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         </ScrollArea>
