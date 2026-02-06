@@ -1,10 +1,4 @@
 import { format } from "date-fns";
-import {
-  CalendarPlus,
-  RefreshCw,
-  XCircle,
-  ArrowRight,
-} from "lucide-react";
 import { Meeting } from "./types";
 import { cn } from "@/lib/utils";
 
@@ -70,50 +64,44 @@ export function BookingTimeline({ meeting }: BookingTimelineProps) {
   });
 
   return (
-    <tr className="hover:bg-transparent">
-      {/* Empty cells for checkbox column */}
-      <td className="p-0" />
-      {/* Empty cell for date column */}
-      <td className="p-0" />
-      {/* Timeline spanning from Booking Info column onwards */}
-      <td colSpan={7} className="p-0">
-        <div className="py-3 pr-4 bg-muted/30">
-          <div className="relative pl-5">
-            {events.map((event, idx) => (
-              <div key={idx} className="relative pb-2.5 last:pb-0">
-                {/* Vertical line */}
-                {idx < events.length - 1 && (
-                  <div className="absolute left-[5px] top-4 bottom-0 w-px bg-border" />
+    <div className="border-t border-border bg-muted/30 rounded-b-[10px] px-4 py-3">
+      {/* Offset to align under the Booking Info column: checkbox(w-8) + gap(16px) + date(w-60) + gap(16px) = ~116px */}
+      <div style={{ marginLeft: "108px" }}>
+        <div className="relative pl-5 max-w-2xl">
+          {events.map((event, idx) => (
+            <div key={idx} className="relative pb-2.5 last:pb-0">
+              {/* Vertical line */}
+              {idx < events.length - 1 && (
+                <div className="absolute left-[5px] top-4 bottom-0 w-px bg-border" />
+              )}
+              {/* Dot */}
+              <div
+                className={cn(
+                  "absolute left-0 top-[5px] w-[10px] h-[10px] rounded-full border-2 border-muted/30",
+                  event.dotColor || "bg-muted-foreground"
                 )}
-                {/* Dot */}
-                <div
-                  className={cn(
-                    "absolute left-0 top-[5px] w-[10px] h-[10px] rounded-full border-2 border-background",
-                    event.dotColor || "bg-muted-foreground"
-                  )}
-                />
-                {/* Content */}
-                <div className="ml-5 flex items-baseline gap-3">
-                  <span className="text-xs font-medium text-foreground whitespace-nowrap">
-                    {event.label}
-                  </span>
-                  <span className="text-[11px] text-muted-foreground">
-                    {event.detail}
-                  </span>
-                  {event.time && (
-                    <>
-                      <span className="text-border">·</span>
-                      <span className="text-[11px] text-muted-foreground/60">
-                        {event.time}
-                      </span>
-                    </>
-                  )}
-                </div>
+              />
+              {/* Content */}
+              <div className="ml-5 flex items-baseline gap-3">
+                <span className="text-xs font-medium text-foreground whitespace-nowrap">
+                  {event.label}
+                </span>
+                <span className="text-[11px] text-muted-foreground">
+                  {event.detail}
+                </span>
+                {event.time && (
+                  <>
+                    <span className="text-border">·</span>
+                    <span className="text-[11px] text-muted-foreground/60">
+                      {event.time}
+                    </span>
+                  </>
+                )}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
-      </td>
-    </tr>
+      </div>
+    </div>
   );
 }

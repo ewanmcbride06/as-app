@@ -3,14 +3,6 @@ import { format } from "date-fns";
 import { Copy, MessageSquare, ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { StatusDropdown } from "./StatusDropdown";
 import { BookingTimeline } from "./BookingTimeline";
 import {
@@ -38,8 +30,6 @@ const leadStatusOptions: LeadStatus[] = [
 const callStatusOptions: CallStatus[] = [
   "Booked",
   "Rescheduled",
-  "No Show",
-  "Completed",
   "Cancelled",
 ];
 
@@ -96,86 +86,92 @@ export function PipelineTable({
 
   return (
     <div className="flex-1 overflow-auto">
-      <Table>
-        <TableHeader className="sticky top-0 bg-background z-10">
-          <TableRow className="hover:bg-transparent">
-            <TableHead className="w-10 pl-4">
-              <Checkbox
-                checked={
-                  selectedMeetings.length === filteredCount &&
-                  filteredCount > 0
-                }
-                onCheckedChange={onToggleSelectAll}
-              />
-            </TableHead>
-            <TableHead className="w-[70px]">Date</TableHead>
-            <TableHead className="min-w-[180px]">Booking Info</TableHead>
-            <TableHead>Lead Status</TableHead>
-            <TableHead>Call Status</TableHead>
-            <TableHead>Taken</TableHead>
-            <TableHead>Billing</TableHead>
-            <TableHead className="w-[100px]">Time</TableHead>
-            <TableHead className="w-[90px]" />
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {groupedMeetings.map(({ date, meetings }) => (
-            <>
-              {/* Date Group Header */}
-              <TableRow
-                key={date.toISOString()}
-                className="bg-muted/30 hover:bg-muted/30"
-              >
-                <TableCell colSpan={9} className="py-1.5 pl-4">
-                  <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
-                    {format(date, "EEEE, dd MMMM yyyy")}
-                  </span>
-                </TableCell>
-              </TableRow>
+      {/* Header Row */}
+      <div className="sticky top-0 bg-background z-10 border-b border-border px-4 py-2">
+        <div className="flex items-center gap-4">
+          <div className="w-8 shrink-0">
+            <Checkbox
+              checked={
+                selectedMeetings.length === filteredCount &&
+                filteredCount > 0
+              }
+              onCheckedChange={onToggleSelectAll}
+            />
+          </div>
+          <div className="w-[60px] shrink-0 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Date</div>
+          <div className="min-w-[160px] flex-[2] text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Booking Info</div>
+          <div className="flex-1 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Lead Status</div>
+          <div className="flex-1 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Call Status</div>
+          <div className="flex-1 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Taken</div>
+          <div className="flex-1 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Billing</div>
+          <div className="w-[90px] shrink-0 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Time</div>
+          <div className="w-[80px] shrink-0" />
+        </div>
+      </div>
 
-              {/* Meeting Rows */}
+      {/* Content */}
+      <div className="p-3 space-y-2">
+        {groupedMeetings.map(({ date, meetings }) => (
+          <div key={date.toISOString()}>
+            {/* Date Group Header */}
+            <div className="px-3 py-1.5 mb-1.5">
+              <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                {format(date, "EEEE, dd MMMM yyyy")}
+              </span>
+            </div>
+
+            {/* Meeting Cards */}
+            <div className="space-y-1.5">
               {meetings.map((meeting) => {
                 const isExpanded = expandedRows.has(meeting.id);
                 return (
-                  <>
-                    <TableRow
-                      key={meeting.id}
-                      className={cn(
-                        "group cursor-pointer",
-                        isExpanded && "bg-muted/10"
-                      )}
+                  <div
+                    key={meeting.id}
+                    className={cn(
+                      "border border-border rounded-[10px] bg-background transition-colors group",
+                      isExpanded && "bg-muted/5"
+                    )}
+                  >
+                    {/* Main Row */}
+                    <div
+                      className="flex items-center gap-4 px-4 py-3 cursor-pointer"
                       onClick={() => toggleExpand(meeting.id)}
                     >
-                      <TableCell
-                        className="pl-4"
+                      <div
+                        className="w-8 shrink-0"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <Checkbox
                           checked={selectedMeetings.includes(meeting.id)}
                           onCheckedChange={() => onToggleSelect(meeting.id)}
                         />
-                      </TableCell>
-                      <TableCell>
-                        <div className="text-center">
-                          <div className="text-[11px] text-muted-foreground leading-none">
-                            {format(meeting.meetingDate, "EEE")}
-                          </div>
-                          <div className="text-lg font-semibold leading-tight">
-                            {format(meeting.meetingDate, "dd")}
-                          </div>
+                      </div>
+
+                      {/* Date */}
+                      <div className="w-[60px] shrink-0 text-center">
+                        <div className="text-[11px] text-muted-foreground leading-none">
+                          {format(meeting.meetingDate, "EEE")}
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium text-sm">
-                            {meeting.inviteeName}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {meeting.company}
-                          </div>
+                        <div className="text-lg font-semibold leading-tight">
+                          {format(meeting.meetingDate, "dd")}
                         </div>
-                      </TableCell>
-                      <TableCell onClick={(e) => e.stopPropagation()}>
+                      </div>
+
+                      {/* Booking Info */}
+                      <div className="min-w-[160px] flex-[2]">
+                        <div className="font-medium text-sm">
+                          {meeting.inviteeName}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {meeting.company}
+                        </div>
+                      </div>
+
+                      {/* Lead Status */}
+                      <div
+                        className="flex-1"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <StatusDropdown
                           value={meeting.leadStatus}
                           options={leadStatusOptions}
@@ -184,8 +180,13 @@ export function PipelineTable({
                             onUpdateStatus(meeting.id, "leadStatus", value)
                           }
                         />
-                      </TableCell>
-                      <TableCell onClick={(e) => e.stopPropagation()}>
+                      </div>
+
+                      {/* Call Status */}
+                      <div
+                        className="flex-1"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <StatusDropdown
                           value={meeting.callStatus}
                           options={callStatusOptions}
@@ -194,8 +195,13 @@ export function PipelineTable({
                             onUpdateStatus(meeting.id, "callStatus", value)
                           }
                         />
-                      </TableCell>
-                      <TableCell onClick={(e) => e.stopPropagation()}>
+                      </div>
+
+                      {/* Taken */}
+                      <div
+                        className="flex-1"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <StatusDropdown
                           value={meeting.takenStatus}
                           options={takenStatusOptions}
@@ -204,8 +210,13 @@ export function PipelineTable({
                             onUpdateStatus(meeting.id, "takenStatus", value)
                           }
                         />
-                      </TableCell>
-                      <TableCell onClick={(e) => e.stopPropagation()}>
+                      </div>
+
+                      {/* Billing */}
+                      <div
+                        className="flex-1"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <StatusDropdown
                           value={meeting.billingStatus}
                           options={billingStatusOptions}
@@ -214,57 +225,62 @@ export function PipelineTable({
                             onUpdateStatus(meeting.id, "billingStatus", value)
                           }
                         />
-                      </TableCell>
-                      <TableCell>
+                      </div>
+
+                      {/* Time */}
+                      <div className="w-[90px] shrink-0">
                         <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium tabular-nums whitespace-nowrap border border-border rounded-[10px] bg-background">
                           {meeting.meetingTime}
                         </span>
-                      </TableCell>
-                      <TableCell onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center gap-0.5">
-                          <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7 text-muted-foreground hover:text-foreground"
-                            >
-                              <Copy className="h-3.5 w-3.5" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7 text-muted-foreground hover:text-foreground"
-                              onClick={() => onOpenConversation(meeting)}
-                            >
-                              <MessageSquare className="h-3.5 w-3.5" />
-                            </Button>
-                          </div>
-                          {isExpanded ? (
-                            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-                          ) : (
-                            <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
-                          )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
+                      </div>
 
-                    {/* Expandable Timeline — uses raw <tr> to align with table columns */}
+                      {/* Actions */}
+                      <div
+                        className="w-[80px] shrink-0 flex items-center justify-end gap-0.5"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                          >
+                            <Copy className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                            onClick={() => onOpenConversation(meeting)}
+                          >
+                            <MessageSquare className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                        {isExpanded ? (
+                          <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                        ) : (
+                          <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Expandable Timeline */}
                     {isExpanded && (
-                      <BookingTimeline key={`${meeting.id}-timeline`} meeting={meeting} />
+                      <BookingTimeline meeting={meeting} />
                     )}
-                  </>
+                  </div>
                 );
               })}
-            </>
-          ))}
-        </TableBody>
-      </Table>
+            </div>
+          </div>
+        ))}
 
-      {filteredCount === 0 && (
-        <div className="text-center py-16 text-sm text-muted-foreground">
-          No meetings found matching your search.
-        </div>
-      )}
+        {filteredCount === 0 && (
+          <div className="text-center py-16 text-sm text-muted-foreground">
+            No meetings found matching your search.
+          </div>
+        )}
+      </div>
     </div>
   );
 }

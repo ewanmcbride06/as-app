@@ -2,7 +2,7 @@ import { format } from "date-fns";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ConversationMessage, Meeting } from "./types";
+import { Meeting } from "./types";
 import { cn } from "@/lib/utils";
 
 interface ConversationPanelProps {
@@ -12,7 +12,7 @@ interface ConversationPanelProps {
 
 export function ConversationPanel({ meeting, onClose }: ConversationPanelProps) {
   return (
-    <div className="h-full flex flex-col border-l border-border bg-background">
+    <div className="h-full flex flex-col border border-border rounded-[10px] bg-background overflow-hidden">
       {/* Header */}
       <div className="px-4 py-3 border-b border-border flex items-center justify-between shrink-0">
         <div>
