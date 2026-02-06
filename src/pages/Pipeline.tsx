@@ -256,15 +256,17 @@ const Pipeline = () => {
 
           {groupedMeetings.map(({ dateKey, date, meetings: dateMeetings }, index) => (
             <div key={date.toISOString()} data-date-label={format(date, "EEEE, dd MMMM yyyy")} data-date-count={`${dateMeetings.length} ${dateMeetings.length === 1 ? "meeting" : "meetings"}`}>
-              {/* ─── Inline Date Header (non-sticky, fully rounded) ─── */}
-              <div className="flex items-center justify-between px-5 py-1.5 bg-secondary border border-border rounded-[10px] mt-3 mb-2">
-                <span className="text-[12px] font-medium text-muted-foreground">
-                  {format(date, "EEEE, dd MMMM yyyy")}
-                </span>
-                <span className="text-[11px] text-muted-foreground tabular-nums">
-                  {dateMeetings.length} {dateMeetings.length === 1 ? "meeting" : "meetings"}
-                </span>
-              </div>
+              {/* ─── Inline Date Header (non-sticky, fully rounded) — skip first group since it's in the sticky header ─── */}
+              {index > 0 && (
+                <div className="flex items-center justify-between px-5 py-1.5 bg-secondary border border-border rounded-[10px] mt-3 mb-2">
+                  <span className="text-[12px] font-medium text-muted-foreground">
+                    {format(date, "EEEE, dd MMMM yyyy")}
+                  </span>
+                  <span className="text-[11px] text-muted-foreground tabular-nums">
+                    {dateMeetings.length} {dateMeetings.length === 1 ? "meeting" : "meetings"}
+                  </span>
+                </div>
+              )}
 
               {/* Booking Cards */}
               <div className="space-y-4">
