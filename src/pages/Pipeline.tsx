@@ -137,7 +137,7 @@ const Pipeline = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search for meetings by invitee or company name"
-              className="pl-9 h-9 text-sm"
+              className="pl-9 h-9 text-xs"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -199,7 +199,7 @@ const Pipeline = () => {
         {/* ─── Scrollable Content (includes sticky column headers) ─── */}
         <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide">
           {/* ─── Column Headers (sticky inside scroll) ─── */}
-          <div className="sticky top-0 z-20 flex items-center px-5 pb-2 pt-1 text-[11px] font-medium text-muted-foreground uppercase tracking-wider bg-background border-b border-border">
+          <div className="sticky top-0 z-20 flex items-center px-5 pb-2 pt-2 text-[11px] font-medium text-muted-foreground uppercase tracking-wider bg-background border-b border-border">
             <div className="w-[300px] shrink-0">Booking Information</div>
             <div className="flex-1">Lead Status</div>
             <div className="flex-1">Call Status</div>
@@ -211,7 +211,7 @@ const Pipeline = () => {
           {groupedMeetings.map(({ date, meetings: dateMeetings }) => (
             <div key={date.toISOString()}>
               {/* Date Group Header */}
-              <div className="sticky top-[33px] z-10 bg-secondary border border-border rounded-[10px] mx-0 px-5 py-2 my-1">
+              <div className="sticky top-[34px] z-10 bg-secondary border border-border rounded-[10px] mx-0 px-5 py-2 my-1">
                 <span className="text-[12px] font-medium text-muted-foreground">
                   {format(date, "dd MMMM yyyy")}
                 </span>
