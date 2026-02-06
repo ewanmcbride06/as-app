@@ -34,16 +34,15 @@ export function PipelineTable({
     <div className="flex-1 overflow-auto">
       {/* Table Header */}
       <div className="sticky top-0 z-10 bg-background border-b border-border">
-        <div className="flex items-center gap-3 px-4 py-2.5 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
-          <div className="shrink-0 w-[18px]" />
-          <div className="w-[52px] shrink-0 text-center">Date</div>
-          <div className="min-w-[160px] flex-[1.5]">Contact</div>
-          <div className="flex-1">Lead Status</div>
-          <div className="flex-1">Call Status</div>
-          <div className="flex-1">Taken</div>
-          <div className="flex-1">Billing</div>
-          <div className="w-[80px] shrink-0 text-right">Time</div>
+        <div className="flex items-center gap-4 px-5 py-2.5 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
           <div className="w-[20px] shrink-0" />
+          <div className="w-[56px] shrink-0 text-center">Date</div>
+          <div className="w-[180px] shrink-0">Contact</div>
+          <div className="flex-1 min-w-[130px]">Lead Status</div>
+          <div className="flex-1 min-w-[110px]">Call Status</div>
+          <div className="flex-1 min-w-[110px]">Taken</div>
+          <div className="flex-1 min-w-[110px]">Billing</div>
+          <div className="w-[80px] shrink-0 text-right">Time</div>
         </div>
       </div>
 
@@ -51,7 +50,7 @@ export function PipelineTable({
       {groupedMeetings.map(({ date, meetings }) => (
         <div key={date.toISOString()}>
           {/* Date Group Header */}
-          <div className="sticky top-[41px] z-[5] px-4 py-2 bg-muted/40 border-b border-border">
+          <div className="sticky top-[41px] z-[5] px-5 py-2 bg-muted/40 border-b border-border">
             <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
               {format(date, "EEEE, dd MMMM yyyy")}
             </span>
