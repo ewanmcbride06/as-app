@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { format, isToday, isThisWeek, isThisMonth } from "date-fns";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Search, Filter, Calendar, ChevronDown, Plus, Copy, MessageSquare } from "lucide-react";
+import { Search, Filter, Calendar, ChevronDown, Plus, MessageSquare, CalendarDays, BarChart3, Link2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -144,16 +144,28 @@ const Pipeline = () => {
         </div>
 
         {/* ─── Tabs ─── */}
-        <div className="flex items-center gap-1 mb-5 shrink-0">
-          {(["booked", "analytics", "connections"] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`nav-tab ${activeTab === tab ? "nav-tab-active" : ""}`}
-            >
-              {tab === "booked" ? "Meetings Booked" : tab === "analytics" ? "Analytics (Coming Soon)" : "Connections"}
-            </button>
-          ))}
+        <div className="shrink-0 border-b mb-5">
+          <div className="flex items-center gap-1">
+            {([
+              { key: "booked" as const, label: "Meetings", icon: CalendarDays },
+              { key: "analytics" as const, label: "Analytics", icon: BarChart3 },
+              { key: "connections" as const, label: "Connections", icon: Link2 },
+            ]).map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={cn(
+                  "shrink-0 flex items-center gap-2 px-3 py-2.5 sm:px-4 sm:py-3 text-sm font-medium border-b-2 -mb-[2px] transition-colors whitespace-nowrap",
+                  activeTab === tab.key
+                    ? "border-foreground text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/50"
+                )}
+              >
+                <tab.icon className="h-4 w-4" />
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* ─── Search & Controls Bar ─── */}
@@ -277,7 +289,7 @@ const Pipeline = () => {
                       {/* Booking Info: Day + Name */}
                       <div className="w-[300px] shrink-0 flex items-center gap-4">
                         <div className="w-[48px] shrink-0 text-center">
-                          <div className="text-[11px] text-muted-foreground leading-none font-medium">
+                          <div className="text-[11px] text-calendar-day leading-none font-medium">
                             {format(meeting.meetingDate, "EEE")}
                           </div>
                           <div className="text-lg font-semibold leading-tight">
@@ -357,9 +369,6 @@ const Pipeline = () => {
                         <span>Call Stage: <span className="text-foreground/60">{meeting.callStage}</span></span>
                       </div>
                       <div className="flex items-center gap-0.5 shrink-0 ml-4">
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground">
-                          <Copy className="h-3.5 w-3.5" />
-                        </Button>
                         <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground" onClick={() => openConversation(meeting)}>
                           <MessageSquare className="h-3.5 w-3.5" />
                         </Button>
