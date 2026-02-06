@@ -47,7 +47,6 @@ export function TimezoneSelector({ value, onChange }: TimezoneSelectorProps) {
           className="gap-2 h-9 px-3 text-xs"
         >
           <Globe className="h-3.5 w-3.5" />
-          <span>{selected.flag}</span>
           <span className="max-w-[120px] truncate">{selected.label}</span>
           <ChevronDown className="h-3 w-3" />
         </Button>
