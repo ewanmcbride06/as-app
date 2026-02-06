@@ -1,6 +1,6 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Calendar, ChevronDown, ArrowLeft, Download } from "lucide-react";
+import { Calendar, ChevronDown, ArrowLeft, Download, Clock, Server } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -28,8 +28,10 @@ import {
   hourlyReplyTypeData,
   espReplyRates,
 } from "@/components/engagement/mockData";
+import { cn } from "@/lib/utils";
 
 const Engagement = () => {
+  const [activeTab, setActiveTab] = useState<"time" | "provider">("time");
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [selectedReplyTypeDay, setSelectedReplyTypeDay] = useState<string | null>(null);
 
@@ -75,178 +77,65 @@ const Engagement = () => {
           </div>
         </div>
 
+        {/* Tab Switcher */}
+        <div className="shrink-0 border-b mb-5">
+          <div className="flex items-center gap-1">
+            {([
+              { key: "time" as const, label: "Time Analysis", icon: Clock },
+              { key: "provider" as const, label: "Provider Analysis", icon: Server },
+            ]).map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={cn(
+                  "shrink-0 flex items-center gap-2 px-3 py-2.5 sm:px-4 sm:py-3 text-sm font-medium border-b-2 -mb-[2px] transition-colors whitespace-nowrap",
+                  activeTab === tab.key
+                    ? "border-foreground text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/50"
+                )}
+              >
+                <tab.icon className="h-4 w-4" />
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Scrollable Content */}
         <ScrollArea className="flex-1 min-h-0">
           <div className="space-y-6 pr-4 pb-6">
-            {/* Section 1: Replies by Time */}
-            <div className="border border-border rounded-[10px] p-5">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h2 className="text-base font-semibold">Replies by Time</h2>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedDay
-                      ? `Hourly breakdown for ${selectedDay}`
-                      : "Average reply times by weekday • Click a bar to drill down"}
-                  </p>
-                </div>
-                {selectedDay && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setSelectedDay(null)}
-                    className="gap-1"
-                  >
-                    <ArrowLeft className="h-4 w-4" />
-                    Back to weekly
-                  </Button>
-                )}
-              </div>
-              <div className="h-[280px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  {selectedDay ? (
-                    <BarChart data={hourlyReplyData[selectedDay]} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                      <XAxis dataKey="hour" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
-                      <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} width={40} />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: "hsl(var(--background))",
-                          border: "1px solid hsl(var(--border))",
-                          borderRadius: "8px",
-                          fontSize: "12px",
-                        }}
-                      />
-                      <Bar dataKey="replies" fill="hsl(var(--foreground))" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  ) : (
-                    <BarChart data={weekdayReplyData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                      <XAxis dataKey="day" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
-                      <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} width={40} />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: "hsl(var(--background))",
-                          border: "1px solid hsl(var(--border))",
-                          borderRadius: "8px",
-                          fontSize: "12px",
-                        }}
-                      />
-                      <Bar
-                        dataKey="replies"
-                        fill="hsl(var(--foreground))"
-                        radius={[4, 4, 0, 0]}
-                        cursor="pointer"
-                        onClick={(data) => handleDayClick(data)}
-                      />
-                    </BarChart>
-                  )}
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* Section 2: Automated vs Human Replies */}
-            <div className="border border-border rounded-[10px] p-5">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h2 className="text-base font-semibold">Automated vs Human Replies</h2>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedReplyTypeDay
-                      ? `Hour by hour for ${selectedReplyTypeDay}`
-                      : "Day by day comparison • Click a point to see hourly breakdown"}
-                  </p>
-                </div>
-                {selectedReplyTypeDay && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setSelectedReplyTypeDay(null)}
-                    className="gap-1"
-                  >
-                    <ArrowLeft className="h-4 w-4" />
-                    Back to daily
-                  </Button>
-                )}
-              </div>
-              <div className="h-[280px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  {selectedReplyTypeDay ? (
-                    <BarChart
-                      data={hourlyReplyTypeData[selectedReplyTypeDay]}
-                      margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                      <XAxis dataKey="hour" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
-                      <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} width={40} />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: "hsl(var(--background))",
-                          border: "1px solid hsl(var(--border))",
-                          borderRadius: "8px",
-                          fontSize: "12px",
-                        }}
-                      />
-                      <Legend wrapperStyle={{ fontSize: "12px" }} />
-                      <Bar dataKey="automated" name="Automated" fill="hsl(var(--foreground))" radius={[4, 4, 0, 0]} />
-                      <Bar dataKey="human" name="Human" fill="hsl(var(--muted-foreground))" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  ) : (
-                    <LineChart data={dailyReplyTypeData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                      <XAxis dataKey="date" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
-                      <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} width={40} />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: "hsl(var(--background))",
-                          border: "1px solid hsl(var(--border))",
-                          borderRadius: "8px",
-                          fontSize: "12px",
-                        }}
-                      />
-                      <Legend wrapperStyle={{ fontSize: "12px" }} />
-                      <Line
-                        type="monotone"
-                        dataKey="automated"
-                        name="Automated"
-                        stroke="hsl(var(--foreground))"
-                        strokeWidth={2}
-                        dot={{ r: 4, cursor: "pointer" }}
-                        activeDot={{
-                          r: 6,
-                          onClick: (e: unknown, payload: unknown) => {
-                            const p = payload as { payload?: { date: string } };
-                            if (p.payload?.date) handleReplyTypeDayClick(p.payload);
-                          },
-                        }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="human"
-                        name="Human"
-                        stroke="hsl(var(--muted-foreground))"
-                        strokeWidth={2}
-                        dot={{ r: 4 }}
-                      />
-                    </LineChart>
-                  )}
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* Section 3: Reply Rate by ESP */}
-            <div>
-              <h2 className="text-base font-semibold mb-4">Reply Rate by ESP</h2>
-              <div className="grid grid-cols-2 gap-4">
-                {espReplyRates.map((esp) => (
-                  <div key={esp.name} className="border border-border rounded-[10px] p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-sm font-medium">{esp.name}</h3>
-                      <span className="text-lg font-semibold">{esp.avgRate}%</span>
+            {activeTab === "time" && (
+              <>
+                {/* Section 1: Replies by Time */}
+                <div className="border border-border rounded-[10px] p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h2 className="text-base font-semibold">Replies by Time</h2>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedDay
+                          ? `Hourly breakdown for ${selectedDay}`
+                          : "Average reply times by weekday • Click a bar to drill down"}
+                      </p>
                     </div>
-                    <div className="h-[140px]">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={esp.data} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
-                          <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} hide />
-                          <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} width={30} domain={[0, 40]} />
+                    {selectedDay && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSelectedDay(null)}
+                        className="gap-1"
+                      >
+                        <ArrowLeft className="h-4 w-4" />
+                        Back to weekly
+                      </Button>
+                    )}
+                  </div>
+                  <div className="h-[280px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      {selectedDay ? (
+                        <BarChart data={hourlyReplyData[selectedDay]} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                          <XAxis dataKey="hour" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+                          <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} width={40} />
                           <Tooltip
                             contentStyle={{
                               backgroundColor: "hsl(var(--background))",
@@ -254,22 +143,164 @@ const Engagement = () => {
                               borderRadius: "8px",
                               fontSize: "12px",
                             }}
-                            formatter={(value: number) => [`${value}%`, "Reply Rate"]}
+                          />
+                          <Bar dataKey="replies" fill="hsl(var(--foreground))" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                      ) : (
+                        <BarChart data={weekdayReplyData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                          <XAxis dataKey="day" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+                          <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} width={40} />
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: "hsl(var(--background))",
+                              border: "1px solid hsl(var(--border))",
+                              borderRadius: "8px",
+                              fontSize: "12px",
+                            }}
+                          />
+                          <Bar
+                            dataKey="replies"
+                            fill="hsl(var(--foreground))"
+                            radius={[4, 4, 0, 0]}
+                            cursor="pointer"
+                            onClick={(data) => handleDayClick(data)}
+                          />
+                        </BarChart>
+                      )}
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Section 2: Automated vs Human Replies */}
+                <div className="border border-border rounded-[10px] p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h2 className="text-base font-semibold">Automated vs Human Replies</h2>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedReplyTypeDay
+                          ? `Hour by hour for ${selectedReplyTypeDay}`
+                          : "Day by day comparison • Click a point to see hourly breakdown"}
+                      </p>
+                    </div>
+                    {selectedReplyTypeDay && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSelectedReplyTypeDay(null)}
+                        className="gap-1"
+                      >
+                        <ArrowLeft className="h-4 w-4" />
+                        Back to daily
+                      </Button>
+                    )}
+                  </div>
+                  <div className="h-[280px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      {selectedReplyTypeDay ? (
+                        <BarChart
+                          data={hourlyReplyTypeData[selectedReplyTypeDay]}
+                          margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                          <XAxis dataKey="hour" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+                          <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} width={40} />
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: "hsl(var(--background))",
+                              border: "1px solid hsl(var(--border))",
+                              borderRadius: "8px",
+                              fontSize: "12px",
+                            }}
+                          />
+                          <Legend wrapperStyle={{ fontSize: "12px" }} />
+                          <Bar dataKey="automated" name="Automated" fill="hsl(var(--foreground))" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="human" name="Human" fill="hsl(var(--muted-foreground))" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                      ) : (
+                        <LineChart data={dailyReplyTypeData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                          <XAxis dataKey="date" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+                          <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} width={40} />
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: "hsl(var(--background))",
+                              border: "1px solid hsl(var(--border))",
+                              borderRadius: "8px",
+                              fontSize: "12px",
+                            }}
+                          />
+                          <Legend wrapperStyle={{ fontSize: "12px" }} />
+                          <Line
+                            type="monotone"
+                            dataKey="automated"
+                            name="Automated"
+                            stroke="hsl(var(--foreground))"
+                            strokeWidth={2}
+                            dot={{ r: 4, cursor: "pointer" }}
+                            activeDot={{
+                              r: 6,
+                              onClick: (e: unknown, payload: unknown) => {
+                                const p = payload as { payload?: { date: string } };
+                                if (p.payload?.date) handleReplyTypeDayClick(p.payload);
+                              },
+                            }}
                           />
                           <Line
                             type="monotone"
-                            dataKey="rate"
-                            stroke="hsl(var(--foreground))"
+                            dataKey="human"
+                            name="Human"
+                            stroke="hsl(var(--muted-foreground))"
                             strokeWidth={2}
-                            dot={false}
+                            dot={{ r: 4 }}
                           />
                         </LineChart>
-                      </ResponsiveContainer>
-                    </div>
+                      )}
+                    </ResponsiveContainer>
                   </div>
-                ))}
-              </div>
-            </div>
+                </div>
+              </>
+            )}
+
+            {activeTab === "provider" && (
+              <>
+                <h2 className="text-base font-semibold">Reply Rate by ESP</h2>
+                <div className="grid grid-cols-2 gap-4">
+                  {espReplyRates.map((esp) => (
+                    <div key={esp.name} className="border border-border rounded-[10px] p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-sm font-medium">{esp.name}</h3>
+                        <span className="text-lg font-semibold">{esp.avgRate}%</span>
+                      </div>
+                      <div className="h-[140px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart data={esp.data} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
+                            <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} hide />
+                            <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} width={30} domain={[0, 40]} />
+                            <Tooltip
+                              contentStyle={{
+                                backgroundColor: "hsl(var(--background))",
+                                border: "1px solid hsl(var(--border))",
+                                borderRadius: "8px",
+                                fontSize: "12px",
+                              }}
+                              formatter={(value: number) => [`${value}%`, "Reply Rate"]}
+                            />
+                            <Line
+                              type="monotone"
+                              dataKey="rate"
+                              stroke="hsl(var(--foreground))"
+                              strokeWidth={2}
+                              dot={false}
+                            />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </ScrollArea>
       </div>
