@@ -1,6 +1,6 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Calendar, ChevronDown, ArrowLeft, Download, Clock, Server } from "lucide-react";
+import { Calendar, ChevronDown, ArrowLeft, Download, Clock, Server, LayoutGrid, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -32,6 +32,7 @@ import { cn } from "@/lib/utils";
 
 const Engagement = () => {
   const [activeTab, setActiveTab] = useState<"time" | "provider">("time");
+  const [providerView, setProviderView] = useState<"grid" | "combined">("grid");
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [selectedReplyTypeDay, setSelectedReplyTypeDay] = useState<string | null>(null);
 
@@ -263,18 +264,83 @@ const Engagement = () => {
             )}
 
             {activeTab === "provider" && (
-              <div className="grid grid-cols-2 gap-6">
-                {espReplyRates.map((esp) => (
-                  <div key={esp.name} className="border border-border rounded-[10px] p-5">
+              <>
+                {providerView === "grid" ? (
+                  <div className="grid grid-cols-2 gap-6">
+                    {espReplyRates.map((esp) => (
+                      <div key={esp.name} className="border border-border rounded-[10px] p-5">
+                        <div className="flex items-center justify-between mb-4">
+                          <div>
+                            <h2 className="text-base font-semibold">{esp.name}</h2>
+                            <p className="text-sm text-muted-foreground">Average reply rate: {esp.avgRate}%</p>
+                          </div>
+                          {/* Toggle only on first card */}
+                          {esp === espReplyRates[0] && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="gap-2 text-xs"
+                              onClick={() => setProviderView("combined")}
+                            >
+                              <TrendingUp className="h-3.5 w-3.5" />
+                              Combined View
+                            </Button>
+                          )}
+                        </div>
+                        <div className="h-[280px]">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={esp.data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                              <XAxis dataKey="date" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+                              <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} width={40} domain={[0, 40]} />
+                              <Tooltip
+                                contentStyle={{
+                                  backgroundColor: "hsl(var(--background))",
+                                  border: "1px solid hsl(var(--border))",
+                                  borderRadius: "8px",
+                                  fontSize: "12px",
+                                }}
+                                formatter={(value: number) => [`${value}%`, "Reply Rate"]}
+                              />
+                              <Line
+                                type="monotone"
+                                dataKey="rate"
+                                stroke="hsl(var(--foreground))"
+                                strokeWidth={2}
+                                dot={false}
+                              />
+                            </LineChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="border border-border rounded-[10px] p-5">
                     <div className="flex items-center justify-between mb-4">
                       <div>
-                        <h2 className="text-base font-semibold">{esp.name}</h2>
-                        <p className="text-sm text-muted-foreground">Average reply rate: {esp.avgRate}%</p>
+                        <h2 className="text-base font-semibold">All Providers</h2>
+                        <p className="text-sm text-muted-foreground">Reply rate comparison across all ESP combinations</p>
                       </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-2 text-xs"
+                        onClick={() => setProviderView("grid")}
+                      >
+                        <LayoutGrid className="h-3.5 w-3.5" />
+                        Grid View
+                      </Button>
                     </div>
-                    <div className="h-[280px]">
+                    <div style={{ height: "calc(280px * 2 + 24px + 40px + 44px)" }}>
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={esp.data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                        <LineChart
+                          data={espReplyRates[0].data.map((d, i) => ({
+                            date: d.date,
+                            ...Object.fromEntries(espReplyRates.map((esp) => [esp.name, esp.data[i].rate])),
+                          }))}
+                          margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                        >
                           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                           <XAxis dataKey="date" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
                           <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} width={40} domain={[0, 40]} />
@@ -285,21 +351,38 @@ const Engagement = () => {
                               borderRadius: "8px",
                               fontSize: "12px",
                             }}
-                            formatter={(value: number) => [`${value}%`, "Reply Rate"]}
+                            formatter={(value: number) => [`${value}%`]}
                           />
-                          <Line
-                            type="monotone"
-                            dataKey="rate"
-                            stroke="hsl(var(--foreground))"
-                            strokeWidth={2}
-                            dot={false}
-                          />
+                          <Legend wrapperStyle={{ fontSize: "12px" }} />
+                          {espReplyRates.map((esp, i) => {
+                            const strokeColors = [
+                              "hsl(var(--foreground))",
+                              "hsl(var(--muted-foreground))",
+                              "hsl(var(--foreground) / 0.6)",
+                              "hsl(var(--muted-foreground) / 0.7)",
+                              "hsl(var(--foreground) / 0.4)",
+                              "hsl(var(--muted-foreground) / 0.4)",
+                            ];
+                            const dashArrays = ["", "5 5", "3 3", "8 4", "2 2", "6 2 2 2"];
+                            return (
+                              <Line
+                                key={esp.name}
+                                type="monotone"
+                                dataKey={esp.name}
+                                name={esp.name}
+                                stroke={strokeColors[i]}
+                                strokeWidth={2}
+                                strokeDasharray={dashArrays[i]}
+                                dot={false}
+                              />
+                            );
+                          })}
                         </LineChart>
                       </ResponsiveContainer>
                     </div>
                   </div>
-                ))}
-              </div>
+                )}
+              </>
             )}
           </div>
         </ScrollArea>
