@@ -62,9 +62,9 @@ export function PipelineRow({
   return (
     <div className="border-b border-border last:border-b-0">
       {/* Main Row */}
-      <div className="flex items-center gap-3 px-5 py-4">
+      <div className="flex items-center gap-4 px-5 py-5">
         {/* Checkbox */}
-        <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
+        <div className="w-[20px] shrink-0" onClick={(e) => e.stopPropagation()}>
           <Checkbox
             checked={isSelected}
             onCheckedChange={() => onToggleSelect(meeting.id)}
@@ -82,7 +82,7 @@ export function PipelineRow({
         </div>
 
         {/* Name & company */}
-        <div className="min-w-[170px] flex-[1.5]">
+        <div className="w-[180px] shrink-0">
           <div className="font-medium text-sm leading-tight">
             {meeting.inviteeName}
           </div>
@@ -92,7 +92,7 @@ export function PipelineRow({
         </div>
 
         {/* Lead Status */}
-        <div className="flex-1" onClick={(e) => e.stopPropagation()}>
+        <div className="flex-1 min-w-[130px]" onClick={(e) => e.stopPropagation()}>
           <StatusDropdown
             value={meeting.leadStatus}
             options={leadStatusOptions}
@@ -104,7 +104,7 @@ export function PipelineRow({
         </div>
 
         {/* Call Status */}
-        <div className="flex-1" onClick={(e) => e.stopPropagation()}>
+        <div className="flex-1 min-w-[110px]" onClick={(e) => e.stopPropagation()}>
           <StatusDropdown
             value={meeting.callStatus}
             options={callStatusOptions}
@@ -116,7 +116,7 @@ export function PipelineRow({
         </div>
 
         {/* Taken */}
-        <div className="flex-1" onClick={(e) => e.stopPropagation()}>
+        <div className="flex-1 min-w-[110px]" onClick={(e) => e.stopPropagation()}>
           <StatusDropdown
             value={meeting.takenStatus}
             options={takenStatusOptions}
@@ -128,7 +128,7 @@ export function PipelineRow({
         </div>
 
         {/* Billing */}
-        <div className="flex-1" onClick={(e) => e.stopPropagation()}>
+        <div className="flex-1 min-w-[110px]" onClick={(e) => e.stopPropagation()}>
           <StatusDropdown
             value={meeting.billingStatus}
             options={billingStatusOptions}
@@ -147,8 +147,8 @@ export function PipelineRow({
         </div>
       </div>
 
-      {/* Detail Row — always visible */}
-      <div className="flex items-center justify-between px-5 pb-4 pt-0">
+      {/* Detail Subsection */}
+      <div className="flex items-center justify-between mx-5 mb-4 px-4 py-3 rounded-[10px] bg-muted/50 border border-border">
         <div className="flex items-center gap-1.5 text-[12px] text-muted-foreground flex-wrap">
           <span>
             Booked on:{" "}
@@ -177,7 +177,7 @@ export function PipelineRow({
 
         {/* Actions */}
         <div
-          className="flex items-center gap-0.5 shrink-0"
+          className="flex items-center gap-0.5 shrink-0 ml-3"
           onClick={(e) => e.stopPropagation()}
         >
           <Button
