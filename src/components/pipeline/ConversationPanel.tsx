@@ -12,7 +12,7 @@ interface ConversationPanelProps {
 
 type FeedItem =
   | { type: "message"; sender: "us" | "them"; message: string; timestamp: Date; id: string }
-  | { type: "activity"; label: string; detail: string; icon: React.ReactNode; timestamp: Date };
+  | { type: "activity"; label: string; detail: string; user: string; icon: React.ReactNode; timestamp: Date };
 
 function buildFeed(meeting: Meeting): FeedItem[] {
   const items: FeedItem[] = [];
@@ -28,76 +28,83 @@ function buildFeed(meeting: Meeting): FeedItem[] {
     });
   });
 
-  // Meeting booked activity — use bookedAt timestamp
+  // Meeting booked — placed at bookedAt time (interleaves with messages)
   items.push({
     type: "activity",
     label: "Meeting Booked",
-    detail: `${format(meeting.bookedAt, "dd MMM yyyy 'at' HH:mm")} · ${meeting.bookedBy}`,
-    icon: <Calendar className="h-3 w-3" />,
+    detail: `Booked for ${format(meeting.meetingDate, "dd MMM yyyy")} at ${meeting.meetingTime}`,
+    user: meeting.bookedBy,
+    icon: <Calendar className="h-3.5 w-3.5" />,
     timestamp: meeting.bookedAt,
   });
 
-  // Reschedules — place them slightly after bookedAt
+  // Reschedules — spaced after booking
   if (meeting.rescheduleCount > 0) {
     for (let i = 0; i < meeting.rescheduleCount; i++) {
-      const rescheduleTime = new Date(meeting.bookedAt.getTime() + (i + 1) * 3600000);
+      const rescheduleTime = new Date(meeting.bookedAt.getTime() + (i + 1) * 7200000);
       items.push({
         type: "activity",
         label: "Meeting Rescheduled",
         detail: `Reschedule ${i + 1} of ${meeting.rescheduleCount}`,
-        icon: <RefreshCw className="h-3 w-3" />,
+        user: meeting.bookedBy,
+        icon: <RefreshCw className="h-3.5 w-3.5" />,
         timestamp: rescheduleTime,
       });
     }
   }
 
-  // Cancelled
+  // Cancelled — after reschedules
   if (meeting.callStatus === "Cancelled") {
-    const cancelTime = new Date(meeting.bookedAt.getTime() + (meeting.rescheduleCount + 1) * 3600000);
+    const cancelTime = new Date(meeting.bookedAt.getTime() + (meeting.rescheduleCount + 1) * 7200000 + 3600000);
     items.push({
       type: "activity",
       label: "Meeting Cancelled",
-      detail: "Meeting was cancelled",
-      icon: <XCircle className="h-3 w-3" />,
+      detail: "Meeting was cancelled by the lead",
+      user: meeting.inviteeName,
+      icon: <XCircle className="h-3.5 w-3.5" />,
       timestamp: cancelTime,
     });
   }
 
-  // Lead status — place after last conversation message
+  // Lead status — placed near the end of the conversation timeline
   const lastMsgTime = meeting.conversation.length > 0
     ? meeting.conversation[meeting.conversation.length - 1].timestamp
     : meeting.bookedAt;
 
   items.push({
     type: "activity",
-    label: "Lead Status Updated",
-    detail: meeting.leadStatus,
-    icon: <User className="h-3 w-3" />,
-    timestamp: new Date(lastMsgTime.getTime() + 1000),
+    label: `Lead: ${meeting.leadStatus}`,
+    detail: `Status updated to ${meeting.leadStatus}`,
+    user: meeting.closer,
+    icon: <User className="h-3.5 w-3.5" />,
+    timestamp: new Date(lastMsgTime.getTime() + 60000),
   });
 
   items.push({
     type: "activity",
-    label: "Call Status",
-    detail: `${meeting.callStatus} · Calendar: ${meeting.calendar}`,
-    icon: <Phone className="h-3 w-3" />,
-    timestamp: new Date(lastMsgTime.getTime() + 2000),
+    label: `Call: ${meeting.callStatus}`,
+    detail: `Calendar: ${meeting.calendar}`,
+    user: meeting.closer,
+    icon: <Phone className="h-3.5 w-3.5" />,
+    timestamp: new Date(lastMsgTime.getTime() + 120000),
   });
 
   items.push({
     type: "activity",
-    label: "Attendance",
-    detail: meeting.takenStatus,
-    icon: <Eye className="h-3 w-3" />,
-    timestamp: new Date(lastMsgTime.getTime() + 3000),
+    label: `Attendance: ${meeting.takenStatus}`,
+    detail: meeting.takenStatus === "Shown" ? "Lead attended the meeting" : meeting.takenStatus === "Not Shown" ? "Lead did not attend" : "Meeting is upcoming",
+    user: meeting.closer,
+    icon: <Eye className="h-3.5 w-3.5" />,
+    timestamp: new Date(lastMsgTime.getTime() + 180000),
   });
 
   items.push({
     type: "activity",
-    label: "Billing",
-    detail: `${meeting.billingStatus} · Closer: ${meeting.closer}`,
-    icon: <Receipt className="h-3 w-3" />,
-    timestamp: new Date(lastMsgTime.getTime() + 4000),
+    label: `Billing: ${meeting.billingStatus}`,
+    detail: `Closer: ${meeting.closer}`,
+    user: meeting.closer,
+    icon: <Receipt className="h-3.5 w-3.5" />,
+    timestamp: new Date(lastMsgTime.getTime() + 240000),
   });
 
   // Sort chronologically
@@ -163,21 +170,26 @@ export function ConversationPanel({ meeting, onClose }: ConversationPanelProps) 
               );
             }
 
-            // Activity event
+            // Activity event — centered pill with status, time, user
             return (
-              <div key={`activity-${idx}`} className="flex items-center justify-center gap-3 py-2">
-                <div className="h-px flex-1 bg-border" />
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted text-muted-foreground">
-                  {item.icon}
-                  <div className="text-[11px] font-medium">
-                    {item.label}
+              <div key={`activity-${idx}`} className="py-1.5">
+                <div className="flex items-center gap-3">
+                  <div className="h-px flex-1 bg-border" />
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    {item.icon}
+                    <span className="text-[11px] font-medium">{item.label}</span>
                   </div>
-                  <span className="text-[10px]">·</span>
-                  <div className="text-[10px]">
-                    {item.detail}
-                  </div>
+                  <div className="h-px flex-1 bg-border" />
                 </div>
-                <div className="h-px flex-1 bg-border" />
+                <div className="flex items-center justify-center gap-1.5 mt-1">
+                  <span className="text-[10px] text-muted-foreground">
+                    {format(item.timestamp, "MMM d, h:mm a")}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground">·</span>
+                  <span className="text-[10px] text-muted-foreground">
+                    {item.user}
+                  </span>
+                </div>
               </div>
             );
           })}

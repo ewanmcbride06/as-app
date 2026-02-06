@@ -1,10 +1,9 @@
-import { useState } from "react";
 import { format } from "date-fns";
-import { Copy, MessageSquare, ChevronDown, ChevronRight } from "lucide-react";
+import { Copy, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { StatusDropdown } from "./StatusDropdown";
-import { BookingTimeline } from "./BookingTimeline";
+
 import {
   Meeting,
   LeadStatus,
@@ -70,19 +69,6 @@ export function PipelineTable({
   onUpdateStatus,
   onOpenConversation,
 }: PipelineTableProps) {
-  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
-
-  const toggleExpand = (id: string) => {
-    setExpandedRows((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  };
 
   return (
     <div className="flex-1 overflow-auto px-3 pb-3">
@@ -99,21 +85,13 @@ export function PipelineTable({
 
           {/* Meeting Cards */}
           <div className="space-y-2 mt-2">
-            {meetings.map((meeting) => {
-              const isExpanded = expandedRows.has(meeting.id);
-              return (
+            {meetings.map((meeting) => (
                 <div
                   key={meeting.id}
-                  className={cn(
-                    "border border-border rounded-[10px] bg-background transition-colors group hover:border-muted-foreground/20",
-                    isExpanded && "bg-muted/5"
-                  )}
+                  className="border border-border rounded-[10px] bg-background transition-colors group hover:border-muted-foreground/20"
                 >
                   {/* Main Row — 20px padding */}
-                  <div
-                    className="flex items-center gap-4 p-5 cursor-pointer"
-                    onClick={() => toggleExpand(meeting.id)}
-                  >
+                  <div className="flex items-center gap-4 p-5">
                     {/* Checkbox */}
                     <div
                       className="w-5 shrink-0"
@@ -222,19 +200,10 @@ export function PipelineTable({
                           <MessageSquare className="h-3.5 w-3.5" />
                         </Button>
                       </div>
-                      {isExpanded ? (
-                        <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-                      ) : (
-                        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
-                      )}
                     </div>
                   </div>
-
-                  {/* Expandable Timeline */}
-                  {isExpanded && <BookingTimeline meeting={meeting} />}
                 </div>
-              );
-            })}
+              ))}
           </div>
         </div>
       ))}
