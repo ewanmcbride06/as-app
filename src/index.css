@@ -30,6 +30,8 @@ All colors MUST be HSL.
     --input: 0 0% 90%;
     --ring: 0 0% 4%;
     --radius: 10px;
+    --imessage-blue: 211 100% 50%;
+    --imessage-gray: 0 0% 90%;
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 0 0% 26%;
     --sidebar-primary: 0 0% 10%;

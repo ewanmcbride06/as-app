@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PipelineToolbar } from "@/components/pipeline/PipelineToolbar";
 import { PipelineTable } from "@/components/pipeline/PipelineTable";
+import { ConversationPanel } from "@/components/pipeline/ConversationPanel";
 import { mockMeetings } from "@/components/pipeline/mockData";
 import { Meeting } from "@/components/pipeline/types";
 import { updateDealStage, updateMeetingShowStatus } from "@/services/pipelineApi";
@@ -16,6 +17,7 @@ const Pipeline = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMeetings, setSelectedMeetings] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<"booked" | "analytics" | "connections">("booked");
+  const [conversationMeeting, setConversationMeeting] = useState<Meeting | null>(null);
   const { toast } = useToast();
 
   const filteredMeetings = useMemo(() => {
@@ -142,9 +144,14 @@ const Pipeline = () => {
           ))}
         </div>
 
-        {/* Main Content */}
-        <div className="flex-1 min-h-0 overflow-hidden border border-border rounded-[10px]">
-          <div className="flex flex-col h-full">
+        {/* Main Content with optional conversation panel */}
+        <div className="flex-1 min-h-0 overflow-hidden flex gap-0">
+          {/* Table */}
+          <div
+            className={`flex-1 min-w-0 border border-border rounded-[10px] flex flex-col overflow-hidden transition-all ${
+              conversationMeeting ? "mr-0 rounded-r-none border-r-0" : ""
+            }`}
+          >
             <PipelineToolbar
               totalCount={filteredMeetings.length}
               selectedCount={selectedMeetings.length}
@@ -158,8 +165,19 @@ const Pipeline = () => {
               onToggleSelectAll={toggleSelectAll}
               onToggleSelect={toggleSelect}
               onUpdateStatus={handleUpdateStatus}
+              onOpenConversation={setConversationMeeting}
             />
           </div>
+
+          {/* Conversation Side Panel */}
+          {conversationMeeting && (
+            <div className="w-[360px] shrink-0 border border-border border-l-0 rounded-r-[10px] overflow-hidden">
+              <ConversationPanel
+                meeting={conversationMeeting}
+                onClose={() => setConversationMeeting(null)}
+              />
+            </div>
+          )}
         </div>
       </div>
     </DashboardLayout>

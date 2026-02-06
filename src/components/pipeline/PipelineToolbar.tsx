@@ -48,7 +48,7 @@ export function PipelineToolbar({
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-2 h-8 text-xs">
+              <Button variant="outline" size="sm" className="gap-2 h-8 px-3 text-xs">
                 <Filter className="h-3.5 w-3.5" />
                 Filters
               </Button>
@@ -63,7 +63,7 @@ export function PipelineToolbar({
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-2 h-8 text-xs">
+              <Button variant="outline" size="sm" className="gap-2 h-8 px-3 text-xs">
                 <Calendar className="h-3.5 w-3.5" />
                 All Time
                 <ChevronDown className="h-3 w-3" />
@@ -79,7 +79,7 @@ export function PipelineToolbar({
 
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-2 h-8 text-xs">
+              <Button variant="outline" size="sm" className="gap-2 h-8 px-3 text-xs">
                 <Columns className="h-3.5 w-3.5" />
                 Columns
               </Button>
@@ -99,7 +99,7 @@ export function PipelineToolbar({
             </PopoverContent>
           </Popover>
 
-          <Button size="sm" variant="outline" className="gap-2 h-8 text-xs">
+          <Button size="sm" variant="outline" className="gap-2 h-8 px-3 text-xs">
             <Plus className="h-3.5 w-3.5" />
             Payout
           </Button>
