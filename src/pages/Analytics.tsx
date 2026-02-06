@@ -1,15 +1,17 @@
+import { useState } from "react";
+import { subDays, startOfDay, endOfDay } from "date-fns";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Calendar, ChevronDown, Download, TrendingUp, Users, Mail, MousePointer } from "lucide-react";
+import { Download, TrendingUp, Users, Mail, MousePointer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DateRangePicker, type DateRange } from "@/components/ui/date-range-picker";
 
 const Analytics = () => {
+  const [dateRange, setDateRange] = useState<DateRange>({
+    from: startOfDay(subDays(new Date(), 29)),
+    to: endOfDay(new Date()),
+  });
+
   return (
     <DashboardLayout>
       <div className="flex flex-col h-full overflow-hidden">
@@ -20,21 +22,7 @@ const Analytics = () => {
             <p className="text-muted-foreground">Track your performance metrics and campaign insights</p>
           </div>
           <div className="flex items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Calendar className="h-4 w-4" />
-                  Last 30 Days
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem>Last 7 Days</DropdownMenuItem>
-                <DropdownMenuItem>Last 30 Days</DropdownMenuItem>
-                <DropdownMenuItem>Last 90 Days</DropdownMenuItem>
-                <DropdownMenuItem>All Time</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <DateRangePicker value={dateRange} onChange={setDateRange} />
             <Button variant="outline" size="sm" className="gap-2">
               <Download className="h-4 w-4" />
               Export

@@ -1,17 +1,13 @@
 import { useState } from "react";
+import { subDays, startOfDay, endOfDay } from "date-fns";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { 
-  TrendingUp, TrendingDown, Users, Mail, MousePointer, Calendar,
-  ChevronDown, Download, RefreshCw, MoreHorizontal
+  TrendingUp, TrendingDown, Users, Mail, MousePointer,
+  Download, RefreshCw, MoreHorizontal
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DateRangePicker, type DateRange } from "@/components/ui/date-range-picker";
 import {
   Table,
   TableBody,
@@ -50,7 +46,10 @@ const recentActivity = [
 ];
 
 const Index = () => {
-  const [dateRange, setDateRange] = useState("Last 30 days");
+  const [dateRange, setDateRange] = useState<DateRange>({
+    from: startOfDay(subDays(new Date(), 29)),
+    to: endOfDay(new Date()),
+  });
 
   return (
     <DashboardLayout>
@@ -62,21 +61,7 @@ const Index = () => {
             <p className="text-muted-foreground">Overview of your outreach performance</p>
           </div>
           <div className="flex items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Calendar className="h-4 w-4" />
-                  {dateRange}
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => setDateRange("Last 7 days")}>Last 7 days</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setDateRange("Last 30 days")}>Last 30 days</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setDateRange("Last 90 days")}>Last 90 days</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setDateRange("This year")}>This year</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <DateRangePicker value={dateRange} onChange={setDateRange} />
             <Button variant="outline" size="sm" className="gap-2">
               <RefreshCw className="h-4 w-4" />
               Refresh
