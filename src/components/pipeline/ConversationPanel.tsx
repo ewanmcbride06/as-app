@@ -13,16 +13,16 @@ interface ConversationPanelProps {
 export function ConversationPanel({ meeting, onClose }: ConversationPanelProps) {
   return (
     <div className="h-full flex flex-col bg-background">
-      {/* Header — matches pipeline page header height */}
-      <div className="px-5 py-4 flex items-center justify-between shrink-0 border-b border-border">
-        <div>
-          <h2 className="text-lg font-semibold tracking-tight">{meeting.inviteeName}</h2>
-          <p className="text-sm text-muted-foreground">{meeting.company}</p>
+      {/* Header — same height as TopNav (h-14 = 56px) */}
+      <div className="h-14 px-5 flex items-center justify-between shrink-0 border-b border-border">
+        <div className="min-w-0">
+          <h2 className="text-sm font-semibold truncate">{meeting.inviteeName}</h2>
+          <p className="text-xs text-muted-foreground truncate">{meeting.company}</p>
         </div>
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8"
+          className="h-8 w-8 shrink-0 ml-3"
           onClick={onClose}
         >
           <X className="h-4 w-4" />
