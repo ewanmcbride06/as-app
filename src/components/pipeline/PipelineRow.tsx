@@ -60,95 +60,98 @@ export function PipelineRow({
   onOpenConversation,
 }: PipelineRowProps) {
   return (
-    <div className="border-b border-border last:border-b-0">
-      {/* Main Row */}
-      <div className="flex items-center gap-4 px-5 py-5">
-        {/* Checkbox */}
-        <div className="w-[20px] shrink-0" onClick={(e) => e.stopPropagation()}>
-          <Checkbox
-            checked={isSelected}
-            onCheckedChange={() => onToggleSelect(meeting.id)}
-          />
-        </div>
-
-        {/* Date block */}
-        <div className="w-[56px] shrink-0 text-center">
-          <div className="text-[11px] text-muted-foreground leading-none">
-            {format(meeting.meetingDate, "EEE")}
+    <div className="mx-5 mb-3">
+      {/* Card */}
+      <div className="border border-border rounded-[10px] bg-background">
+        {/* Main row */}
+        <div className="flex items-center gap-4 px-5 py-4">
+          {/* Checkbox */}
+          <div className="w-[20px] shrink-0" onClick={(e) => e.stopPropagation()}>
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={() => onToggleSelect(meeting.id)}
+            />
           </div>
-          <div className="text-lg font-semibold leading-tight">
-            {format(meeting.meetingDate, "dd")}
+
+          {/* Date block */}
+          <div className="w-[56px] shrink-0 text-center">
+            <div className="text-[11px] text-muted-foreground leading-none">
+              {format(meeting.meetingDate, "EEE")}
+            </div>
+            <div className="text-lg font-semibold leading-tight">
+              {format(meeting.meetingDate, "dd")}
+            </div>
           </div>
-        </div>
 
-        {/* Name & company */}
-        <div className="w-[180px] shrink-0">
-          <div className="font-medium text-sm leading-tight">
-            {meeting.inviteeName}
+          {/* Name & company */}
+          <div className="flex-[1.8] min-w-[150px]">
+            <div className="font-medium text-sm leading-tight">
+              {meeting.inviteeName}
+            </div>
+            <div className="text-xs text-muted-foreground leading-tight mt-0.5">
+              {meeting.company}
+            </div>
           </div>
-          <div className="text-xs text-muted-foreground leading-tight mt-0.5">
-            {meeting.company}
+
+          {/* Lead Status */}
+          <div className="flex-1" onClick={(e) => e.stopPropagation()}>
+            <StatusDropdown
+              value={meeting.leadStatus}
+              options={leadStatusOptions}
+              colorMap={leadStatusColors}
+              onChange={(value) =>
+                onUpdateStatus(meeting.id, "leadStatus", value)
+              }
+            />
           </div>
-        </div>
 
-        {/* Lead Status */}
-        <div className="flex-1 min-w-[130px]" onClick={(e) => e.stopPropagation()}>
-          <StatusDropdown
-            value={meeting.leadStatus}
-            options={leadStatusOptions}
-            colorMap={leadStatusColors}
-            onChange={(value) =>
-              onUpdateStatus(meeting.id, "leadStatus", value)
-            }
-          />
-        </div>
+          {/* Call Status */}
+          <div className="flex-1" onClick={(e) => e.stopPropagation()}>
+            <StatusDropdown
+              value={meeting.callStatus}
+              options={callStatusOptions}
+              colorMap={callStatusColors}
+              onChange={(value) =>
+                onUpdateStatus(meeting.id, "callStatus", value)
+              }
+            />
+          </div>
 
-        {/* Call Status */}
-        <div className="flex-1 min-w-[110px]" onClick={(e) => e.stopPropagation()}>
-          <StatusDropdown
-            value={meeting.callStatus}
-            options={callStatusOptions}
-            colorMap={callStatusColors}
-            onChange={(value) =>
-              onUpdateStatus(meeting.id, "callStatus", value)
-            }
-          />
-        </div>
+          {/* Taken */}
+          <div className="flex-1" onClick={(e) => e.stopPropagation()}>
+            <StatusDropdown
+              value={meeting.takenStatus}
+              options={takenStatusOptions}
+              colorMap={takenStatusColors}
+              onChange={(value) =>
+                onUpdateStatus(meeting.id, "takenStatus", value)
+              }
+            />
+          </div>
 
-        {/* Taken */}
-        <div className="flex-1 min-w-[110px]" onClick={(e) => e.stopPropagation()}>
-          <StatusDropdown
-            value={meeting.takenStatus}
-            options={takenStatusOptions}
-            colorMap={takenStatusColors}
-            onChange={(value) =>
-              onUpdateStatus(meeting.id, "takenStatus", value)
-            }
-          />
-        </div>
+          {/* Billing */}
+          <div className="flex-1" onClick={(e) => e.stopPropagation()}>
+            <StatusDropdown
+              value={meeting.billingStatus}
+              options={billingStatusOptions}
+              colorMap={billingStatusColors}
+              onChange={(value) =>
+                onUpdateStatus(meeting.id, "billingStatus", value)
+              }
+            />
+          </div>
 
-        {/* Billing */}
-        <div className="flex-1 min-w-[110px]" onClick={(e) => e.stopPropagation()}>
-          <StatusDropdown
-            value={meeting.billingStatus}
-            options={billingStatusOptions}
-            colorMap={billingStatusColors}
-            onChange={(value) =>
-              onUpdateStatus(meeting.id, "billingStatus", value)
-            }
-          />
-        </div>
-
-        {/* Time */}
-        <div className="w-[80px] shrink-0 text-right">
-          <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium tabular-nums whitespace-nowrap border border-border rounded-[10px] bg-background">
-            {meeting.meetingTime}
-          </span>
+          {/* Time */}
+          <div className="w-[80px] shrink-0 text-right">
+            <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium tabular-nums whitespace-nowrap border border-border rounded-[10px] bg-background">
+              {meeting.meetingTime}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Detail Subsection */}
-      <div className="flex items-center justify-between mx-5 mb-4 px-4 py-3 rounded-[10px] bg-muted/50 border border-border">
+      {/* Detail row — outside card, beneath it */}
+      <div className="flex items-center justify-between px-5 pt-2 pb-0">
         <div className="flex items-center gap-1.5 text-[12px] text-muted-foreground flex-wrap">
           <span>
             Booked on:{" "}
