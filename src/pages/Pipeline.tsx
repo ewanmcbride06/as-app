@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { format, isToday, isThisWeek, isThisMonth } from "date-fns";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Search, Filter, Calendar, ChevronDown, Plus, Copy, MessageSquare } from "lucide-react";
@@ -63,6 +63,34 @@ const Pipeline = () => {
   const [dateFilter, setDateFilter] = useState<DateFilter>("all");
   const { openConversation } = useConversationPanel();
   const { toast } = useToast();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const dateHeaderRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const [stuckDateKey, setStuckDateKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const stickyOffset = 34;
+      let currentStuck: string | null = null;
+
+      dateHeaderRefs.current.forEach((el, key) => {
+        const containerRect = container.getBoundingClientRect();
+        const elRect = el.getBoundingClientRect();
+        const relativeTop = elRect.top - containerRect.top;
+
+        if (relativeTop <= stickyOffset + 2) {
+          currentStuck = key;
+        }
+      });
+
+      setStuckDateKey((prev) => (prev !== currentStuck ? currentStuck : prev));
+    };
+
+    container.addEventListener("scroll", handleScroll, { passive: true });
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const filteredMeetings = useMemo(() => {
     return meetings.filter((m) => {
@@ -88,7 +116,7 @@ const Pipeline = () => {
     });
     return Object.entries(groups)
       .sort(([a], [b]) => new Date(b).getTime() - new Date(a).getTime())
-      .map(([dateKey, meetings]) => ({ date: new Date(dateKey), meetings }));
+      .map(([dateKey, meetings]) => ({ dateKey, date: new Date(dateKey), meetings }));
   }, [filteredMeetings]);
 
   const handleUpdateStatus = async (
@@ -197,7 +225,7 @@ const Pipeline = () => {
         </div>
 
         {/* ─── Scrollable Content (includes sticky column headers) ─── */}
-        <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide">
+        <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto scrollbar-hide">
           {/* ─── Column Headers (sticky inside scroll) ─── */}
           <div className="sticky top-0 z-20 flex items-center px-5 pb-2 pt-2 text-[11px] font-medium text-muted-foreground uppercase tracking-wider bg-background border-b border-border">
             <div className="w-[300px] shrink-0">Booking Information</div>
@@ -208,10 +236,18 @@ const Pipeline = () => {
             <div className="w-[100px] shrink-0 text-right">Time of Call</div>
           </div>
 
-          {groupedMeetings.map(({ date, meetings: dateMeetings }) => (
+          {groupedMeetings.map(({ dateKey, date, meetings: dateMeetings }) => (
             <div key={date.toISOString()}>
               {/* Date Group Header */}
-              <div className="sticky top-[34px] z-10 bg-secondary border border-border border-t-0 rounded-b-[10px] rounded-t-none mx-0 px-5 py-2 mb-1">
+              <div
+                ref={(el) => { if (el) dateHeaderRefs.current.set(dateKey, el); }}
+                className={cn(
+                  "sticky top-[34px] z-10 bg-secondary border border-border mx-0 px-5 py-2",
+                  stuckDateKey === dateKey
+                    ? "rounded-b-[10px] rounded-t-none border-t-0 mb-1"
+                    : "rounded-[10px] my-1"
+                )}
+              >
                 <span className="text-[12px] font-medium text-muted-foreground">
                   {format(date, "dd MMMM yyyy")}
                 </span>
