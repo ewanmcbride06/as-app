@@ -1,20 +1,63 @@
 import { useState, useMemo } from "react";
 import { format, isToday, isThisWeek, isThisMonth } from "date-fns";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Search } from "lucide-react";
+import { Search, Filter, Calendar, ChevronDown, Plus, Copy, MessageSquare } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { PipelineToolbar, LeadFilter, DateFilter } from "@/components/pipeline/PipelineToolbar";
-import { PipelineTable } from "@/components/pipeline/PipelineTable";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { StatusDropdown } from "@/components/pipeline/StatusDropdown";
 import { mockMeetings } from "@/components/pipeline/mockData";
-import { Meeting } from "@/components/pipeline/types";
+import {
+  Meeting,
+  LeadStatus,
+  CallStatus,
+  TakenStatus,
+  BillingStatus,
+  leadStatusColors,
+  callStatusColors,
+  takenStatusColors,
+  billingStatusColors,
+} from "@/components/pipeline/types";
 import { updateDealStage, updateMeetingShowStatus } from "@/services/pipelineApi";
 import { useToast } from "@/hooks/use-toast";
 import { useConversationPanel } from "@/contexts/ConversationPanelContext";
+import { cn } from "@/lib/utils";
+
+// Status options
+const leadStatusOptions: LeadStatus[] = ["Potential", "Qualified", "Not Qualified", "Won", "Lost - Not Interest", "Lost - Failed To Close"];
+const callStatusOptions: CallStatus[] = ["Booked", "Rescheduled", "Cancelled"];
+const takenStatusOptions: TakenStatus[] = ["Upcoming", "Shown", "Not Shown"];
+const billingStatusOptions: BillingStatus[] = ["Not Billed", "Billed", "Pending", "Refunded"];
+
+// Filter types
+type DateFilter = "all" | "today" | "this_week" | "this_month";
+type LeadFilter = "all" | LeadStatus;
+
+const leadFilterOptions: { label: string; value: LeadFilter }[] = [
+  { label: "All Statuses", value: "all" },
+  { label: "Potential", value: "Potential" },
+  { label: "Qualified", value: "Qualified" },
+  { label: "Not Qualified", value: "Not Qualified" },
+  { label: "Won", value: "Won" },
+  { label: "Lost - Not Interest", value: "Lost - Not Interest" },
+  { label: "Lost - Failed To Close", value: "Lost - Failed To Close" },
+];
+
+const dateFilterOptions: { label: string; value: DateFilter }[] = [
+  { label: "All Time", value: "all" },
+  { label: "Today", value: "today" },
+  { label: "This Week", value: "this_week" },
+  { label: "This Month", value: "this_month" },
+];
 
 const Pipeline = () => {
   const [meetings, setMeetings] = useState<Meeting[]>(mockMeetings);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedMeetings, setSelectedMeetings] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<"booked" | "analytics" | "connections">("booked");
   const [leadFilter, setLeadFilter] = useState<LeadFilter>("all");
   const [dateFilter, setDateFilter] = useState<DateFilter>("all");
@@ -23,25 +66,15 @@ const Pipeline = () => {
 
   const filteredMeetings = useMemo(() => {
     return meetings.filter((m) => {
-      // Search filter
       const matchesSearch =
         m.inviteeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         m.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
         m.inviteeEmail.toLowerCase().includes(searchQuery.toLowerCase());
-
-      // Lead status filter
       const matchesLead = leadFilter === "all" || m.leadStatus === leadFilter;
-
-      // Date filter
       let matchesDate = true;
-      if (dateFilter === "today") {
-        matchesDate = isToday(m.meetingDate);
-      } else if (dateFilter === "this_week") {
-        matchesDate = isThisWeek(m.meetingDate, { weekStartsOn: 1 });
-      } else if (dateFilter === "this_month") {
-        matchesDate = isThisMonth(m.meetingDate);
-      }
-
+      if (dateFilter === "today") matchesDate = isToday(m.meetingDate);
+      else if (dateFilter === "this_week") matchesDate = isThisWeek(m.meetingDate, { weekStartsOn: 1 });
+      else if (dateFilter === "this_month") matchesDate = isThisMonth(m.meetingDate);
       return matchesSearch && matchesLead && matchesDate;
     });
   }, [meetings, searchQuery, leadFilter, dateFilter]);
@@ -53,13 +86,9 @@ const Pipeline = () => {
       if (!groups[dateKey]) groups[dateKey] = [];
       groups[dateKey].push(meeting);
     });
-
     return Object.entries(groups)
       .sort(([a], [b]) => new Date(b).getTime() - new Date(a).getTime())
-      .map(([dateKey, meetings]) => ({
-        date: new Date(dateKey),
-        meetings,
-      }));
+      .map(([dateKey, meetings]) => ({ date: new Date(dateKey), meetings }));
   }, [filteredMeetings]);
 
   const handleUpdateStatus = async (
@@ -67,109 +96,234 @@ const Pipeline = () => {
     field: "leadStatus" | "callStatus" | "takenStatus" | "billingStatus",
     value: string
   ) => {
-    setMeetings((prev) =>
-      prev.map((m) => (m.id === id ? { ...m, [field]: value } : m))
-    );
-
+    setMeetings((prev) => prev.map((m) => (m.id === id ? { ...m, [field]: value } : m)));
     if (field === "leadStatus") {
       const success = await updateDealStage({ deal_id: id, new_stage: value });
-      if (!success) {
-        toast({
-          title: "Sync failed",
-          description: "Failed to update deal stage on the server.",
-          variant: "destructive",
-        });
-      }
+      if (!success) toast({ title: "Sync failed", description: "Failed to update deal stage.", variant: "destructive" });
     }
-
     if (field === "takenStatus") {
       const success = await updateMeetingShowStatus({ meeting_id: id, show_status: value });
-      if (!success) {
-        toast({
-          title: "Sync failed",
-          description: "Failed to update meeting status on the server.",
-          variant: "destructive",
-        });
-      }
+      if (!success) toast({ title: "Sync failed", description: "Failed to update meeting status.", variant: "destructive" });
     }
-  };
-
-  const toggleSelectAll = () => {
-    if (selectedMeetings.length === filteredMeetings.length) {
-      setSelectedMeetings([]);
-    } else {
-      setSelectedMeetings(filteredMeetings.map((m) => m.id));
-    }
-  };
-
-  const toggleSelect = (id: string) => {
-    setSelectedMeetings((prev) =>
-      prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id]
-    );
   };
 
   return (
     <DashboardLayout>
       <div className="flex flex-col h-full overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between pb-4 shrink-0">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Pipeline</h1>
-            <p className="text-muted-foreground">
-              Overview of all bookings and their sales analytics.
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="relative w-60">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search invitee or company..."
-                className="pl-9 h-9 text-sm"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-          </div>
+        {/* ─── Page Header ─── */}
+        <div className="shrink-0 pb-5">
+          <h1 className="text-2xl font-semibold tracking-tight">Pipeline</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            See an overview of all the clients' bookings and their sales analytics.
+          </p>
         </div>
 
-        {/* Tabs */}
-        <div className="flex items-center gap-1 mb-4 shrink-0">
+        {/* ─── Tabs ─── */}
+        <div className="flex items-center gap-1 mb-5 shrink-0">
           {(["booked", "analytics", "connections"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`nav-tab ${activeTab === tab ? "nav-tab-active" : ""}`}
             >
-              {tab === "booked"
-                ? "Meetings Booked"
-                : tab === "analytics"
-                ? "Analytics"
-                : "Connections"}
+              {tab === "booked" ? "Meetings Booked" : tab === "analytics" ? "Analytics (Coming Soon)" : "Connections"}
             </button>
           ))}
         </div>
 
-        {/* Toolbar + Table */}
-        <div className="flex-1 min-h-0 overflow-hidden flex flex-col border border-border rounded-[10px]">
-          <PipelineToolbar
-            totalCount={filteredMeetings.length}
-            selectedCount={selectedMeetings.length}
-            onClearSelection={() => setSelectedMeetings([])}
-            leadFilter={leadFilter}
-            dateFilter={dateFilter}
-            onLeadFilterChange={setLeadFilter}
-            onDateFilterChange={setDateFilter}
-          />
+        {/* ─── Search & Controls Bar ─── */}
+        <div className="flex items-center gap-3 mb-5 shrink-0">
+          <div className="relative flex-1 max-w-xl">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search for meetings by invitee or company name"
+              className="pl-9 h-9 text-sm"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
 
-          <PipelineTable
-            groupedMeetings={groupedMeetings}
-            filteredCount={filteredMeetings.length}
-            selectedMeetings={selectedMeetings}
-            onToggleSelectAll={toggleSelectAll}
-            onToggleSelect={toggleSelect}
-            onUpdateStatus={handleUpdateStatus}
-            onOpenConversation={openConversation}
-          />
+          <div className="flex items-center gap-2 ml-auto">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className={cn("gap-2 h-9 px-3 text-xs", leadFilter !== "all" && "border-foreground/30")}>
+                  <Filter className="h-3.5 w-3.5" />
+                  Filters
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[180px]">
+                {leadFilterOptions.map((opt) => (
+                  <DropdownMenuItem
+                    key={opt.value}
+                    onClick={() => setLeadFilter(opt.value)}
+                    className={cn("cursor-pointer text-sm", leadFilter === opt.value && "bg-muted font-medium")}
+                  >
+                    {opt.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className={cn("gap-2 h-9 px-3 text-xs", dateFilter !== "all" && "border-foreground/30")}>
+                  <Calendar className="h-3.5 w-3.5" />
+                  {dateFilterOptions.find((o) => o.value === dateFilter)?.label}
+                  <ChevronDown className="h-3 w-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[150px]">
+                {dateFilterOptions.map((opt) => (
+                  <DropdownMenuItem
+                    key={opt.value}
+                    onClick={() => setDateFilter(opt.value)}
+                    className={cn("cursor-pointer text-sm", dateFilter === opt.value && "bg-muted font-medium")}
+                  >
+                    {opt.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <Button variant="outline" size="sm" className="gap-2 h-9 px-3 text-xs">
+              <Plus className="h-3.5 w-3.5" />
+              Payout
+            </Button>
+
+            <div className="inline-flex items-center h-9 px-4 text-xs font-medium border border-border rounded-[10px] bg-background">
+              Total: {filteredMeetings.length}
+            </div>
+          </div>
+        </div>
+
+        {/* ─── Column Headers ─── */}
+        <div className="shrink-0 flex items-center px-1 pb-2 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+          <div className="w-[320px] shrink-0 pl-2">Booking Information</div>
+          <div className="flex-1">Lead Status</div>
+          <div className="flex-1">Call Status</div>
+          <div className="flex-1">Taken Status</div>
+          <div className="flex-1">Billing Status</div>
+          <div className="w-[100px] shrink-0 text-right pr-2">Time of Call</div>
+        </div>
+
+        {/* ─── Scrollable Content ─── */}
+        <div className="flex-1 min-h-0 overflow-y-auto">
+          {groupedMeetings.map(({ date, meetings: dateMeetings }) => (
+            <div key={date.toISOString()}>
+              {/* Date Group Header */}
+              <div className="sticky top-0 z-10 bg-secondary border-y border-border px-4 py-2">
+                <span className="text-[12px] font-medium text-muted-foreground">
+                  {format(date, "dd MMMM yyyy")}
+                </span>
+              </div>
+
+              {/* Booking Cards */}
+              <div className="py-3 space-y-4 px-1">
+                {dateMeetings.map((meeting) => (
+                  <div key={meeting.id}>
+                    {/* Card */}
+                    <div className="border border-border rounded-[10px] bg-background">
+                      <div className="flex items-center px-5 py-4">
+                        {/* Booking Info: Day + Name */}
+                        <div className="w-[300px] shrink-0 flex items-center gap-4">
+                          <div className="w-[48px] shrink-0 text-center">
+                            <div className="text-[11px] text-muted-foreground leading-none font-medium">
+                              {format(meeting.meetingDate, "EEE")}
+                            </div>
+                            <div className="text-lg font-semibold leading-tight">
+                              {format(meeting.meetingDate, "dd")}
+                            </div>
+                          </div>
+                          <div className="min-w-0">
+                            <div className="font-medium text-sm leading-tight truncate">
+                              {meeting.inviteeName}
+                            </div>
+                            <div className="text-xs text-muted-foreground leading-tight mt-0.5 truncate">
+                              {meeting.company}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Lead Status */}
+                        <div className="flex-1" onClick={(e) => e.stopPropagation()}>
+                          <StatusDropdown
+                            value={meeting.leadStatus}
+                            options={leadStatusOptions}
+                            colorMap={leadStatusColors}
+                            onChange={(v) => handleUpdateStatus(meeting.id, "leadStatus", v)}
+                          />
+                        </div>
+
+                        {/* Call Status */}
+                        <div className="flex-1" onClick={(e) => e.stopPropagation()}>
+                          <StatusDropdown
+                            value={meeting.callStatus}
+                            options={callStatusOptions}
+                            colorMap={callStatusColors}
+                            onChange={(v) => handleUpdateStatus(meeting.id, "callStatus", v)}
+                          />
+                        </div>
+
+                        {/* Taken Status */}
+                        <div className="flex-1" onClick={(e) => e.stopPropagation()}>
+                          <StatusDropdown
+                            value={meeting.takenStatus}
+                            options={takenStatusOptions}
+                            colorMap={takenStatusColors}
+                            onChange={(v) => handleUpdateStatus(meeting.id, "takenStatus", v)}
+                          />
+                        </div>
+
+                        {/* Billing Status */}
+                        <div className="flex-1" onClick={(e) => e.stopPropagation()}>
+                          <StatusDropdown
+                            value={meeting.billingStatus}
+                            options={billingStatusOptions}
+                            colorMap={billingStatusColors}
+                            onChange={(v) => handleUpdateStatus(meeting.id, "billingStatus", v)}
+                          />
+                        </div>
+
+                        {/* Time */}
+                        <div className="w-[100px] shrink-0 text-right">
+                          <span className="inline-flex items-center px-3 py-1 text-xs font-medium tabular-nums whitespace-nowrap border border-border rounded-[10px] bg-background">
+                            {meeting.meetingTime}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Metadata Row — beneath card */}
+                    <div className="flex items-center justify-between px-5 pt-2">
+                      <div className="flex items-center text-[12px] text-muted-foreground gap-1 flex-wrap">
+                        <span>Booked on: <span className="text-foreground/60">{format(meeting.bookedAt, "EEEE dd MMM yyyy 'at' h:mm a")}</span></span>
+                        <span className="mx-1.5">·</span>
+                        <span>Invitees: <span className="text-foreground/60">{meeting.inviteeEmail}</span></span>
+                        <span className="mx-1.5">·</span>
+                        <span>No. of Reschedules <span className="text-foreground/60">{meeting.rescheduleCount}</span></span>
+                        <span className="mx-1.5">·</span>
+                        <span>Call Stage: <span className="text-foreground/60">{meeting.callStage}</span></span>
+                      </div>
+                      <div className="flex items-center gap-0.5 shrink-0 ml-4">
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground">
+                          <Copy className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground" onClick={() => openConversation(meeting)}>
+                          <MessageSquare className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+
+          {filteredMeetings.length === 0 && (
+            <div className="text-center py-16 text-sm text-muted-foreground">
+              No meetings found matching your filters.
+            </div>
+          )}
         </div>
       </div>
     </DashboardLayout>
