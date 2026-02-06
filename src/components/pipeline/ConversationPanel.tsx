@@ -17,7 +17,6 @@ type FeedItem =
 function buildFeed(meeting: Meeting): FeedItem[] {
   const items: FeedItem[] = [];
 
-  // Add all conversation messages
   meeting.conversation.forEach((msg) => {
     items.push({
       type: "message",
@@ -28,7 +27,6 @@ function buildFeed(meeting: Meeting): FeedItem[] {
     });
   });
 
-  // Meeting booked — placed at bookedAt time (interleaves with messages)
   items.push({
     type: "activity",
     label: "Meeting Booked",
@@ -38,7 +36,6 @@ function buildFeed(meeting: Meeting): FeedItem[] {
     timestamp: meeting.bookedAt,
   });
 
-  // Reschedules — spaced after booking
   if (meeting.rescheduleCount > 0) {
     for (let i = 0; i < meeting.rescheduleCount; i++) {
       const rescheduleTime = new Date(meeting.bookedAt.getTime() + (i + 1) * 7200000);
@@ -53,7 +50,6 @@ function buildFeed(meeting: Meeting): FeedItem[] {
     }
   }
 
-  // Cancelled — after reschedules
   if (meeting.callStatus === "Cancelled") {
     const cancelTime = new Date(meeting.bookedAt.getTime() + (meeting.rescheduleCount + 1) * 7200000 + 3600000);
     items.push({
@@ -66,7 +62,6 @@ function buildFeed(meeting: Meeting): FeedItem[] {
     });
   }
 
-  // Lead status — placed near the end of the conversation timeline
   const lastMsgTime = meeting.conversation.length > 0
     ? meeting.conversation[meeting.conversation.length - 1].timestamp
     : meeting.bookedAt;
@@ -107,10 +102,17 @@ function buildFeed(meeting: Meeting): FeedItem[] {
     timestamp: new Date(lastMsgTime.getTime() + 240000),
   });
 
-  // Sort chronologically
   items.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
-
   return items;
+}
+
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
 }
 
 export function ConversationPanel({ meeting, onClose }: ConversationPanelProps) {
@@ -118,11 +120,18 @@ export function ConversationPanel({ meeting, onClose }: ConversationPanelProps) 
 
   return (
     <div className="h-full flex flex-col bg-background">
-      {/* Header — same height as TopNav (h-14 = 56px) */}
+      {/* Header */}
       <div className="h-14 px-5 flex items-center justify-between shrink-0 border-b border-border">
-        <div className="min-w-0">
-          <h2 className="text-sm font-semibold truncate">{meeting.inviteeName}</h2>
-          <p className="text-xs text-muted-foreground truncate">{meeting.company}</p>
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="h-8 w-8 rounded-[10px] bg-foreground text-background flex items-center justify-center text-xs font-semibold shrink-0">
+            {getInitials(meeting.inviteeName)}
+          </div>
+          <div className="min-w-0">
+            <h2 className="text-sm font-semibold truncate">{meeting.inviteeName}</h2>
+            <p className="text-[11px] text-muted-foreground truncate">
+              {meeting.company} · {meeting.inviteeEmail}
+            </p>
+          </div>
         </div>
         <Button
           variant="ghost"
@@ -136,63 +145,93 @@ export function ConversationPanel({ meeting, onClose }: ConversationPanelProps) 
 
       {/* Feed */}
       <ScrollArea className="flex-1">
-        <div className="p-5 space-y-4">
-          {feed.map((item, idx) => {
-            if (item.type === "message") {
-              return (
-                <div key={`msg-${item.id}`} className="space-y-1">
-                  <div
-                    className={cn(
-                      "flex",
-                      item.sender === "us" ? "justify-end" : "justify-start"
-                    )}
-                  >
-                    <div
-                      className={cn(
-                        "max-w-[85%] px-3.5 py-2 rounded-2xl text-sm",
-                        item.sender === "us"
-                          ? "bg-[hsl(var(--imessage-blue))] text-white rounded-br-sm"
-                          : "bg-[hsl(var(--imessage-gray))] text-foreground rounded-bl-sm"
-                      )}
-                    >
-                      <p className="leading-relaxed">{item.message}</p>
+        <div className="px-5 py-6">
+          {/* Timeline spine */}
+          <div className="relative">
+            {feed.map((item, idx) => {
+              const isLast = idx === feed.length - 1;
+
+              if (item.type === "activity") {
+                return (
+                  <div key={`activity-${idx}`} className="relative flex gap-3 pb-6">
+                    {/* Spine */}
+                    <div className="flex flex-col items-center shrink-0 w-8">
+                      <div className="h-8 w-8 rounded-[10px] border border-border bg-background flex items-center justify-center text-muted-foreground shrink-0">
+                        {item.icon}
+                      </div>
+                      {!isLast && <div className="w-px flex-1 bg-border mt-1.5" />}
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0 pt-1">
+                      <div className="text-[13px] font-medium text-foreground leading-tight">
+                        {item.label}
+                      </div>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        {item.detail}
+                      </p>
+                      <div className="flex items-center gap-1.5 mt-1.5">
+                        <div className="h-4 w-4 rounded-full bg-muted flex items-center justify-center">
+                          <span className="text-[7px] font-semibold text-muted-foreground">
+                            {getInitials(item.user)}
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-muted-foreground">
+                          {item.user}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">·</span>
+                        <span className="text-[10px] text-muted-foreground">
+                          {format(item.timestamp, "MMM d, h:mm a")}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                  <p
-                    className={cn(
-                      "text-[10px] text-muted-foreground",
-                      item.sender === "us" ? "text-right" : "text-left"
-                    )}
-                  >
-                    {format(item.timestamp, "MMM d, h:mm a")}
-                  </p>
+                );
+              }
+
+              // Message
+              return (
+                <div key={`msg-${item.id}`} className="relative flex gap-3 pb-6">
+                  {/* Spine */}
+                  <div className="flex flex-col items-center shrink-0 w-8">
+                    <div
+                      className={cn(
+                        "h-8 w-8 rounded-[10px] flex items-center justify-center text-[10px] font-semibold shrink-0",
+                        item.sender === "us"
+                          ? "bg-foreground text-background"
+                          : "bg-muted text-muted-foreground"
+                      )}
+                    >
+                      {item.sender === "us" ? "You" : getInitials(meeting.inviteeName)}
+                    </div>
+                    {!isLast && <div className="w-px flex-1 bg-border mt-1.5" />}
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0 pt-1">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-[13px] font-medium text-foreground">
+                        {item.sender === "us" ? "You" : meeting.inviteeName}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground">
+                        {format(item.timestamp, "MMM d, h:mm a")}
+                      </span>
+                    </div>
+                    <div
+                      className={cn(
+                        "mt-1.5 px-3.5 py-2.5 rounded-[10px] text-[13px] leading-relaxed",
+                        item.sender === "us"
+                          ? "bg-foreground text-background"
+                          : "bg-muted text-foreground"
+                      )}
+                    >
+                      {item.message}
+                    </div>
+                  </div>
                 </div>
               );
-            }
-
-            // Activity event — centered pill with status, time, user
-            return (
-              <div key={`activity-${idx}`} className="py-1.5">
-                <div className="flex items-center gap-3">
-                  <div className="h-px flex-1 bg-border" />
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    {item.icon}
-                    <span className="text-[11px] font-medium">{item.label}</span>
-                  </div>
-                  <div className="h-px flex-1 bg-border" />
-                </div>
-                <div className="flex items-center justify-center gap-1.5 mt-1">
-                  <span className="text-[10px] text-muted-foreground">
-                    {format(item.timestamp, "MMM d, h:mm a")}
-                  </span>
-                  <span className="text-[10px] text-muted-foreground">·</span>
-                  <span className="text-[10px] text-muted-foreground">
-                    {item.user}
-                  </span>
-                </div>
-              </div>
-            );
-          })}
+            })}
+          </div>
         </div>
       </ScrollArea>
     </div>
