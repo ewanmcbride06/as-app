@@ -12,17 +12,17 @@ interface ConversationPanelProps {
 
 export function ConversationPanel({ meeting, onClose }: ConversationPanelProps) {
   return (
-    <div className="h-full flex flex-col border border-border rounded-[10px] bg-background overflow-hidden">
-      {/* Header */}
-      <div className="px-4 py-3 border-b border-border flex items-center justify-between shrink-0">
+    <div className="h-full flex flex-col bg-background">
+      {/* Header — matches pipeline page header height */}
+      <div className="px-5 py-4 flex items-center justify-between shrink-0 border-b border-border">
         <div>
-          <h3 className="text-sm font-medium">{meeting.inviteeName}</h3>
-          <p className="text-xs text-muted-foreground">{meeting.company}</p>
+          <h2 className="text-lg font-semibold tracking-tight">{meeting.inviteeName}</h2>
+          <p className="text-sm text-muted-foreground">{meeting.company}</p>
         </div>
         <Button
           variant="ghost"
           size="icon"
-          className="h-7 w-7"
+          className="h-8 w-8"
           onClick={onClose}
         >
           <X className="h-4 w-4" />
@@ -31,7 +31,7 @@ export function ConversationPanel({ meeting, onClose }: ConversationPanelProps) 
 
       {/* Messages */}
       <ScrollArea className="flex-1">
-        <div className="p-4 space-y-3">
+        <div className="p-5 space-y-3">
           {meeting.conversation.map((msg) => (
             <div
               key={msg.id}

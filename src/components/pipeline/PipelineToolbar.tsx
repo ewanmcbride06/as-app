@@ -1,17 +1,11 @@
-import { Filter, Calendar, ChevronDown, Columns, Plus } from "lucide-react";
+import { Filter, Calendar, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 
 interface PipelineToolbarProps {
   totalCount: number;
@@ -19,26 +13,15 @@ interface PipelineToolbarProps {
   onClearSelection: () => void;
 }
 
-const columnOptions = [
-  "Date",
-  "Invitee",
-  "Lead Status",
-  "Call Status",
-  "Taken",
-  "Billing",
-  "Time",
-  "Details",
-];
-
 export function PipelineToolbar({
   totalCount,
   selectedCount,
   onClearSelection,
 }: PipelineToolbarProps) {
   return (
-    <div className="space-y-0">
+    <div className="space-y-0 shrink-0">
       {/* Main Toolbar */}
-      <div className="border-b border-border px-4 py-2.5 flex items-center justify-between bg-background shrink-0">
+      <div className="px-3 py-2.5 flex items-center justify-between">
         <span className="text-sm text-muted-foreground">
           Showing{" "}
           <strong className="text-foreground">{totalCount}</strong>{" "}
@@ -76,39 +59,12 @@ export function PipelineToolbar({
               <DropdownMenuItem>All Time</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-2 h-8 px-3 text-xs">
-                <Columns className="h-3.5 w-3.5" />
-                Columns
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-48">
-              <div className="space-y-2">
-                {columnOptions.map((col) => (
-                  <label
-                    key={col}
-                    className="flex items-center gap-2 text-sm cursor-pointer"
-                  >
-                    <Checkbox defaultChecked />
-                    {col}
-                  </label>
-                ))}
-              </div>
-            </PopoverContent>
-          </Popover>
-
-          <Button size="sm" variant="outline" className="gap-2 h-8 px-3 text-xs">
-            <Plus className="h-3.5 w-3.5" />
-            Payout
-          </Button>
         </div>
       </div>
 
       {/* Bulk Actions Bar */}
       {selectedCount > 0 && (
-        <div className="border-b border-border px-4 py-2.5 bg-muted/40 flex items-center gap-3 shrink-0">
+        <div className="px-3 py-2.5 bg-muted/40 border-t border-border flex items-center gap-3">
           <span className="text-xs font-medium">
             {selectedCount} selected
           </span>
