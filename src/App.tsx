@@ -11,7 +11,7 @@ import Campaigns from "./pages/Campaigns";
 import CampaignDetail from "./pages/CampaignDetail";
 import Infrastructure from "./pages/Infrastructure";
 import Engagement from "./pages/Engagement";
-import Personas from "./pages/Personas";
+
 import Settings from "./pages/Settings";
 import SettingsTeam from "./pages/SettingsTeam";
 import SettingsIntegrations from "./pages/SettingsIntegrations";
@@ -39,7 +39,7 @@ const App = () => (
             <Route path="/campaigns/:id" element={<CampaignDetail />} />
             <Route path="/infrastructure" element={<Infrastructure />} />
             <Route path="/engagement" element={<Engagement />} />
-            <Route path="/personas" element={<Personas />} />
+            
             
             {/* LeadVault Routes */}
             <Route path="/leads" element={<LeadVaultDatabase />} />
