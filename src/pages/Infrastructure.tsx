@@ -1,5 +1,6 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import { cn } from "@/lib/utils";
 import { 
   Plus, MoreHorizontal, Mail, Globe, 
   CheckCircle2, XCircle, AlertCircle, RefreshCw, Download, Upload
@@ -116,21 +117,27 @@ const Infrastructure = () => {
         </div>
 
         {/* Tabs */}
-        <div className="flex items-center gap-1 mb-4">
-          <button
-            onClick={() => setActiveTab("domains")}
-            className={`nav-tab flex items-center gap-2 ${activeTab === "domains" ? "nav-tab-active" : ""}`}
-          >
-            <Globe className="h-4 w-4" />
-            Domains
-          </button>
-          <button
-            onClick={() => setActiveTab("mailboxes")}
-            className={`nav-tab flex items-center gap-2 ${activeTab === "mailboxes" ? "nav-tab-active" : ""}`}
-          >
-            <Mail className="h-4 w-4" />
-            Mailboxes
-          </button>
+        <div className="shrink-0 border-b mb-5">
+          <div className="flex items-center gap-1">
+            {([
+              { key: "domains" as const, label: "Domains", icon: Globe },
+              { key: "mailboxes" as const, label: "Mailboxes", icon: Mail },
+            ]).map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={cn(
+                  "shrink-0 flex items-center gap-2 px-3 py-2.5 sm:px-4 sm:py-3 text-sm font-medium border-b-2 -mb-[2px] transition-colors whitespace-nowrap",
+                  activeTab === tab.key
+                    ? "border-foreground text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/50"
+                )}
+              >
+                <tab.icon className="h-4 w-4" />
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Main Content */}

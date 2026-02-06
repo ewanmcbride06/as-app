@@ -1,4 +1,5 @@
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
@@ -194,16 +195,23 @@ const Campaigns = () => {
         </div>
 
         {/* Tabs */}
-        <div className="flex items-center gap-1 mb-4">
-          {["All", "Active", "Completed", "Paused", "Archived"].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveFilter(tab)}
-              className={`nav-tab ${activeFilter === tab ? "nav-tab-active" : ""}`}
-            >
-              {tab}
-            </button>
-          ))}
+        <div className="shrink-0 border-b mb-5">
+          <div className="flex items-center gap-1">
+            {["All", "Active", "Completed", "Paused", "Archived"].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveFilter(tab)}
+                className={cn(
+                  "shrink-0 flex items-center gap-2 px-3 py-2.5 sm:px-4 sm:py-3 text-sm font-medium border-b-2 -mb-[2px] transition-colors whitespace-nowrap",
+                  activeFilter === tab
+                    ? "border-foreground text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/50"
+                )}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Main Content */}
