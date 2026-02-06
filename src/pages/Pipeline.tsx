@@ -1,11 +1,12 @@
 import { useState, useMemo, useRef, useEffect } from "react";
-import { format, isToday, isThisWeek, isThisMonth } from "date-fns";
+import { format, isWithinInterval, startOfDay, endOfDay, subDays } from "date-fns";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Search, Filter, Calendar, ChevronDown, MessageSquare, CalendarDays, BarChart3, Link2, Hash, X } from "lucide-react";
+import { Search, Filter, MessageSquare, CalendarDays, BarChart3, Link2, Hash, X } from "lucide-react";
 import { TimezoneSelector } from "@/components/pipeline/TimezoneSelector";
 import { getLocalTimezone, formatTimeInTimezone } from "@/components/pipeline/timezones";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { DateRangePicker, type DateRange } from "@/components/ui/date-range-picker";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,8 +37,6 @@ const callStatusOptions: CallStatus[] = ["Booked", "Rescheduled", "Cancelled"];
 const takenStatusOptions: TakenStatus[] = ["Upcoming", "Shown", "Not Shown"];
 const billingStatusOptions: BillingStatus[] = ["Not Billed", "Billed", "Pending", "Refunded"];
 
-// Filter types
-type DateFilter = "all" | "today" | "this_week" | "this_month";
 type LeadFilter = "all" | LeadStatus;
 
 const leadFilterOptions: { label: string; value: LeadFilter }[] = [
@@ -50,19 +49,15 @@ const leadFilterOptions: { label: string; value: LeadFilter }[] = [
   { label: "Lost - Failed To Close", value: "Lost - Failed To Close" },
 ];
 
-const dateFilterOptions: { label: string; value: DateFilter }[] = [
-  { label: "All Time", value: "all" },
-  { label: "Today", value: "today" },
-  { label: "This Week", value: "this_week" },
-  { label: "This Month", value: "this_month" },
-];
-
 const Pipeline = () => {
   const [meetings, setMeetings] = useState<Meeting[]>(mockMeetings);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<"booked" | "analytics" | "connections">("booked");
   const [leadFilter, setLeadFilter] = useState<LeadFilter>("all");
-  const [dateFilter, setDateFilter] = useState<DateFilter>("all");
+  const [dateRange, setDateRange] = useState<DateRange>({
+    from: startOfDay(subDays(new Date(), 29)),
+    to: endOfDay(new Date()),
+  });
   const [timezone, setTimezone] = useState<string>(getLocalTimezone());
   const [searchOpen, setSearchOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -101,13 +96,13 @@ const Pipeline = () => {
         m.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
         m.inviteeEmail.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesLead = leadFilter === "all" || m.leadStatus === leadFilter;
-      let matchesDate = true;
-      if (dateFilter === "today") matchesDate = isToday(m.meetingDate);
-      else if (dateFilter === "this_week") matchesDate = isThisWeek(m.meetingDate, { weekStartsOn: 1 });
-      else if (dateFilter === "this_month") matchesDate = isThisMonth(m.meetingDate);
+      const matchesDate = isWithinInterval(m.meetingDate, {
+        start: startOfDay(dateRange.from),
+        end: endOfDay(dateRange.to),
+      });
       return matchesSearch && matchesLead && matchesDate;
     });
-  }, [meetings, searchQuery, leadFilter, dateFilter]);
+  }, [meetings, searchQuery, leadFilter, dateRange]);
 
   const groupedMeetings = useMemo(() => {
     const groups: Record<string, Meeting[]> = {};
@@ -203,26 +198,7 @@ const Pipeline = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className={cn("gap-2 h-9 px-3 text-xs", dateFilter !== "all" && "border-foreground/30")}>
-                  <Calendar className="h-3.5 w-3.5" />
-                  {dateFilterOptions.find((o) => o.value === dateFilter)?.label}
-                  <ChevronDown className="h-3 w-3" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-[150px]">
-                {dateFilterOptions.map((opt) => (
-                  <DropdownMenuItem
-                    key={opt.value}
-                    onClick={() => setDateFilter(opt.value)}
-                    className={cn("cursor-pointer text-sm", dateFilter === opt.value && "bg-muted font-medium")}
-                  >
-                    {opt.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <DateRangePicker value={dateRange} onChange={setDateRange} />
 
             {/* Expandable Search */}
             <div className="relative flex items-center">
