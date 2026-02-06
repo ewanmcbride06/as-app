@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { format, isToday, isThisWeek, isThisMonth } from "date-fns";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Search, Filter, Calendar, ChevronDown, Plus, MessageSquare, CalendarDays, BarChart3, Link2 } from "lucide-react";
+import { Search, Filter, Calendar, ChevronDown, MessageSquare, CalendarDays, BarChart3, Link2 } from "lucide-react";
 import { TimezoneSelector } from "@/components/pipeline/TimezoneSelector";
 import { getLocalTimezone, formatTimeInTimezone } from "@/components/pipeline/timezones";
 import { Input } from "@/components/ui/input";
@@ -173,6 +173,10 @@ const Pipeline = () => {
 
         {/* ─── Search & Controls Bar ─── */}
         <div className="flex items-center gap-3 mb-5 shrink-0">
+          <div className="inline-flex items-center h-9 px-4 text-xs font-medium border border-border rounded-[10px] bg-background shrink-0">
+            Total: {filteredMeetings.length}
+          </div>
+
           <div className="relative flex-1 max-w-xl">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -184,6 +188,8 @@ const Pipeline = () => {
           </div>
 
           <div className="flex items-center gap-2 ml-auto">
+            <TimezoneSelector value={timezone} onChange={setTimezone} />
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className={cn("gap-2 h-9 px-3 text-xs", leadFilter !== "all" && "border-foreground/30")}>
@@ -224,17 +230,6 @@ const Pipeline = () => {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-
-            <TimezoneSelector value={timezone} onChange={setTimezone} />
-
-            <Button variant="outline" size="sm" className="gap-2 h-9 px-3 text-xs">
-              <Plus className="h-3.5 w-3.5" />
-              Payout
-            </Button>
-
-            <div className="inline-flex items-center h-9 px-4 text-xs font-medium border border-border rounded-[10px] bg-background">
-              Total: {filteredMeetings.length}
-            </div>
           </div>
         </div>
 
