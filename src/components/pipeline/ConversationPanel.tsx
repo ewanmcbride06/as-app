@@ -191,48 +191,43 @@ export function ConversationPanel({ meeting, onClose }: ConversationPanelProps) 
 
               // Message
               return (
-                <div key={`msg-${item.id}`} className="relative pb-6">
-                  {/* Connector line to next item */}
-                  {!isLast && (
-                    <div className="absolute left-4 top-10 bottom-0 w-px bg-border" />
-                  )}
+                <div key={`msg-${item.id}`} className="relative flex gap-3 pb-6">
+                  {/* Spine */}
+                  <div className="flex flex-col items-center shrink-0 w-8">
+                    <div
+                      className={cn(
+                        "h-8 w-8 rounded-[10px] flex items-center justify-center text-[10px] font-semibold shrink-0",
+                        item.sender === "us"
+                          ? "bg-[hsl(var(--imessage-blue))] text-white"
+                          : "bg-[hsl(var(--imessage-gray))] text-foreground"
+                      )}
+                    >
+                      {item.sender === "us" ? "You" : getInitials(meeting.inviteeName)}
+                    </div>
+                    {!isLast && <div className="w-px flex-1 bg-border mt-1.5" />}
+                  </div>
 
-                  {item.sender === "us" ? (
-                    // Our message — right-aligned
-                    <div className="flex flex-col items-end pl-11">
-                      <div className="flex items-baseline gap-2 mb-1.5">
-                        <span className="text-[10px] text-muted-foreground">
-                          {format(item.timestamp, "MMM d, h:mm a")}
-                        </span>
-                        <span className="text-[13px] font-medium text-foreground">You</span>
-                      </div>
-                      <div className="max-w-[90%] px-3.5 py-2.5 rounded-2xl rounded-br-sm bg-[hsl(var(--imessage-blue))] text-white text-[13px] leading-relaxed">
-                        {item.message}
-                      </div>
+                  {/* Content */}
+                  <div className="flex-1 min-w-0 pt-1">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-[13px] font-medium text-foreground">
+                        {item.sender === "us" ? "You" : meeting.inviteeName}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground">
+                        {format(item.timestamp, "MMM d, h:mm a")}
+                      </span>
                     </div>
-                  ) : (
-                    // Their message — left-aligned with avatar on spine
-                    <div className="flex gap-3">
-                      <div className="flex flex-col items-center shrink-0 w-8">
-                        <div className="h-8 w-8 rounded-[10px] bg-muted text-muted-foreground flex items-center justify-center text-[10px] font-semibold shrink-0">
-                          {getInitials(meeting.inviteeName)}
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0 pt-1">
-                        <div className="flex items-baseline gap-2 mb-1.5">
-                          <span className="text-[13px] font-medium text-foreground">
-                            {meeting.inviteeName}
-                          </span>
-                          <span className="text-[10px] text-muted-foreground">
-                            {format(item.timestamp, "MMM d, h:mm a")}
-                          </span>
-                        </div>
-                        <div className="max-w-[90%] px-3.5 py-2.5 rounded-2xl rounded-bl-sm bg-[hsl(var(--imessage-gray))] text-foreground text-[13px] leading-relaxed">
-                          {item.message}
-                        </div>
-                      </div>
+                    <div
+                      className={cn(
+                        "mt-1.5 px-3.5 py-2.5 rounded-[10px] text-[13px] leading-relaxed",
+                        item.sender === "us"
+                          ? "bg-[hsl(var(--imessage-blue))] text-white"
+                          : "bg-[hsl(var(--imessage-gray))] text-foreground"
+                      )}
+                    >
+                      {item.message}
                     </div>
-                  )}
+                  </div>
                 </div>
               );
             })}
