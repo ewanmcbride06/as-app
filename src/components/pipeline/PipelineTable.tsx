@@ -216,7 +216,7 @@ export function PipelineTable({
                         />
                       </TableCell>
                       <TableCell>
-                        <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium tabular-nums border border-border rounded-[10px] bg-background">
+                        <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium tabular-nums whitespace-nowrap border border-border rounded-[10px] bg-background">
                           {meeting.meetingTime}
                         </span>
                       </TableCell>
@@ -248,16 +248,9 @@ export function PipelineTable({
                       </TableCell>
                     </TableRow>
 
-                    {/* Expandable Timeline Row */}
+                    {/* Expandable Timeline — uses raw <tr> to align with table columns */}
                     {isExpanded && (
-                      <TableRow
-                        key={`${meeting.id}-timeline`}
-                        className="hover:bg-transparent"
-                      >
-                        <TableCell colSpan={9} className="p-0">
-                          <BookingTimeline meeting={meeting} />
-                        </TableCell>
-                      </TableRow>
+                      <BookingTimeline key={`${meeting.id}-timeline`} meeting={meeting} />
                     )}
                   </>
                 );
