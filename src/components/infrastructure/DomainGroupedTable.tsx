@@ -16,16 +16,21 @@ import { type InfraDomain, getDomainAggregate } from "./mockData";
 
 const OutlookIcon = () => (
   <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0" fill="none">
-    <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" strokeWidth="1.5" />
-    <path d="M2 8l10 5 10-5" stroke="currentColor" strokeWidth="1.5" />
+    <path d="M22 8.5V17a2 2 0 0 1-2 2h-7V7h7a2 2 0 0 1 2 2v-.5Z" fill="#0078D4"/>
+    <path d="M15 7H9.5L4 10v8l5.5 1H15V7Z" fill="#0364B8"/>
+    <path d="M9.5 7L4 10v8l5.5 1V7Z" fill="#0078D4"/>
+    <path d="M9.5 11.5a3 3 0 1 1-3 3 3 3 0 0 1 3-3Z" fill="#28A8EA" opacity="0.5"/>
+    <ellipse cx="6.75" cy="14.5" rx="2.25" ry="2.25" fill="white"/>
   </svg>
 );
 
-const GoogleIcon = () => (
+const GmailIcon = () => (
   <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0" fill="none">
-    <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" strokeWidth="1.5" />
-    <path d="M2 8l10 5 10-5" stroke="currentColor" strokeWidth="1.5" />
-    <circle cx="12" cy="12" r="2" fill="currentColor" />
+    <path d="M2 6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6Z" fill="#F2F2F2"/>
+    <path d="M2 6l10 7 10-7" stroke="#EA4335" strokeWidth="1.5" fill="none"/>
+    <path d="M2 6v12l6-7L2 6Z" fill="#4285F4"/>
+    <path d="M22 6v12l-6-7 6-5Z" fill="#34A853"/>
+    <path d="M2 18l6-7 4 2.8L16 11l6 7H2Z" fill="#FBBC05"/>
   </svg>
 );
 
@@ -159,10 +164,8 @@ const DomainGroupedTable = ({ domains }: DomainGroupedTableProps) => {
                       <TableRow key={mailbox.id} className="bg-muted/20 hover:bg-muted/40">
                         <TableCell className="w-[40px]"></TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-2 pl-4">
-                            <span className="text-muted-foreground">
-                              {mailbox.provider === "outlook" ? <OutlookIcon /> : <GoogleIcon />}
-                            </span>
+                          <div className="flex items-center gap-2 pl-2">
+                            {mailbox.provider === "outlook" ? <OutlookIcon /> : <GmailIcon />}
                             <span className="text-sm">{mailbox.email}</span>
                           </div>
                         </TableCell>
