@@ -26,8 +26,8 @@ function FilterSection({
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className="border-b">
       <CollapsibleTrigger className="flex items-center justify-between w-full py-3 px-4 text-sm font-medium hover:bg-muted/50">
+        {title}
         <div className="flex items-center gap-2">
-          {title}
           {activeCount > 0 && (
             <span
               role="button"
@@ -41,8 +41,8 @@ function FilterSection({
               {activeCount}
             </span>
           )}
+          <ChevronDown className={cn("h-4 w-4 transition-transform", isOpen && "rotate-180")} />
         </div>
-        <ChevronDown className={cn("h-4 w-4 transition-transform", isOpen && "rotate-180")} />
       </CollapsibleTrigger>
       <CollapsibleContent className="px-0 py-0 pl-0 pt-0 pr-0 pb-0">
         {children}
