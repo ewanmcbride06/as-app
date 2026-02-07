@@ -1,14 +1,10 @@
 import { useState } from "react";
+import { startOfDay, endOfDay, subDays } from "date-fns";
 
-import { Calendar, ChevronDown, ArrowLeft, Download, Clock, Server } from "lucide-react";
+import { ArrowLeft, Download, Clock, Server } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DateRangePicker, type DateRange } from "@/components/ui/date-range-picker";
 import {
   BarChart,
   Bar,
@@ -25,7 +21,6 @@ import {
   weekdayReplyData,
   hourlyReplyData,
   dailyReplyTypeData,
-  hourlyReplyTypeData,
   espReplyRates,
 } from "@/components/engagement/mockData";
 import { cn } from "@/lib/utils";
@@ -33,16 +28,13 @@ import { cn } from "@/lib/utils";
 const Engagement = () => {
   const [activeTab, setActiveTab] = useState<"time" | "provider">("time");
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
-  const [selectedReplyTypeDay, setSelectedReplyTypeDay] = useState<string | null>(null);
+  const [dateRange, setDateRange] = useState<DateRange>({
+    from: startOfDay(subDays(new Date(), 29)),
+    to: endOfDay(new Date()),
+  });
 
   const handleDayClick = (data: { day: string }) => {
     setSelectedDay(data.day);
-  };
-
-  const handleReplyTypeDayClick = (data: { date: string }) => {
-    if (hourlyReplyTypeData[data.date]) {
-      setSelectedReplyTypeDay(data.date);
-    }
   };
 
   return (
@@ -54,24 +46,10 @@ const Engagement = () => {
             <h1 className="text-2xl font-semibold tracking-tight">Engagement</h1>
             <p className="text-muted-foreground">Reply analytics and ESP performance metrics</p>
           </div>
-          <div className="flex items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Calendar className="h-4 w-4" />
-                  Last 10 Days
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem>Last 7 Days</DropdownMenuItem>
-                <DropdownMenuItem>Last 10 Days</DropdownMenuItem>
-                <DropdownMenuItem>Last 30 Days</DropdownMenuItem>
-                <DropdownMenuItem>Last 90 Days</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <Button variant="outline" size="sm" className="gap-2">
-              <Download className="h-4 w-4" />
+           <div className="flex items-center gap-2">
+            <DateRangePicker value={dateRange} onChange={setDateRange} />
+            <Button variant="outline" size="sm" className="gap-2 h-9 px-3 text-xs">
+              <Download className="h-3.5 w-3.5" />
               Export
             </Button>
           </div>
@@ -112,84 +90,47 @@ const Engagement = () => {
                     <div>
                       <h2 className="text-base font-semibold">Human vs Automated Replies</h2>
                       <p className="text-sm text-muted-foreground">
-                        {selectedReplyTypeDay
-                          ? `Hour by hour for ${selectedReplyTypeDay}`
-                          : "Day by day comparison • Click a point to see hourly breakdown"}
+                        Day by day comparison with percentage breakdown
                       </p>
                     </div>
-                    {selectedReplyTypeDay && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setSelectedReplyTypeDay(null)}
-                        className="gap-1"
-                      >
-                        <ArrowLeft className="h-4 w-4" />
-                        Back to daily
-                      </Button>
-                    )}
                   </div>
                   <div className="h-[280px]">
                     <ResponsiveContainer width="100%" height="100%">
-                      {selectedReplyTypeDay ? (
-                        <BarChart
-                          data={hourlyReplyTypeData[selectedReplyTypeDay]}
-                          margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-                        >
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                          <XAxis dataKey="hour" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
-                          <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} width={40} />
-                          <Tooltip
-                            contentStyle={{
-                              backgroundColor: "hsl(var(--background))",
-                              border: "1px solid hsl(var(--border))",
-                              borderRadius: "8px",
-                              fontSize: "12px",
-                            }}
-                          />
-                          <Legend wrapperStyle={{ fontSize: "12px" }} />
-                          <Bar dataKey="human" name="Human" fill="hsl(var(--foreground))" radius={[4, 4, 0, 0]} />
-                          <Bar dataKey="automated" name="Automated" fill="hsl(var(--muted-foreground))" radius={[4, 4, 0, 0]} />
-                        </BarChart>
-                      ) : (
-                        <LineChart data={dailyReplyTypeData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                          <XAxis dataKey="date" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
-                          <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} width={40} />
-                          <Tooltip
-                            contentStyle={{
-                              backgroundColor: "hsl(var(--background))",
-                              border: "1px solid hsl(var(--border))",
-                              borderRadius: "8px",
-                              fontSize: "12px",
-                            }}
-                          />
-                          <Legend wrapperStyle={{ fontSize: "12px" }} />
-                          <Line
-                            type="monotone"
-                            dataKey="human"
-                            name="Human"
-                            stroke="hsl(var(--foreground))"
-                            strokeWidth={2}
-                            dot={{ r: 4, cursor: "pointer" }}
-                            activeDot={{
-                              r: 6,
-                              onClick: (e: unknown, payload: unknown) => {
-                                const p = payload as { payload?: { date: string } };
-                                if (p.payload?.date) handleReplyTypeDayClick(p.payload);
-                              },
-                            }}
-                          />
-                          <Line
-                            type="monotone"
-                            dataKey="automated"
-                            name="Automated"
-                            stroke="hsl(var(--muted-foreground))"
-                            strokeWidth={2}
-                            dot={{ r: 4 }}
-                          />
-                        </LineChart>
-                      )}
+                      <LineChart data={dailyReplyTypeData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                        <XAxis dataKey="date" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+                        <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} width={40} />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "hsl(var(--background))",
+                            border: "1px solid hsl(var(--border))",
+                            borderRadius: "8px",
+                            fontSize: "12px",
+                          }}
+                          formatter={(value: number, name: string, props: { payload: { human: number; automated: number } }) => {
+                            const total = props.payload.human + props.payload.automated;
+                            const pct = total > 0 ? ((value / total) * 100).toFixed(1) : "0.0";
+                            return [`${value} (${pct}%)`, name];
+                          }}
+                        />
+                        <Legend wrapperStyle={{ fontSize: "12px" }} />
+                        <Line
+                          type="monotone"
+                          dataKey="human"
+                          name="Human"
+                          stroke="hsl(var(--foreground))"
+                          strokeWidth={2}
+                          dot={{ r: 4 }}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="automated"
+                          name="Automated"
+                          stroke="hsl(var(--muted-foreground))"
+                          strokeWidth={2}
+                          dot={{ r: 4 }}
+                        />
+                      </LineChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
