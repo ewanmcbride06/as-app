@@ -3,13 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { ChevronRight, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import WarmupCircle from "./WarmupCircle";
 import {
   Table,
@@ -22,22 +15,34 @@ import {
 import { type InfraDomain, getDomainAggregate } from "./mockData";
 import gmailLogo from "@/assets/gmail-logo.png";
 import outlookLogo from "@/assets/outlook-logo.png";
+import {
+  VolumeFilterPopover,
+  RangeFilterPopover,
+  DurationFilterPopover,
+  defaultVolumeFilter,
+  defaultRangeFilter,
+  defaultDurationFilter,
+  matchesVolumeFilter,
+  matchesRangeFilter,
+  matchesDurationFilter,
+  type VolumeFilter,
+  type RangeFilter,
+  type DurationFilter,
+} from "./InfraFilters";
 
 interface DomainGroupedTableProps {
   domains: InfraDomain[];
 }
 
-type FilterValue = "all" | string;
-
 const DomainGroupedTable = ({ domains }: DomainGroupedTableProps) => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [expandedDomains, setExpandedDomains] = useState<Set<string>>(new Set());
-  const [sendingVolumeFilter, setSendingVolumeFilter] = useState<FilterValue>("all");
-  const [replyRateFilter, setReplyRateFilter] = useState<FilterValue>("all");
-  const [bounceRateFilter, setBounceRateFilter] = useState<FilterValue>("all");
-  const [warmupDaysFilter, setWarmupDaysFilter] = useState<FilterValue>("all");
-  const [warmupHealthFilter, setWarmupHealthFilter] = useState<FilterValue>("all");
+  const [volumeFilter, setVolumeFilter] = useState<VolumeFilter>(defaultVolumeFilter);
+  const [replyFilter, setReplyFilter] = useState<RangeFilter>(defaultRangeFilter);
+  const [bounceFilter, setBounceFilter] = useState<RangeFilter>(defaultRangeFilter);
+  const [durationFilter, setDurationFilter] = useState<DurationFilter>(defaultDurationFilter);
+  const [healthFilter, setHealthFilter] = useState<RangeFilter>(defaultRangeFilter);
 
   const toggleDomain = (domain: string) => {
     setExpandedDomains((prev) => {
@@ -51,50 +56,22 @@ const DomainGroupedTable = ({ domains }: DomainGroupedTableProps) => {
     });
   };
 
-  const matchesMailboxFilters = (m: { sendingVolumeCurrent: number; sendingVolumeMax: number; replyRate: number; bounceRate: number; warmupDays: number; warmupPercent: number }) => {
-    if (sendingVolumeFilter !== "all") {
-      const ratio = m.sendingVolumeMax > 0 ? m.sendingVolumeCurrent / m.sendingVolumeMax : 0;
-      if (sendingVolumeFilter === "full" && ratio < 1) return false;
-      if (sendingVolumeFilter === "partial" && ratio >= 1) return false;
-      if (sendingVolumeFilter === "zero" && m.sendingVolumeCurrent > 0) return false;
-    }
-    if (replyRateFilter !== "all") {
-      if (replyRateFilter === "0" && m.replyRate > 0) return false;
-      if (replyRateFilter === "lt2" && (m.replyRate <= 0 || m.replyRate >= 2)) return false;
-      if (replyRateFilter === "2to5" && (m.replyRate < 2 || m.replyRate > 5)) return false;
-      if (replyRateFilter === "gt5" && m.replyRate <= 5) return false;
-    }
-    if (bounceRateFilter !== "all") {
-      if (bounceRateFilter === "0" && m.bounceRate > 0) return false;
-      if (bounceRateFilter === "lt2" && (m.bounceRate <= 0 || m.bounceRate >= 2)) return false;
-      if (bounceRateFilter === "2to5" && (m.bounceRate < 2 || m.bounceRate > 5)) return false;
-      if (bounceRateFilter === "gt5" && m.bounceRate <= 5) return false;
-    }
-    if (warmupDaysFilter !== "all") {
-      if (warmupDaysFilter === "lt14" && m.warmupDays >= 14) return false;
-      if (warmupDaysFilter === "14to30" && (m.warmupDays < 14 || m.warmupDays > 30)) return false;
-      if (warmupDaysFilter === "gt30" && m.warmupDays <= 30) return false;
-    }
-    if (warmupHealthFilter !== "all") {
-      if (warmupHealthFilter === "healthy" && m.warmupPercent < 95) return false;
-      if (warmupHealthFilter === "warning" && (m.warmupPercent < 80 || m.warmupPercent >= 95)) return false;
-      if (warmupHealthFilter === "critical" && m.warmupPercent >= 80) return false;
-    }
+  const matchesAllFilters = (m: { sendingVolumeCurrent: number; sendingVolumeMax: number; replyRate: number; bounceRate: number; warmupDays: number; warmupPercent: number }) => {
+    if (!matchesVolumeFilter(volumeFilter, m.sendingVolumeCurrent)) return false;
+    if (!matchesRangeFilter(replyFilter, m.replyRate)) return false;
+    if (!matchesRangeFilter(bounceFilter, m.bounceRate)) return false;
+    if (!matchesDurationFilter(durationFilter, m.warmupDays)) return false;
+    if (!matchesRangeFilter(healthFilter, m.warmupPercent)) return false;
     return true;
   };
 
   const filteredDomains = useMemo(() => {
     const q = search.toLowerCase().trim();
-    const hasFilters = sendingVolumeFilter !== "all" || replyRateFilter !== "all" || bounceRateFilter !== "all" || warmupDaysFilter !== "all" || warmupHealthFilter !== "all";
 
     return domains
       .map((d) => {
-        // Apply metric filters at mailbox level
-        let matchingMailboxes = hasFilters
-          ? d.mailboxes.filter(matchesMailboxFilters)
-          : d.mailboxes;
+        let matchingMailboxes = d.mailboxes.filter(matchesAllFilters);
 
-        // Apply search
         if (q) {
           const domainMatches = d.domain.toLowerCase().includes(q);
           if (!domainMatches) {
@@ -108,9 +85,8 @@ const DomainGroupedTable = ({ domains }: DomainGroupedTableProps) => {
         return { ...d, mailboxes: matchingMailboxes };
       })
       .filter(Boolean) as InfraDomain[];
-  }, [domains, search, sendingVolumeFilter, replyRateFilter, bounceRateFilter, warmupDaysFilter, warmupHealthFilter]);
+  }, [domains, search, volumeFilter, replyFilter, bounceFilter, durationFilter, healthFilter]);
 
-  // Auto-expand when searching
   const isExpanded = (domain: string) => {
     if (search.trim()) {
       const q = search.toLowerCase();
@@ -122,8 +98,6 @@ const DomainGroupedTable = ({ domains }: DomainGroupedTableProps) => {
     }
     return expandedDomains.has(domain);
   };
-
-  const hasActiveFilters = sendingVolumeFilter !== "all" || replyRateFilter !== "all" || bounceRateFilter !== "all" || warmupDaysFilter !== "all" || warmupHealthFilter !== "all";
 
   return (
     <div className="flex flex-col h-full">
@@ -140,67 +114,11 @@ const DomainGroupedTable = ({ domains }: DomainGroupedTableProps) => {
         </div>
 
         <div className="flex items-center gap-2 ml-auto">
-          <Select value={sendingVolumeFilter} onValueChange={setSendingVolumeFilter}>
-            <SelectTrigger className={cn("h-9 w-auto min-w-[130px] text-xs gap-1.5", sendingVolumeFilter !== "all" && "border-foreground/30")}>
-              <SelectValue placeholder="Sending Volume" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Volume</SelectItem>
-              <SelectItem value="full">At Capacity</SelectItem>
-              <SelectItem value="partial">Below Capacity</SelectItem>
-              <SelectItem value="zero">No Volume</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={replyRateFilter} onValueChange={setReplyRateFilter}>
-            <SelectTrigger className={cn("h-9 w-auto min-w-[120px] text-xs gap-1.5", replyRateFilter !== "all" && "border-foreground/30")}>
-              <SelectValue placeholder="Reply Rate" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Replies</SelectItem>
-              <SelectItem value="0">0%</SelectItem>
-              <SelectItem value="lt2">&lt; 2%</SelectItem>
-              <SelectItem value="2to5">2 – 5%</SelectItem>
-              <SelectItem value="gt5">&gt; 5%</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={bounceRateFilter} onValueChange={setBounceRateFilter}>
-            <SelectTrigger className={cn("h-9 w-auto min-w-[120px] text-xs gap-1.5", bounceRateFilter !== "all" && "border-foreground/30")}>
-              <SelectValue placeholder="Bounce Rate" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Bounces</SelectItem>
-              <SelectItem value="0">0%</SelectItem>
-              <SelectItem value="lt2">&lt; 2%</SelectItem>
-              <SelectItem value="2to5">2 – 5%</SelectItem>
-              <SelectItem value="gt5">&gt; 5%</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={warmupDaysFilter} onValueChange={setWarmupDaysFilter}>
-            <SelectTrigger className={cn("h-9 w-auto min-w-[130px] text-xs gap-1.5", warmupDaysFilter !== "all" && "border-foreground/30")}>
-              <SelectValue placeholder="Time in Warmup" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Durations</SelectItem>
-              <SelectItem value="lt14">&lt; 14 Days</SelectItem>
-              <SelectItem value="14to30">14 – 30 Days</SelectItem>
-              <SelectItem value="gt30">30+ Days</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={warmupHealthFilter} onValueChange={setWarmupHealthFilter}>
-            <SelectTrigger className={cn("h-9 w-auto min-w-[140px] text-xs gap-1.5", warmupHealthFilter !== "all" && "border-foreground/30")}>
-              <SelectValue placeholder="Warmup Health" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Health</SelectItem>
-              <SelectItem value="healthy">Healthy (≥ 95%)</SelectItem>
-              <SelectItem value="warning">Warning (80–94%)</SelectItem>
-              <SelectItem value="critical">Critical (&lt; 80%)</SelectItem>
-            </SelectContent>
-          </Select>
+          <VolumeFilterPopover value={volumeFilter} onChange={setVolumeFilter} />
+          <RangeFilterPopover label="Reply Rate" value={replyFilter} onChange={setReplyFilter} />
+          <RangeFilterPopover label="Bounce Rate" value={bounceFilter} onChange={setBounceFilter} />
+          <DurationFilterPopover value={durationFilter} onChange={setDurationFilter} />
+          <RangeFilterPopover label="Health" value={healthFilter} onChange={setHealthFilter} unit="%" />
         </div>
       </div>
 
