@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { MoreHorizontal, ChevronDown, Columns, Table as TableIcon, LayoutList, Linkedin, Globe, Plus, Search, Download, Maximize2, Minimize2 } from "lucide-react";
+import { MoreHorizontal, Columns, Linkedin, Globe, Plus, Search, Download, Maximize2, Minimize2 } from "lucide-react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import LeadVaultNav from "@/components/leadvault/LeadVaultNav";
 import FilterSidebar from "@/components/leadvault/FilterSidebar";
@@ -168,10 +168,6 @@ export default function LeadVaultDatabase() {
               <p className="text-muted-foreground">Search and manage your contacts and companies</p>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="gap-2">
-                <Download className="h-4 w-4" />
-                Export
-              </Button>
               <Button size="sm" className="gap-2">
                 <Plus className="h-4 w-4" />
                 Create List
@@ -223,47 +219,6 @@ export default function LeadVaultDatabase() {
                   />
                 </div>
 
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Download className="h-4 w-4" />
-                  Export
-                </Button>
-
-                <div className="w-px h-5 bg-border" />
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="gap-2">
-                      Sort by: Relevance
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem>Relevance</DropdownMenuItem>
-                    <DropdownMenuItem>Name A-Z</DropdownMenuItem>
-                    <DropdownMenuItem>{viewType === 'contacts' ? 'Company A-Z' : 'Employees'}</DropdownMenuItem>
-                    <DropdownMenuItem>{viewType === 'contacts' ? 'Last Updated' : 'Revenue'}</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-
-                <div className="flex border rounded-lg">
-                  <Button 
-                    variant={viewMode === 'table' ? 'secondary' : 'ghost'} 
-                    size="sm"
-                    className="rounded-r-none"
-                    onClick={() => setViewMode('table')}
-                  >
-                    <TableIcon className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    variant={viewMode === 'compact' ? 'secondary' : 'ghost'} 
-                    size="sm"
-                    className="rounded-l-none"
-                    onClick={() => setViewMode('compact')}
-                  >
-                    <LayoutList className="h-4 w-4" />
-                  </Button>
-                </div>
-
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button variant="outline" size="sm" className="gap-2">
@@ -284,6 +239,14 @@ export default function LeadVaultDatabase() {
                 </Popover>
 
                 <div className="w-px h-5 bg-border" />
+
+                <Button 
+                  size="sm" 
+                  className="gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  Export
+                </Button>
 
                 <Button 
                   variant="outline" 
