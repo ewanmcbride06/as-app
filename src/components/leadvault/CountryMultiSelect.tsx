@@ -48,7 +48,7 @@ export default function CountryMultiSelect({ selected, onChange }: CountryMultiS
   };
 
   return (
-    <div className="p-[10px] space-y-2" ref={containerRef} onBlur={handleBlur}>
+    <div className="space-y-2" ref={containerRef} onBlur={handleBlur}>
       {/* Selected chips */}
       {selectedCountries.length > 0 && (
         <div className="flex flex-wrap gap-1">
