@@ -1,5 +1,5 @@
-import { useState, useMemo, useRef } from "react";
-import { MoreHorizontal, Columns, Linkedin, Globe, Plus, Search, Download, Maximize2, Minimize2, ChevronDown } from "lucide-react";
+import { useState, useMemo } from "react";
+import { MoreHorizontal, Columns, Linkedin, Globe, Plus, Search, Download, Maximize2, Minimize2, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import LeadVaultNav from "@/components/leadvault/LeadVaultNav";
 import FilterSidebar from "@/components/leadvault/FilterSidebar";
@@ -51,6 +51,9 @@ export default function LeadVaultDatabase() {
   const [filters, setFilters] = useState<FilterState>(emptyFilterState);
   const [isExpanded, setIsExpanded] = useState(false);
   const [tableSearch, setTableSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(25);
+  const [pageInput, setPageInput] = useState("");
 
   const contacts = mockContacts;
   const companies = mockCompanies;
@@ -131,9 +134,24 @@ export default function LeadVaultDatabase() {
 
   const items = viewType === 'contacts' ? filteredContacts : filteredCompanies;
   const totalCount = viewType === 'contacts' ? totalContacts : totalCompanies;
+  const totalPages = Math.max(1, Math.ceil(items.length / pageSize));
+  const paginatedItems = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return items.slice(start, start + pageSize);
+  }, [items, currentPage, pageSize]);
+
+  // Reset page when filters or search change
+  const safeCurrentPage = currentPage > totalPages ? 1 : currentPage;
+  if (safeCurrentPage !== currentPage) setCurrentPage(safeCurrentPage);
+
+  const goToPage = (page: number) => {
+    const clamped = Math.max(1, Math.min(page, totalPages));
+    setCurrentPage(clamped);
+    setPageInput("");
+  };
 
   const selectCurrentPage = () => {
-    setSelectedItems(items.map(item => item.id));
+    setSelectedItems(paginatedItems.map(item => item.id));
     setAllPagesSelected(false);
     setCustomSelectedTotal(null);
   };
@@ -196,12 +214,19 @@ export default function LeadVaultDatabase() {
   const handleViewTypeChange = (type: 'contacts' | 'companies') => {
     setViewType(type);
     clearSelection();
+    setCurrentPage(1);
     setPreviewContact(null);
     setPreviewCompany(null);
   };
 
   const handleClearFilters = () => {
     setFilters(emptyFilterState);
+    setCurrentPage(1);
+  };
+
+  const handleFiltersChange = (newFilters: FilterState) => {
+    setFilters(newFilters);
+    setCurrentPage(1);
   };
 
   const contactColumns = ['Name', 'Title', 'Company', 'Industry', 'Employees', 'Location', 'Email', 'LinkedIn'];
@@ -249,7 +274,7 @@ export default function LeadVaultDatabase() {
             viewType={viewType}
             onViewTypeChange={handleViewTypeChange}
             filters={filters}
-            onFiltersChange={setFilters}
+            onFiltersChange={handleFiltersChange}
             onClearFilters={handleClearFilters}
           />
 
@@ -269,7 +294,7 @@ export default function LeadVaultDatabase() {
                   <Input
                     placeholder={`Search ${viewType}...`}
                     value={tableSearch}
-                    onChange={(e) => setTableSearch(e.target.value)}
+                    onChange={(e) => { setTableSearch(e.target.value); setCurrentPage(1); }}
                     className="pl-9 h-9"
                   />
                 </div>
@@ -326,7 +351,7 @@ export default function LeadVaultDatabase() {
                         <TableHead className="w-14">
                           <div className="flex items-center gap-0.5">
                             <Checkbox 
-                              checked={selectedItems.length === filteredContacts.length && filteredContacts.length > 0}
+                              checked={selectedItems.length === paginatedItems.length && paginatedItems.length > 0}
                               onCheckedChange={toggleSelectAll}
                             />
                             <DropdownMenu open={selectDropdownOpen} onOpenChange={setSelectDropdownOpen}>
@@ -410,7 +435,7 @@ export default function LeadVaultDatabase() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredContacts.map((contact) => (
+                      {paginatedItems.map((contact) => (
                         <TableRow 
                           key={contact.id}
                           className="cursor-pointer hover:bg-muted/50"
@@ -482,7 +507,7 @@ export default function LeadVaultDatabase() {
                 ) : (
                   /* Compact view for contacts */
                   <div className="divide-y">
-                    {filteredContacts.map((contact) => (
+                    {paginatedItems.map((contact) => (
                       <div
                         key={contact.id}
                         className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted/50 cursor-pointer"
@@ -521,7 +546,7 @@ export default function LeadVaultDatabase() {
                         <TableHead className="w-14">
                           <div className="flex items-center gap-0.5">
                             <Checkbox 
-                              checked={selectedItems.length === filteredCompanies.length && filteredCompanies.length > 0}
+                              checked={selectedItems.length === paginatedItems.length && paginatedItems.length > 0}
                               onCheckedChange={toggleSelectAll}
                             />
                             <DropdownMenu open={selectDropdownOpen} onOpenChange={setSelectDropdownOpen}>
@@ -604,7 +629,7 @@ export default function LeadVaultDatabase() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredCompanies.map((company) => (
+                      {paginatedItems.map((company) => (
                         <TableRow 
                           key={company.id}
                           className="cursor-pointer hover:bg-muted/50"
@@ -673,7 +698,7 @@ export default function LeadVaultDatabase() {
                 ) : (
                   /* Compact view for companies */
                   <div className="divide-y">
-                    {filteredCompanies.map((company) => (
+                    {paginatedItems.map((company) => (
                       <div
                         key={company.id}
                         className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted/50 cursor-pointer"
@@ -706,6 +731,57 @@ export default function LeadVaultDatabase() {
                   </div>
                 )
               )}
+              </div>
+            </div>
+
+            {/* Sticky Pagination Bar */}
+            <div className="shrink-0 border-t border-border bg-background px-4 py-2 flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">
+                {((currentPage - 1) * pageSize) + 1}–{Math.min(currentPage * pageSize, items.length)} of {items.length.toLocaleString()} results
+              </span>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 w-7 p-0"
+                  disabled={currentPage === 1}
+                  onClick={() => goToPage(currentPage - 1)}
+                >
+                  <ChevronLeft className="h-3.5 w-3.5" />
+                </Button>
+                <div className="flex items-center gap-1.5 text-xs">
+                  <span className="text-muted-foreground">Page</span>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={totalPages}
+                    placeholder={String(currentPage)}
+                    className="h-7 w-12 text-xs text-center px-1"
+                    value={pageInput}
+                    onChange={(e) => setPageInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        const val = parseInt(pageInput, 10);
+                        if (!isNaN(val)) goToPage(val);
+                      }
+                    }}
+                    onBlur={() => {
+                      const val = parseInt(pageInput, 10);
+                      if (!isNaN(val)) goToPage(val);
+                      else setPageInput("");
+                    }}
+                  />
+                  <span className="text-muted-foreground">of {totalPages.toLocaleString()}</span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 w-7 p-0"
+                  disabled={currentPage === totalPages}
+                  onClick={() => goToPage(currentPage + 1)}
+                >
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </Button>
               </div>
             </div>
           </div>
