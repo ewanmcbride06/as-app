@@ -3,46 +3,43 @@ import { Search, Check, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { countries, type Country } from "./countries";
 
-interface CountryMultiSelectProps {
+interface SearchableMultiSelectProps {
+  options: string[];
   selected: string[];
   onChange: (selected: string[]) => void;
+  placeholder?: string;
 }
 
-export default function CountryMultiSelect({ selected, onChange }: CountryMultiSelectProps) {
+export default function SearchableMultiSelect({
+  options,
+  selected,
+  onChange,
+  placeholder = "Search..."
+}: SearchableMultiSelectProps) {
   const [search, setSearch] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const filtered = useMemo(() => {
-    if (!search.trim()) return countries;
+    if (!search.trim()) return options;
     const q = search.toLowerCase();
-    return countries.filter(
-      (c) =>
-        c.name.toLowerCase().includes(q) ||
-        c.code.toLowerCase().includes(q)
-    );
-  }, [search]);
+    return options.filter((opt) => opt.toLowerCase().includes(q));
+  }, [search, options]);
 
-  const toggleCountry = (name: string) => {
-    if (selected.includes(name)) {
-      onChange(selected.filter((s) => s !== name));
+  const toggleOption = (option: string) => {
+    if (selected.includes(option)) {
+      onChange(selected.filter((s) => s !== option));
     } else {
-      onChange([...selected, name]);
+      onChange([...selected, option]);
     }
   };
 
-  const removeCountry = (name: string) => {
-    onChange(selected.filter((s) => s !== name));
+  const removeOption = (option: string) => {
+    onChange(selected.filter((s) => s !== option));
   };
 
-  const selectedCountries = selected
-    .map((name) => countries.find((c) => c.name === name))
-    .filter(Boolean) as Country[];
-
   const handleBlur = (e: React.FocusEvent) => {
-    // Don't close if focus moves within the container
     if (containerRef.current?.contains(e.relatedTarget as Node)) return;
     setIsFocused(false);
   };
@@ -50,18 +47,17 @@ export default function CountryMultiSelect({ selected, onChange }: CountryMultiS
   return (
     <div className="px-4 pb-4 space-y-2" ref={containerRef} onBlur={handleBlur}>
       {/* Selected chips */}
-      {selectedCountries.length > 0 && (
+      {selected.length > 0 && (
         <div className="flex flex-wrap gap-1">
-          {selectedCountries.map((c) => (
+          {selected.map((item) => (
             <Badge
-              key={c.code}
+              key={item}
               variant="secondary"
               className="gap-1 text-xs pr-1"
             >
-              <span className="text-sm leading-none">{c.flag}</span>
-              {c.name}
+              {item}
               <button
-                onClick={() => removeCountry(c.name)}
+                onClick={() => removeOption(item)}
                 className="ml-0.5 rounded-full hover:bg-muted-foreground/20 p-0.5"
               >
                 <X className="h-2.5 w-2.5" />
@@ -75,7 +71,7 @@ export default function CountryMultiSelect({ selected, onChange }: CountryMultiS
       <div className="relative">
         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
         <Input
-          placeholder="Search countries..."
+          placeholder={placeholder}
           className="pl-8 h-8 text-sm"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -83,27 +79,26 @@ export default function CountryMultiSelect({ selected, onChange }: CountryMultiS
         />
       </div>
 
-      {/* Country list - only show when focused */}
+      {/* Options list - only show when focused */}
       {isFocused && (
         <div className="max-h-[200px] overflow-y-auto scrollbar-hide -mx-4 border-t border-border">
           {filtered.length === 0 ? (
             <div className="px-4 py-3 text-center text-xs text-muted-foreground">
-              No countries found
+              No results found
             </div>
           ) : (
-            filtered.map((country) => (
+            filtered.map((option) => (
               <button
-                key={country.code}
+                key={option}
                 onMouseDown={(e) => e.preventDefault()}
-                onClick={() => toggleCountry(country.name)}
+                onClick={() => toggleOption(option)}
                 className={cn(
                   "w-full flex items-center gap-2.5 px-4 py-1.5 text-left text-sm hover:bg-muted transition-colors",
-                  selected.includes(country.name) && "bg-muted/50 font-medium"
+                  selected.includes(option) && "bg-muted/50 font-medium"
                 )}
               >
-                <span className="text-base leading-none">{country.flag}</span>
-                <span className="flex-1 truncate">{country.name}</span>
-                {selected.includes(country.name) && (
+                <span className="flex-1 truncate">{option}</span>
+                {selected.includes(option) && (
                   <Check className="h-3.5 w-3.5 text-foreground shrink-0" />
                 )}
               </button>
