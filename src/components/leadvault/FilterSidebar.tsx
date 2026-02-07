@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
+import CountryMultiSelect from "./CountryMultiSelect";
 
 interface FilterSectionProps {
   title: string;
@@ -44,7 +45,7 @@ function FilterSection({
           <ChevronDown className={cn("h-4 w-4 transition-transform", isOpen && "rotate-180")} />
         </div>
       </CollapsibleTrigger>
-      <CollapsibleContent className="px-0 py-0 pl-0 pt-0 pr-0 pb-0">
+      <CollapsibleContent>
         {children}
       </CollapsibleContent>
     </Collapsible>
@@ -70,7 +71,7 @@ function MultiSelectFilter({
     }
   };
   return (
-    <div className="space-y-2 max-h-40 overflow-y-auto mx-[16px] my-[16px]">
+    <div className="space-y-2 max-h-40 overflow-y-auto mx-4 my-4">
       {options.map(option => (
         <label key={option} className="flex items-center gap-2 text-sm cursor-pointer">
           <Checkbox checked={selected.includes(option)} onCheckedChange={() => toggleOption(option)} />
@@ -116,40 +117,40 @@ function ChipSelect({
 }
 
 export interface FilterState {
+  // Company
   industries: string[];
-  companyTypes: string[];
-  employeeRange: string[];
-  seniority: string[];
-  department: string[];
+  employeeSize: string[];
+  associatedMembersMin: string;
+  associatedMembersMax: string;
+  companyLocation: string[];
+  // People
+  jobTitle: string;
+  jobTitleMode: 'contains' | 'exact';
+  peopleLocation: string[];
   emailStatus: string[];
-  location: string;
-  techStack: string;
-  title: string;
 }
 
 export const emptyFilterState: FilterState = {
   industries: [],
-  companyTypes: [],
-  employeeRange: [],
-  seniority: [],
-  department: [],
+  employeeSize: [],
+  associatedMembersMin: "",
+  associatedMembersMax: "",
+  companyLocation: [],
+  jobTitle: "",
+  jobTitleMode: "contains",
+  peopleLocation: [],
   emailStatus: [],
-  location: "",
-  techStack: "",
-  title: "",
 };
 
 export function getActiveFilterCount(filters: FilterState): number {
   let count = 0;
   if (filters.industries.length) count++;
-  if (filters.companyTypes.length) count++;
-  if (filters.employeeRange.length) count++;
-  if (filters.seniority.length) count++;
-  if (filters.department.length) count++;
+  if (filters.employeeSize.length) count++;
+  if (filters.associatedMembersMin.trim() || filters.associatedMembersMax.trim()) count++;
+  if (filters.companyLocation.length) count++;
+  if (filters.jobTitle.trim()) count++;
+  if (filters.peopleLocation.length) count++;
   if (filters.emailStatus.length) count++;
-  if (filters.location.trim()) count++;
-  if (filters.techStack.trim()) count++;
-  if (filters.title.trim()) count++;
   return count;
 }
 
@@ -168,18 +169,17 @@ export default function FilterSidebar({
   onFiltersChange,
   onClearFilters
 }: FilterSidebarProps) {
-  const industryOptions = ['SaaS', 'Fintech', 'Healthcare', 'E-commerce', 'Marketing', 'HR Tech', 'Cybersecurity', 'AI/ML', 'EdTech'];
-  const companyTypeOptions = ['Startup', 'SMB', 'Mid-Market', 'Enterprise', 'Agency'];
-  const employeeOptions = ['1-10', '11-50', '51-200', '201-500', '501-1000', '1000+'];
-  const seniorityOptions = ['C-level', 'VP', 'Head', 'Director', 'Manager', 'IC'];
-  const departmentOptions = ['Sales', 'Marketing', 'RevOps', 'Product', 'Operations', 'Finance', 'HR', 'Engineering'];
-  const emailStatusOptions = ['Verified', 'Guessed', 'Unknown'];
+  const industryOptions = ['SaaS', 'Fintech', 'Healthcare', 'E-commerce', 'Marketing', 'HR Tech', 'Cybersecurity', 'AI/ML', 'EdTech', 'Real Estate', 'Logistics', 'Manufacturing'];
+  const employeeSizeOptions = ['1-10', '11-50', '51-200', '201-500', '501-1000', '1000+'];
+  const emailStatusOptions = ['Verified', 'Old', 'Not Verified', 'Unknown'];
 
   const activeCount = getActiveFilterCount(filters);
 
   const updateFilter = <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
     onFiltersChange({ ...filters, [key]: value });
   };
+
+  const associatedMembersCount = (filters.associatedMembersMin.trim() || filters.associatedMembersMax.trim()) ? 1 : 0;
 
   return (
     <div className="w-72 border-r bg-background flex flex-col h-full shrink-0">
@@ -235,61 +235,87 @@ export default function FilterSidebar({
             <MultiSelectFilter options={industryOptions} selected={filters.industries} onChange={(v) => updateFilter('industries', v)} />
           </FilterSection>
 
-          <FilterSection title="Company Type" activeCount={filters.companyTypes.length} onClear={() => updateFilter('companyTypes', [])}>
-            <MultiSelectFilter options={companyTypeOptions} selected={filters.companyTypes} onChange={(v) => updateFilter('companyTypes', v)} />
+          <FilterSection title="Employee Size" activeCount={filters.employeeSize.length} onClear={() => updateFilter('employeeSize', [])}>
+            <ChipSelect options={employeeSizeOptions} selected={filters.employeeSize} onChange={(v) => updateFilter('employeeSize', v)} />
           </FilterSection>
 
-          <FilterSection title="Employee Range" activeCount={filters.employeeRange.length} onClear={() => updateFilter('employeeRange', [])}>
-            <ChipSelect options={employeeOptions} selected={filters.employeeRange} onChange={(v) => updateFilter('employeeRange', v)} />
-          </FilterSection>
-
-          <FilterSection title="Location" defaultOpen={false} activeCount={filters.location.trim() ? 1 : 0} onClear={() => updateFilter('location', '')}>
-            <div className="px-4 pb-4">
+          <FilterSection
+            title="Associated Members"
+            activeCount={associatedMembersCount}
+            onClear={() => {
+              onFiltersChange({ ...filters, associatedMembersMin: "", associatedMembersMax: "" });
+            }}
+          >
+            <div className="px-4 pb-4 flex items-center gap-2">
               <Input
-                placeholder="Country or city..."
-                className="h-8 text-sm"
-                value={filters.location}
-                onChange={(e) => updateFilter('location', e.target.value)}
+                type="number"
+                placeholder="Min"
+                className="h-8 text-sm w-full"
+                min={0}
+                value={filters.associatedMembersMin}
+                onChange={(e) => updateFilter('associatedMembersMin', e.target.value)}
+              />
+              <span className="text-muted-foreground text-xs shrink-0">to</span>
+              <Input
+                type="number"
+                placeholder="Max"
+                className="h-8 text-sm w-full"
+                min={0}
+                value={filters.associatedMembersMax}
+                onChange={(e) => updateFilter('associatedMembersMax', e.target.value)}
               />
             </div>
           </FilterSection>
 
-          <FilterSection title="Tech Stack" defaultOpen={false} activeCount={filters.techStack.trim() ? 1 : 0} onClear={() => updateFilter('techStack', '')}>
-            <div className="px-4 pb-4">
-              <Input
-                placeholder="Search technologies..."
-                className="h-8 text-sm"
-                value={filters.techStack}
-                onChange={(e) => updateFilter('techStack', e.target.value)}
-              />
-            </div>
+          <FilterSection title="Location" activeCount={filters.companyLocation.length} onClear={() => updateFilter('companyLocation', [])}>
+            <CountryMultiSelect selected={filters.companyLocation} onChange={(v) => updateFilter('companyLocation', v)} />
           </FilterSection>
         </div>
 
-        {/* Contact Filters - Only show for contacts */}
+        {/* People Filters - Only show for contacts */}
         {viewType === 'contacts' && (
           <div>
             <div className="px-4 py-2 bg-muted/50">
-              <span className="text-xs font-semibold uppercase text-muted-foreground">Contact</span>
+              <span className="text-xs font-semibold uppercase text-muted-foreground">People</span>
             </div>
 
-            <FilterSection title="Title" activeCount={filters.title.trim() ? 1 : 0} onClear={() => updateFilter('title', '')}>
-              <div className="px-4 pb-4">
+            <FilterSection title="Job Title" activeCount={filters.jobTitle.trim() ? 1 : 0} onClear={() => onFiltersChange({ ...filters, jobTitle: "", jobTitleMode: "contains" })}>
+              <div className="px-4 pb-4 space-y-2">
+                <div className="flex rounded-md border p-0.5 bg-muted/30">
+                  <button
+                    onClick={() => updateFilter('jobTitleMode', 'contains')}
+                    className={cn(
+                      "flex-1 py-1 px-2 rounded text-xs font-medium transition-all",
+                      filters.jobTitleMode === 'contains'
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    Contains
+                  </button>
+                  <button
+                    onClick={() => updateFilter('jobTitleMode', 'exact')}
+                    className={cn(
+                      "flex-1 py-1 px-2 rounded text-xs font-medium transition-all",
+                      filters.jobTitleMode === 'exact'
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    Is Exactly
+                  </button>
+                </div>
                 <Input
-                  placeholder="Contains..."
+                  placeholder={filters.jobTitleMode === 'contains' ? "e.g. VP, Director..." : "e.g. VP of Sales"}
                   className="h-8 text-sm"
-                  value={filters.title}
-                  onChange={(e) => updateFilter('title', e.target.value)}
+                  value={filters.jobTitle}
+                  onChange={(e) => updateFilter('jobTitle', e.target.value)}
                 />
               </div>
             </FilterSection>
 
-            <FilterSection title="Seniority" activeCount={filters.seniority.length} onClear={() => updateFilter('seniority', [])}>
-              <ChipSelect options={seniorityOptions} selected={filters.seniority} onChange={(v) => updateFilter('seniority', v)} />
-            </FilterSection>
-
-            <FilterSection title="Department" activeCount={filters.department.length} onClear={() => updateFilter('department', [])}>
-              <MultiSelectFilter options={departmentOptions} selected={filters.department} onChange={(v) => updateFilter('department', v)} />
+            <FilterSection title="Location" activeCount={filters.peopleLocation.length} onClear={() => updateFilter('peopleLocation', [])}>
+              <CountryMultiSelect selected={filters.peopleLocation} onChange={(v) => updateFilter('peopleLocation', v)} />
             </FilterSection>
 
             <FilterSection title="Email Status" activeCount={filters.emailStatus.length} onClear={() => updateFilter('emailStatus', [])}>
