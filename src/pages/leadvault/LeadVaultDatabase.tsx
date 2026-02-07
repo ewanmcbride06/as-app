@@ -134,7 +134,10 @@ export default function LeadVaultDatabase() {
 
   const items = viewType === 'contacts' ? filteredContacts : filteredCompanies;
   const totalCount = viewType === 'contacts' ? totalContacts : totalCompanies;
-  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+  const filteredCount = items.length;
+  const hasActiveFilters = tableSearch.trim() || filters.industries.length || filters.employeeSize.length || filters.companyLocation.length || filters.jobTitle.trim() || filters.peopleLocation.length;
+  const displayCount = hasActiveFilters ? filteredCount : totalCount;
+  const totalPages = Math.max(1, Math.ceil(displayCount / pageSize));
   const paginatedItems = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
     return items.slice(start, start + pageSize);
@@ -284,7 +287,7 @@ export default function LeadVaultDatabase() {
             <div className="border-b p-3 flex items-center justify-between bg-background">
               <div className="flex items-center gap-3">
                 <span className="text-sm text-muted-foreground">
-                  Showing <strong className="text-foreground">{((currentPage - 1) * pageSize) + 1}–{Math.min(currentPage * pageSize, totalCount)}</strong> of <strong className="text-foreground">{totalCount.toLocaleString()}</strong> {viewType}
+                  Showing <strong className="text-foreground">{((currentPage - 1) * pageSize) + 1}–{Math.min(currentPage * pageSize, displayCount)}</strong> of <strong className="text-foreground">{displayCount.toLocaleString()}</strong> {viewType}
                 </span>
               </div>
 
