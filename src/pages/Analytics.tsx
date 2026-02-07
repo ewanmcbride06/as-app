@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { subDays, startOfDay, endOfDay } from "date-fns";
-import DashboardLayout from "@/components/layout/DashboardLayout";
+
 import { Download, TrendingUp, Users, Mail, MousePointer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -13,7 +13,7 @@ const Analytics = () => {
   });
 
   return (
-    <DashboardLayout>
+    <>
       <div className="flex flex-col h-full overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 shrink-0">
@@ -108,7 +108,7 @@ const Analytics = () => {
           </div>
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 

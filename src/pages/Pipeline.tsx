@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { format, isWithinInterval, startOfDay, endOfDay, subDays } from "date-fns";
-import DashboardLayout from "@/components/layout/DashboardLayout";
+
 import { Search, Filter, MessageSquare, CalendarDays, BarChart3, Link2, Hash, X } from "lucide-react";
 import { TimezoneSelector } from "@/components/pipeline/TimezoneSelector";
 import { getLocalTimezone, formatTimeInTimezone } from "@/components/pipeline/timezones";
@@ -133,7 +133,7 @@ const Pipeline = () => {
   };
 
   return (
-    <DashboardLayout>
+    <>
       <div className="flex flex-col h-full overflow-visible">
         {/* ─── Page Header ─── */}
         <div className="shrink-0 pb-5">
@@ -398,7 +398,7 @@ const Pipeline = () => {
           )}
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, MoreHorizontal, Download, Users, Building2, Linkedin, Plus, Activity } from "lucide-react";
-import DashboardLayout from "@/components/layout/DashboardLayout";
+
 import { mockLists, mockContacts, mockCompanies } from "@/components/leadvault/mockData";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -39,7 +39,7 @@ export default function LeadVaultListDetail() {
   ];
 
   return (
-    <DashboardLayout>
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-start gap-4">
@@ -242,6 +242,6 @@ export default function LeadVaultListDetail() {
           </TabsContent>
         </Tabs>
       </div>
-    </DashboardLayout>
+    </>
   );
 }

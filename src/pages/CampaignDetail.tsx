@@ -1,4 +1,4 @@
-import DashboardLayout from "@/components/layout/DashboardLayout";
+
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Info } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -124,19 +124,19 @@ const CampaignDetail = () => {
 
   if (!campaign) {
     return (
-      <DashboardLayout>
+      <>
         <div className="text-center py-12">
           <p className="text-muted-foreground">Campaign not found</p>
           <Link to="/campaigns" className="text-primary hover:underline mt-2 inline-block">
             Back to Campaigns
           </Link>
         </div>
-      </DashboardLayout>
+      </>
     );
   }
 
   return (
-    <DashboardLayout>
+    <>
       <div className="space-y-6">
         {/* Back Link */}
         <Link
@@ -283,7 +283,7 @@ const CampaignDetail = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 

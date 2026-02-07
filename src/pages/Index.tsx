@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { subDays, startOfDay, endOfDay } from "date-fns";
-import DashboardLayout from "@/components/layout/DashboardLayout";
+
 import { 
   TrendingUp, TrendingDown, Users, Mail, MousePointer,
   Download, RefreshCw, MoreHorizontal
@@ -52,7 +52,7 @@ const Index = () => {
   });
 
   return (
-    <DashboardLayout>
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -155,7 +155,7 @@ const Index = () => {
           </div>
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 

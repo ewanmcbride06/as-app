@@ -40,7 +40,7 @@ const TopNav = () => {
         <div className="flex h-14 items-center justify-between">
           <div className="flex items-center gap-4">
             <Link to="/" className="flex items-center">
-              <img src={logo} alt="Logo" className="h-8 w-8" />
+              <img src={logo} alt="Logo" className="h-8 w-8" width={32} height={32} decoding="sync" />
             </Link>
             <Separator orientation="vertical" className="h-6" />
             <div className="flex items-center gap-1">
