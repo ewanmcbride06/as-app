@@ -45,7 +45,7 @@ export default function SearchableMultiSelect({
   };
 
   return (
-    <div className="px-4 pb-4 space-y-2" ref={containerRef} onBlur={handleBlur}>
+    <div className="p-[10px] space-y-2" ref={containerRef} onBlur={handleBlur}>
       {/* Selected chips */}
       {selected.length > 0 && (
         <div className="flex flex-wrap gap-1">
