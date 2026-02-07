@@ -4,7 +4,7 @@ import { ChevronRight, Search, SlidersHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+import WarmupCircle from "./WarmupCircle";
 import {
   Table,
   TableBody,
@@ -135,10 +135,7 @@ const DomainGroupedTable = ({ domains }: DomainGroupedTableProps) => {
                     <TableCell className="text-muted-foreground">{agg.bounceRate}%</TableCell>
                     <TableCell className="text-muted-foreground">{agg.warmupDays} Days</TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Progress value={agg.warmupPercent} className="w-16 h-1.5" />
-                        <span className="text-sm text-muted-foreground">{agg.warmupPercent}%</span>
-                      </div>
+                      <WarmupCircle percent={agg.warmupPercent} />
                     </TableCell>
                   </TableRow>
 
@@ -168,10 +165,7 @@ const DomainGroupedTable = ({ domains }: DomainGroupedTableProps) => {
                         <TableCell className="text-sm text-muted-foreground">{mailbox.bounceRate}%</TableCell>
                         <TableCell className="text-sm text-muted-foreground">{mailbox.warmupDays} Days</TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Progress value={mailbox.warmupPercent} className="w-16 h-1.5" />
-                            <span className="text-sm text-muted-foreground">{mailbox.warmupPercent}%</span>
-                          </div>
+                          <WarmupCircle percent={mailbox.warmupPercent} />
                         </TableCell>
                       </TableRow>
                     ))}
