@@ -14,7 +14,7 @@ interface InfraStatCardsProps {
 
 const InfraStatCards = ({ stats }: InfraStatCardsProps) => {
   return (
-    <div className="grid grid-cols-6 gap-4">
+    <div className="grid grid-cols-3 gap-4">
       {stats.map((stat) => (
         <div key={stat.label} className="stat-card relative">
           <div className="flex items-center justify-between">
