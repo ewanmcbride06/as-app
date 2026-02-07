@@ -86,7 +86,7 @@ export default function CountryMultiSelect({ selected, onChange }: CountryMultiS
 
         {/* Country list - positioned as dropdown menu */}
         {isFocused && (
-          <div className="absolute left-0 right-0 top-full mt-1 z-50 max-h-[200px] overflow-y-auto scrollbar-hide rounded-[10px] border border-border bg-popover shadow-md">
+          <div className="absolute left-0 right-0 top-full mt-[5px] z-50 max-h-[200px] overflow-y-auto scrollbar-hide rounded-[10px] border border-border bg-popover shadow-md">
             {filtered.length === 0 ? (
               <div className="px-3 py-3 text-center text-xs text-muted-foreground">
                 No countries found
