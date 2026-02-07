@@ -188,11 +188,9 @@ export default function FilterSidebar({
       <div className="p-4 border-b space-y-3">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold text-sm">Filters</h3>
-          {activeCount > 0 && (
-            <Badge variant="secondary" className="text-xs">
-              {activeCount} active
-            </Badge>
-          )}
+          <Badge variant="secondary" className={cn("text-xs", activeCount === 0 && "invisible")}>
+            {activeCount} active
+          </Badge>
         </div>
         
         {/* View Type Toggle */}
