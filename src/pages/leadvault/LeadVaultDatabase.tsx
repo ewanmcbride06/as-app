@@ -26,9 +26,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import {
   Popover,
@@ -42,6 +41,7 @@ export default function LeadVaultDatabase() {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [allPagesSelected, setAllPagesSelected] = useState(false);
   const [customSelectInput, setCustomSelectInput] = useState("");
+  const [customSelectError, setCustomSelectError] = useState("");
   const [selectDropdownOpen, setSelectDropdownOpen] = useState(false);
   const [previewContact, setPreviewContact] = useState<Contact | null>(null);
   const [previewCompany, setPreviewCompany] = useState<Company | null>(null);
@@ -140,12 +140,24 @@ export default function LeadVaultDatabase() {
     setAllPagesSelected(true);
   };
 
-  const selectCustomAmount = (amount: number) => {
-    if (isNaN(amount) || amount <= 0) return;
-    const clamped = Math.min(amount, totalCount);
-    const toSelect = items.slice(0, clamped);
+  const handleCustomSelect = () => {
+    const val = parseInt(customSelectInput, 10);
+    if (isNaN(val) || customSelectInput.trim() === "") {
+      setCustomSelectError("Enter a number");
+      return;
+    }
+    if (val <= 0) {
+      setCustomSelectError("Must be at least 1");
+      return;
+    }
+    if (val > totalCount) {
+      setCustomSelectError(`Max is ${totalCount.toLocaleString()}`);
+      return;
+    }
+    setCustomSelectError("");
+    const toSelect = items.slice(0, val);
     setSelectedItems(toSelect.map(item => item.id));
-    setAllPagesSelected(clamped > items.length);
+    setAllPagesSelected(val > items.length);
     setCustomSelectInput("");
     setSelectDropdownOpen(false);
   };
@@ -322,47 +334,50 @@ export default function LeadVaultDatabase() {
                                   </TooltipContent>
                                 </Tooltip>
                               </TooltipProvider>
-                              <DropdownMenuContent align="start" className="bg-background z-50">
+                              <DropdownMenuContent align="start" className="bg-background z-50 w-56" onCloseAutoFocus={(e) => e.preventDefault()}>
                                 <DropdownMenuItem onClick={selectAllPages}>
                                   Select all ({totalContacts.toLocaleString()})
                                 </DropdownMenuItem>
-                                <DropdownMenuSub>
-                                  <DropdownMenuSubTrigger>Select custom</DropdownMenuSubTrigger>
-                                  <DropdownMenuSubContent className="bg-background z-50 p-2" onKeyDown={(e) => e.stopPropagation()}>
-                                    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                                      <Input
-                                        type="number"
-                                        min={1}
-                                        placeholder="Amount"
-                                        className="h-8 w-28 text-xs"
-                                        value={customSelectInput}
-                                        onChange={(e) => setCustomSelectInput(e.target.value)}
-                                        onKeyDown={(e) => {
-                                          e.stopPropagation();
-                                          if (e.key === 'Enter') {
-                                            e.preventDefault();
-                                            const val = parseInt(customSelectInput, 10);
-                                            if (!isNaN(val) && val > 0) selectCustomAmount(val);
-                                          }
-                                        }}
-                                        onClick={(e) => e.stopPropagation()}
-                                        autoFocus
-                                      />
-                                      <Button
-                                        size="sm"
-                                        className="h-8 text-xs"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
+                                <DropdownMenuSeparator />
+                                <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Custom amount</DropdownMenuLabel>
+                                <div className="px-2 pb-2" onKeyDown={(e) => e.stopPropagation()}>
+                                  <div className="flex items-center gap-2">
+                                    <Input
+                                      type="number"
+                                      min={1}
+                                      max={totalContacts}
+                                      placeholder={`1 – ${totalContacts.toLocaleString()}`}
+                                      className="h-8 flex-1 text-xs"
+                                      value={customSelectInput}
+                                      onChange={(e) => {
+                                        setCustomSelectInput(e.target.value);
+                                        setCustomSelectError("");
+                                      }}
+                                      onKeyDown={(e) => {
+                                        e.stopPropagation();
+                                        if (e.key === 'Enter') {
                                           e.preventDefault();
-                                          const val = parseInt(customSelectInput, 10);
-                                          if (!isNaN(val) && val > 0) selectCustomAmount(val);
-                                        }}
-                                      >
-                                        Go
-                                      </Button>
-                                    </div>
-                                  </DropdownMenuSubContent>
-                                </DropdownMenuSub>
+                                          handleCustomSelect();
+                                        }
+                                      }}
+                                      onClick={(e) => e.stopPropagation()}
+                                    />
+                                    <Button
+                                      size="sm"
+                                      className="h-8 text-xs shrink-0"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        e.preventDefault();
+                                        handleCustomSelect();
+                                      }}
+                                    >
+                                      Go
+                                    </Button>
+                                  </div>
+                                  {customSelectError && (
+                                    <p className="text-xs text-destructive mt-1">{customSelectError}</p>
+                                  )}
+                                </div>
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </div>
@@ -509,47 +524,50 @@ export default function LeadVaultDatabase() {
                                   </TooltipContent>
                                 </Tooltip>
                               </TooltipProvider>
-                              <DropdownMenuContent align="start" className="bg-background z-50">
+                              <DropdownMenuContent align="start" className="bg-background z-50 w-56" onCloseAutoFocus={(e) => e.preventDefault()}>
                                 <DropdownMenuItem onClick={selectAllPages}>
                                   Select all ({totalCompanies.toLocaleString()})
                                 </DropdownMenuItem>
-                                <DropdownMenuSub>
-                                  <DropdownMenuSubTrigger>Select custom</DropdownMenuSubTrigger>
-                                  <DropdownMenuSubContent className="bg-background z-50 p-2" onKeyDown={(e) => e.stopPropagation()}>
-                                    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                                      <Input
-                                        type="number"
-                                        min={1}
-                                        placeholder="Amount"
-                                        className="h-8 w-28 text-xs"
-                                        value={customSelectInput}
-                                        onChange={(e) => setCustomSelectInput(e.target.value)}
-                                        onKeyDown={(e) => {
-                                          e.stopPropagation();
-                                          if (e.key === 'Enter') {
-                                            e.preventDefault();
-                                            const val = parseInt(customSelectInput, 10);
-                                            if (!isNaN(val) && val > 0) selectCustomAmount(val);
-                                          }
-                                        }}
-                                        onClick={(e) => e.stopPropagation()}
-                                        autoFocus
-                                      />
-                                      <Button
-                                        size="sm"
-                                        className="h-8 text-xs"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
+                                <DropdownMenuSeparator />
+                                <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Custom amount</DropdownMenuLabel>
+                                <div className="px-2 pb-2" onKeyDown={(e) => e.stopPropagation()}>
+                                  <div className="flex items-center gap-2">
+                                    <Input
+                                      type="number"
+                                      min={1}
+                                      max={totalCompanies}
+                                      placeholder={`1 – ${totalCompanies.toLocaleString()}`}
+                                      className="h-8 flex-1 text-xs"
+                                      value={customSelectInput}
+                                      onChange={(e) => {
+                                        setCustomSelectInput(e.target.value);
+                                        setCustomSelectError("");
+                                      }}
+                                      onKeyDown={(e) => {
+                                        e.stopPropagation();
+                                        if (e.key === 'Enter') {
                                           e.preventDefault();
-                                          const val = parseInt(customSelectInput, 10);
-                                          if (!isNaN(val) && val > 0) selectCustomAmount(val);
-                                        }}
-                                      >
-                                        Go
-                                      </Button>
-                                    </div>
-                                  </DropdownMenuSubContent>
-                                </DropdownMenuSub>
+                                          handleCustomSelect();
+                                        }
+                                      }}
+                                      onClick={(e) => e.stopPropagation()}
+                                    />
+                                    <Button
+                                      size="sm"
+                                      className="h-8 text-xs shrink-0"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        e.preventDefault();
+                                        handleCustomSelect();
+                                      }}
+                                    >
+                                      Go
+                                    </Button>
+                                  </div>
+                                  {customSelectError && (
+                                    <p className="text-xs text-destructive mt-1">{customSelectError}</p>
+                                  )}
+                                </div>
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </div>
