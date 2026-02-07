@@ -28,8 +28,8 @@ const Infrastructure = () => {
       showMenu: true,
     },
     {
-      label: "Avg. Warmup Health",
-      value: `${stats.avgWarmupHealth}%`,
+      label: "Total Sent",
+      value: stats.totalSent.toLocaleString(),
       showMenu: true,
     },
     {
