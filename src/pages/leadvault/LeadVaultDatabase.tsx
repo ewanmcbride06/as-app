@@ -64,26 +64,30 @@ export default function LeadVaultDatabase() {
     if (filters.industries.length) {
       result = result.filter(c => filters.industries.includes(c.industry));
     }
-    if (filters.employeeRange.length) {
-      result = result.filter(c => filters.employeeRange.includes(c.employees));
+    if (filters.employeeSize.length) {
+      result = result.filter(c => filters.employeeSize.includes(c.employees));
     }
-    if (filters.seniority.length) {
-      result = result.filter(c => filters.seniority.includes(c.seniority));
-    }
-    if (filters.department.length) {
-      result = result.filter(c => filters.department.includes(c.department));
+    if (filters.companyLocation.length) {
+      result = result.filter(c =>
+        filters.companyLocation.some(country => c.location.toLowerCase().includes(country.toLowerCase()))
+      );
     }
     if (filters.emailStatus.length) {
       const statuses = filters.emailStatus.map(s => s.toLowerCase());
       result = result.filter(c => statuses.includes(c.emailStatus));
     }
-    if (filters.title.trim()) {
-      const titleQ = filters.title.toLowerCase();
-      result = result.filter(c => c.title.toLowerCase().includes(titleQ));
+    if (filters.jobTitle.trim()) {
+      const titleQ = filters.jobTitle.toLowerCase();
+      if (filters.jobTitleMode === 'exact') {
+        result = result.filter(c => c.title.toLowerCase() === titleQ);
+      } else {
+        result = result.filter(c => c.title.toLowerCase().includes(titleQ));
+      }
     }
-    if (filters.location.trim()) {
-      const locQ = filters.location.toLowerCase();
-      result = result.filter(c => c.location.toLowerCase().includes(locQ));
+    if (filters.peopleLocation.length) {
+      result = result.filter(c =>
+        filters.peopleLocation.some(country => c.location.toLowerCase().includes(country.toLowerCase()))
+      );
     }
 
     return result;
@@ -104,16 +108,13 @@ export default function LeadVaultDatabase() {
     if (filters.industries.length) {
       result = result.filter(c => filters.industries.includes(c.industry));
     }
-    if (filters.employeeRange.length) {
-      result = result.filter(c => filters.employeeRange.includes(c.employees));
+    if (filters.employeeSize.length) {
+      result = result.filter(c => filters.employeeSize.includes(c.employees));
     }
-    if (filters.location.trim()) {
-      const locQ = filters.location.toLowerCase();
-      result = result.filter(c => c.location.toLowerCase().includes(locQ));
-    }
-    if (filters.techStack.trim()) {
-      const techQ = filters.techStack.toLowerCase();
-      result = result.filter(c => c.techStack.some(t => t.toLowerCase().includes(techQ)));
+    if (filters.companyLocation.length) {
+      result = result.filter(c =>
+        filters.companyLocation.some(country => c.location.toLowerCase().includes(country.toLowerCase()))
+      );
     }
 
     return result;
