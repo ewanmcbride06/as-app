@@ -141,7 +141,8 @@ export default function LeadVaultDatabase() {
   };
 
   const selectCustomAmount = (amount: number) => {
-    const clamped = Math.max(0, Math.min(amount, totalCount));
+    if (isNaN(amount) || amount <= 0) return;
+    const clamped = Math.min(amount, totalCount);
     const toSelect = items.slice(0, clamped);
     setSelectedItems(toSelect.map(item => item.id));
     setAllPagesSelected(clamped > items.length);
@@ -282,20 +283,19 @@ export default function LeadVaultDatabase() {
               </div>
             </div>
 
-            {/* Table */}
-            <div className="flex-1 overflow-auto scrollbar-hide relative">
-              {/* Floating Bulk Actions */}
+            {/* Table wrapper with relative for pill positioning */}
+            <div className="flex-1 relative overflow-hidden">
+              {/* Floating Bulk Actions - positioned over the table, outside scroll */}
               {selectedItems.length > 0 && (
-                <div className="sticky top-[50px] right-[7px] z-20 flex justify-end pr-[7px] pointer-events-none" style={{ marginBottom: '-44px' }}>
-                  <div className="flex items-center gap-2 rounded-[10px] border border-border bg-background shadow-md px-3 py-2.5 pointer-events-auto">
-                    <span className="text-xs font-medium">{allPagesSelected ? totalCount.toLocaleString() : selectedItems.length} selected</span>
-                    <div className="w-px h-4 bg-border" />
-                    <Button size="sm" variant="outline" className="h-8 text-xs">Add to List</Button>
-                    <Button size="sm" className="h-8 text-xs">Export CSV</Button>
-                    <Button size="sm" variant="ghost" className="h-8 text-xs" onClick={clearSelection}>Clear</Button>
-                  </div>
+                <div className="absolute top-[50px] right-[7px] z-20 flex items-center gap-2 rounded-[10px] border border-border bg-background shadow-md px-3 py-2.5">
+                  <span className="text-xs font-medium">{allPagesSelected ? totalCount.toLocaleString() : selectedItems.length} selected</span>
+                  <div className="w-px h-4 bg-border" />
+                  <Button size="sm" variant="outline" className="h-8 text-xs">Add to List</Button>
+                  <Button size="sm" className="h-8 text-xs">Export CSV</Button>
+                  <Button size="sm" variant="ghost" className="h-8 text-xs" onClick={clearSelection}>Clear</Button>
                 </div>
               )}
+              <div className="h-full overflow-auto scrollbar-hide">
               {viewType === 'contacts' ? (
                 viewMode === 'table' ? (
                   <Table>
@@ -328,36 +328,39 @@ export default function LeadVaultDatabase() {
                                 </DropdownMenuItem>
                                 <DropdownMenuSub>
                                   <DropdownMenuSubTrigger>Select custom</DropdownMenuSubTrigger>
-                                  <DropdownMenuSubContent className="bg-background z-50 p-2">
-                                    <form
-                                      onSubmit={(e) => {
-                                        e.preventDefault();
-                                        if (customSelectInput) {
-                                          selectCustomAmount(parseInt(customSelectInput, 10));
-                                        }
-                                      }}
-                                    >
-                                      <div className="flex items-center gap-2">
-                                        <Input
-                                          type="number"
-                                          min={1}
-                                          placeholder="Amount"
-                                          className="h-8 w-28 text-xs"
-                                          value={customSelectInput}
-                                          onChange={(e) => setCustomSelectInput(e.target.value)}
-                                          onKeyDown={(e) => e.stopPropagation()}
-                                          onClick={(e) => e.stopPropagation()}
-                                          autoFocus
-                                        />
-                                        <Button
-                                          type="submit"
-                                          size="sm"
-                                          className="h-8 text-xs"
-                                        >
-                                          Go
-                                        </Button>
-                                      </div>
-                                    </form>
+                                  <DropdownMenuSubContent className="bg-background z-50 p-2" onKeyDown={(e) => e.stopPropagation()}>
+                                    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                                      <Input
+                                        type="number"
+                                        min={1}
+                                        placeholder="Amount"
+                                        className="h-8 w-28 text-xs"
+                                        value={customSelectInput}
+                                        onChange={(e) => setCustomSelectInput(e.target.value)}
+                                        onKeyDown={(e) => {
+                                          e.stopPropagation();
+                                          if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                            const val = parseInt(customSelectInput, 10);
+                                            if (!isNaN(val) && val > 0) selectCustomAmount(val);
+                                          }
+                                        }}
+                                        onClick={(e) => e.stopPropagation()}
+                                        autoFocus
+                                      />
+                                      <Button
+                                        size="sm"
+                                        className="h-8 text-xs"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          e.preventDefault();
+                                          const val = parseInt(customSelectInput, 10);
+                                          if (!isNaN(val) && val > 0) selectCustomAmount(val);
+                                        }}
+                                      >
+                                        Go
+                                      </Button>
+                                    </div>
                                   </DropdownMenuSubContent>
                                 </DropdownMenuSub>
                               </DropdownMenuContent>
@@ -512,36 +515,39 @@ export default function LeadVaultDatabase() {
                                 </DropdownMenuItem>
                                 <DropdownMenuSub>
                                   <DropdownMenuSubTrigger>Select custom</DropdownMenuSubTrigger>
-                                  <DropdownMenuSubContent className="bg-background z-50 p-2">
-                                    <form
-                                      onSubmit={(e) => {
-                                        e.preventDefault();
-                                        if (customSelectInput) {
-                                          selectCustomAmount(parseInt(customSelectInput, 10));
-                                        }
-                                      }}
-                                    >
-                                      <div className="flex items-center gap-2">
-                                        <Input
-                                          type="number"
-                                          min={1}
-                                          placeholder="Amount"
-                                          className="h-8 w-28 text-xs"
-                                          value={customSelectInput}
-                                          onChange={(e) => setCustomSelectInput(e.target.value)}
-                                          onKeyDown={(e) => e.stopPropagation()}
-                                          onClick={(e) => e.stopPropagation()}
-                                          autoFocus
-                                        />
-                                        <Button
-                                          type="submit"
-                                          size="sm"
-                                          className="h-8 text-xs"
-                                        >
-                                          Go
-                                        </Button>
-                                      </div>
-                                    </form>
+                                  <DropdownMenuSubContent className="bg-background z-50 p-2" onKeyDown={(e) => e.stopPropagation()}>
+                                    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                                      <Input
+                                        type="number"
+                                        min={1}
+                                        placeholder="Amount"
+                                        className="h-8 w-28 text-xs"
+                                        value={customSelectInput}
+                                        onChange={(e) => setCustomSelectInput(e.target.value)}
+                                        onKeyDown={(e) => {
+                                          e.stopPropagation();
+                                          if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                            const val = parseInt(customSelectInput, 10);
+                                            if (!isNaN(val) && val > 0) selectCustomAmount(val);
+                                          }
+                                        }}
+                                        onClick={(e) => e.stopPropagation()}
+                                        autoFocus
+                                      />
+                                      <Button
+                                        size="sm"
+                                        className="h-8 text-xs"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          e.preventDefault();
+                                          const val = parseInt(customSelectInput, 10);
+                                          if (!isNaN(val) && val > 0) selectCustomAmount(val);
+                                        }}
+                                      >
+                                        Go
+                                      </Button>
+                                    </div>
                                   </DropdownMenuSubContent>
                                 </DropdownMenuSub>
                               </DropdownMenuContent>
@@ -662,6 +668,7 @@ export default function LeadVaultDatabase() {
                   </div>
                 )
               )}
+              </div>
             </div>
           </div>
 
