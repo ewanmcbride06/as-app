@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 interface StatCardItem {
   label: string;
   value: string;
-  subtitle?: string;
+  valueSuffix?: string;
   showMenu?: boolean;
 }
 
@@ -16,7 +16,7 @@ const InfraStatCards = ({ stats }: InfraStatCardsProps) => {
   return (
     <div className="grid grid-cols-3 gap-4">
       {stats.map((stat) => (
-        <div key={stat.label} className="stat-card relative">
+        <div key={stat.label} className="stat-card relative flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
             {stat.showMenu && (
@@ -26,10 +26,12 @@ const InfraStatCards = ({ stats }: InfraStatCardsProps) => {
             )}
           </div>
           <div className="mt-4">
-            <p className="text-3xl font-semibold tracking-tight text-foreground">{stat.value}</p>
-            {stat.subtitle && (
-              <p className="mt-1 text-sm text-muted-foreground">{stat.subtitle}</p>
-            )}
+            <div className="flex items-baseline gap-2">
+              <p className="text-3xl font-semibold tracking-tight text-foreground">{stat.value}</p>
+              {stat.valueSuffix && (
+                <p className="text-sm text-muted-foreground">{stat.valueSuffix}</p>
+              )}
+            </div>
           </div>
         </div>
       ))}

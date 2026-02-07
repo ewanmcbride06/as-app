@@ -10,6 +10,7 @@ import Pipeline from "./pages/Pipeline";
 import Campaigns from "./pages/Campaigns";
 import CampaignDetail from "./pages/CampaignDetail";
 import Infrastructure from "./pages/Infrastructure";
+import MailboxDetail from "./pages/MailboxDetail";
 import Engagement from "./pages/Engagement";
 
 import Settings from "./pages/Settings";
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/campaigns" element={<Campaigns />} />
             <Route path="/campaigns/:id" element={<CampaignDetail />} />
             <Route path="/infrastructure" element={<Infrastructure />} />
+            <Route path="/infrastructure/mailbox/:id" element={<MailboxDetail />} />
             <Route path="/engagement" element={<Engagement />} />
             
             
