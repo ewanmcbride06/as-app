@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { ChevronDown, Building2, Sparkles } from "lucide-react";
+import { ChevronDown, Building2, Sparkles, BookOpen } from "lucide-react";
 import { useState } from "react";
 import {
   DropdownMenu,
@@ -63,9 +63,15 @@ const TopNav = () => {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <button className="flex h-9 items-center rounded-[10px] border border-border bg-background px-3 text-sm font-medium transition-colors hover:bg-muted">
-              Documentation
-            </button>
+            <a
+              href="https://docs.acquisitionsystems.com/c/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-9 items-center gap-2 rounded-[10px] border border-border bg-background px-3 text-xs font-medium transition-colors hover:bg-muted"
+            >
+              <BookOpen className="h-3.5 w-3.5" />
+              Docs
+            </a>
             
             {/* Company Switcher */}
             <DropdownMenu>
