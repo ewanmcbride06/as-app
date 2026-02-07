@@ -1,5 +1,5 @@
 import { useState } from "react";
-import DashboardLayout from "@/components/layout/DashboardLayout";
+
 import { cn } from "@/lib/utils";
 import { BarChart3, Replace, AlertTriangle } from "lucide-react";
 import InfraStatCards from "@/components/infrastructure/InfraStatCards";
@@ -51,7 +51,7 @@ const Infrastructure = () => {
   ];
 
   return (
-    <DashboardLayout>
+    <>
       <div className="flex flex-col h-full overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 shrink-0">
@@ -119,7 +119,7 @@ const Infrastructure = () => {
           </div>
         )}
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 

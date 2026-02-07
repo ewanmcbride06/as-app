@@ -1,4 +1,3 @@
-import DashboardLayout from "@/components/layout/DashboardLayout";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -161,7 +160,7 @@ const Campaigns = () => {
   };
 
   return (
-    <DashboardLayout>
+    <>
       <div className="flex flex-col h-full overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 shrink-0">
@@ -352,7 +351,7 @@ const Campaigns = () => {
           </div>
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 

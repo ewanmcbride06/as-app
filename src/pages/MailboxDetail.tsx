@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import DashboardLayout from "@/components/layout/DashboardLayout";
+
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { infrastructureDomains } from "@/components/infrastructure/mockData";
@@ -17,19 +17,19 @@ const MailboxDetail = () => {
 
   if (!mailbox) {
     return (
-      <DashboardLayout>
+      <>
         <div className="flex flex-col h-full items-center justify-center">
           <p className="text-muted-foreground">Mailbox not found.</p>
           <Button variant="outline" className="mt-4" onClick={() => navigate("/infrastructure")}>
             Back to Infrastructure
           </Button>
         </div>
-      </DashboardLayout>
+      </>
     );
   }
 
   return (
-    <DashboardLayout>
+    <>
       <div className="flex flex-col h-full overflow-hidden">
         {/* Header */}
         <div className="flex items-center gap-3 pb-4 shrink-0">
@@ -76,7 +76,7 @@ const MailboxDetail = () => {
           </div>
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 

@@ -1,4 +1,4 @@
- import DashboardLayout from "@/components/layout/DashboardLayout";
+ 
  
  const users = [
    { id: 1, name: "Alex Morgan", email: "alex@example.com", role: "Admin", status: "Active" },
@@ -10,7 +10,7 @@
  
  const Users = () => {
    return (
-     <DashboardLayout>
+     <>
        <div className="space-y-8">
          <div>
            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
@@ -68,7 +68,7 @@
            </table>
          </div>
        </div>
-     </DashboardLayout>
+     </>
    );
  };
  

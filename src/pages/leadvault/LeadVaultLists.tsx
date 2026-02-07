@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { MoreHorizontal, Plus, Users, Building2, Calendar, User, Search } from "lucide-react";
 import { Link } from "react-router-dom";
-import DashboardLayout from "@/components/layout/DashboardLayout";
+
 import LeadVaultNav from "@/components/leadvault/LeadVaultNav";
 import { mockLists } from "@/components/leadvault/mockData";
 import { Button } from "@/components/ui/button";
@@ -45,7 +45,7 @@ export default function LeadVaultLists() {
   const lists = mockLists;
 
   return (
-    <DashboardLayout>
+    <>
       <div className="space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -180,6 +180,6 @@ export default function LeadVaultLists() {
           </Table>
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 }

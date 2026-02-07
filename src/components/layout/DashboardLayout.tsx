@@ -1,15 +1,13 @@
 import TopNav from "./TopNav";
 import { ConversationPanel } from "@/components/pipeline/ConversationPanel";
 import { useConversationPanel } from "@/contexts/ConversationPanelContext";
+import { useLayout } from "@/contexts/LayoutContext";
 import { cn } from "@/lib/utils";
+import { Outlet } from "react-router-dom";
 
-interface DashboardLayoutProps {
-  children: React.ReactNode;
-  isExpanded?: boolean;
-}
-
-const DashboardLayout = ({ children, isExpanded = false }: DashboardLayoutProps) => {
+const DashboardLayout = () => {
   const { meeting, closeConversation, isOpen } = useConversationPanel();
+  const { isExpanded } = useLayout();
 
   return (
     <div className="h-screen flex overflow-hidden bg-background">
@@ -22,7 +20,7 @@ const DashboardLayout = ({ children, isExpanded = false }: DashboardLayoutProps)
           "flex-1 overflow-hidden transition-all duration-300 ease-out",
           isExpanded ? "px-0 pt-0" : "px-[50px] pt-[50px]"
         )}>
-          {children}
+          <Outlet />
         </main>
       </div>
 

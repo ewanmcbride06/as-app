@@ -1,5 +1,5 @@
 import { useState } from "react";
-import DashboardLayout from "@/components/layout/DashboardLayout";
+
 import { Calendar, ChevronDown, ArrowLeft, Download, Clock, Server } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -46,7 +46,7 @@ const Engagement = () => {
   };
 
   return (
-    <DashboardLayout>
+    <>
       <div className="flex flex-col h-full overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 shrink-0">
@@ -321,7 +321,7 @@ const Engagement = () => {
           </div>
         </ScrollArea>
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 

@@ -1,6 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, MapPin, Mail, Phone, Linkedin, Plus, Download, Sparkles, Building2, Globe } from "lucide-react";
-import DashboardLayout from "@/components/layout/DashboardLayout";
+
 import { mockContacts, mockCompanies } from "@/components/leadvault/mockData";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,7 +16,7 @@ export default function LeadVaultContactDetail() {
   const company = mockCompanies.find(c => c.name === contact.company) || mockCompanies[0];
 
   return (
-    <DashboardLayout>
+    <>
       <div className="max-w-4xl space-y-6">
         {/* Header */}
         <div className="flex items-start gap-4">
@@ -222,6 +222,6 @@ export default function LeadVaultContactDetail() {
           </div>
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 }

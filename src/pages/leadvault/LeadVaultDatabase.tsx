@@ -1,6 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { MoreHorizontal, Columns, Linkedin, Globe, Plus, Search, Download, Maximize2, Minimize2, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
-import DashboardLayout from "@/components/layout/DashboardLayout";
+import { useLayout } from "@/contexts/LayoutContext";
 import LeadVaultNav from "@/components/leadvault/LeadVaultNav";
 import FilterSidebar from "@/components/leadvault/FilterSidebar";
 import { FilterState, emptyFilterState } from "@/components/leadvault/FilterSidebar";
@@ -49,7 +49,12 @@ export default function LeadVaultDatabase() {
   const [previewCompany, setPreviewCompany] = useState<Company | null>(null);
   const [viewMode, setViewMode] = useState<'table' | 'compact'>('table');
   const [filters, setFilters] = useState<FilterState>(emptyFilterState);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const { isExpanded, setIsExpanded } = useLayout();
+
+  // Reset expanded state when leaving the page
+  useEffect(() => {
+    return () => setIsExpanded(false);
+  }, [setIsExpanded]);
   const [tableSearch, setTableSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(25);
@@ -236,7 +241,7 @@ export default function LeadVaultDatabase() {
   const companyColumns = ['Company', 'Domain', 'Industry', 'Employees', 'Revenue', 'Location', 'Tech Stack'];
 
   return (
-    <DashboardLayout isExpanded={isExpanded}>
+    <>
       <div className={cn(
         "flex flex-col h-full overflow-hidden transition-all duration-300 ease-out"
       )}>
@@ -801,6 +806,6 @@ export default function LeadVaultDatabase() {
           )}
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 }
