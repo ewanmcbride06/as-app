@@ -96,26 +96,59 @@ function ChipSelect({
   );
 }
 
+export interface FilterState {
+  industries: string[];
+  companyTypes: string[];
+  employeeRange: string[];
+  seniority: string[];
+  department: string[];
+  emailStatus: string[];
+  location: string;
+  techStack: string;
+  title: string;
+}
+
+export const emptyFilterState: FilterState = {
+  industries: [],
+  companyTypes: [],
+  employeeRange: [],
+  seniority: [],
+  department: [],
+  emailStatus: [],
+  location: "",
+  techStack: "",
+  title: "",
+};
+
+export function getActiveFilterCount(filters: FilterState): number {
+  let count = 0;
+  if (filters.industries.length) count++;
+  if (filters.companyTypes.length) count++;
+  if (filters.employeeRange.length) count++;
+  if (filters.seniority.length) count++;
+  if (filters.department.length) count++;
+  if (filters.emailStatus.length) count++;
+  if (filters.location.trim()) count++;
+  if (filters.techStack.trim()) count++;
+  if (filters.title.trim()) count++;
+  return count;
+}
+
 interface FilterSidebarProps {
   viewType: 'contacts' | 'companies';
   onViewTypeChange: (type: 'contacts' | 'companies') => void;
-  activeFilters: string[];
+  filters: FilterState;
+  onFiltersChange: (filters: FilterState) => void;
   onClearFilters: () => void;
 }
 
 export default function FilterSidebar({
   viewType,
   onViewTypeChange,
-  activeFilters,
+  filters,
+  onFiltersChange,
   onClearFilters
 }: FilterSidebarProps) {
-  const [industries, setIndustries] = useState<string[]>([]);
-  const [companyTypes, setCompanyTypes] = useState<string[]>([]);
-  const [employeeRange, setEmployeeRange] = useState<string[]>([]);
-  const [seniority, setSeniority] = useState<string[]>([]);
-  const [department, setDepartment] = useState<string[]>([]);
-  const [emailStatus, setEmailStatus] = useState<string[]>([]);
-
   const industryOptions = ['SaaS', 'Fintech', 'Healthcare', 'E-commerce', 'Marketing', 'HR Tech', 'Cybersecurity', 'AI/ML', 'EdTech'];
   const companyTypeOptions = ['Startup', 'SMB', 'Mid-Market', 'Enterprise', 'Agency'];
   const employeeOptions = ['1-10', '11-50', '51-200', '201-500', '501-1000', '1000+'];
@@ -123,15 +156,21 @@ export default function FilterSidebar({
   const departmentOptions = ['Sales', 'Marketing', 'RevOps', 'Product', 'Operations', 'Finance', 'HR', 'Engineering'];
   const emailStatusOptions = ['Verified', 'Guessed', 'Unknown'];
 
+  const activeCount = getActiveFilterCount(filters);
+
+  const updateFilter = <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
+    onFiltersChange({ ...filters, [key]: value });
+  };
+
   return (
     <div className="w-72 border-r bg-background flex flex-col h-full shrink-0">
       {/* Header with View Type Toggle */}
       <div className="p-4 border-b space-y-3">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold text-sm">Filters</h3>
-          {activeFilters.length > 0 && (
+          {activeCount > 0 && (
             <Badge variant="secondary" className="text-xs">
-              {activeFilters.length} active
+              {activeCount} active
             </Badge>
           )}
         </div>
@@ -166,7 +205,7 @@ export default function FilterSidebar({
       </div>
 
       {/* Scrollable Filter Content */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto scrollbar-hide">
         {/* Company Filters */}
         <div className="border-b">
           <div className="px-4 py-2 bg-muted/50">
@@ -174,26 +213,36 @@ export default function FilterSidebar({
           </div>
           
           <FilterSection title="Industry">
-            <MultiSelectFilter options={industryOptions} selected={industries} onChange={setIndustries} />
+            <MultiSelectFilter options={industryOptions} selected={filters.industries} onChange={(v) => updateFilter('industries', v)} />
           </FilterSection>
 
           <FilterSection title="Company Type">
-            <MultiSelectFilter options={companyTypeOptions} selected={companyTypes} onChange={setCompanyTypes} />
+            <MultiSelectFilter options={companyTypeOptions} selected={filters.companyTypes} onChange={(v) => updateFilter('companyTypes', v)} />
           </FilterSection>
 
           <FilterSection title="Employee Range">
-            <ChipSelect options={employeeOptions} selected={employeeRange} onChange={setEmployeeRange} />
+            <ChipSelect options={employeeOptions} selected={filters.employeeRange} onChange={(v) => updateFilter('employeeRange', v)} />
           </FilterSection>
 
           <FilterSection title="Location" defaultOpen={false}>
             <div className="px-4 pb-4">
-              <Input placeholder="Country or city..." className="h-8 text-sm" />
+              <Input
+                placeholder="Country or city..."
+                className="h-8 text-sm"
+                value={filters.location}
+                onChange={(e) => updateFilter('location', e.target.value)}
+              />
             </div>
           </FilterSection>
 
           <FilterSection title="Tech Stack" defaultOpen={false}>
             <div className="px-4 pb-4">
-              <Input placeholder="Search technologies..." className="h-8 text-sm" />
+              <Input
+                placeholder="Search technologies..."
+                className="h-8 text-sm"
+                value={filters.techStack}
+                onChange={(e) => updateFilter('techStack', e.target.value)}
+              />
             </div>
           </FilterSection>
         </div>
@@ -207,20 +256,25 @@ export default function FilterSidebar({
 
             <FilterSection title="Title">
               <div className="px-4 pb-4">
-                <Input placeholder="Contains..." className="h-8 text-sm" />
+                <Input
+                  placeholder="Contains..."
+                  className="h-8 text-sm"
+                  value={filters.title}
+                  onChange={(e) => updateFilter('title', e.target.value)}
+                />
               </div>
             </FilterSection>
 
             <FilterSection title="Seniority">
-              <ChipSelect options={seniorityOptions} selected={seniority} onChange={setSeniority} />
+              <ChipSelect options={seniorityOptions} selected={filters.seniority} onChange={(v) => updateFilter('seniority', v)} />
             </FilterSection>
 
             <FilterSection title="Department">
-              <MultiSelectFilter options={departmentOptions} selected={department} onChange={setDepartment} />
+              <MultiSelectFilter options={departmentOptions} selected={filters.department} onChange={(v) => updateFilter('department', v)} />
             </FilterSection>
 
             <FilterSection title="Email Status">
-              <MultiSelectFilter options={emailStatusOptions} selected={emailStatus} onChange={setEmailStatus} />
+              <MultiSelectFilter options={emailStatusOptions} selected={filters.emailStatus} onChange={(v) => updateFilter('emailStatus', v)} />
             </FilterSection>
           </div>
         )}
