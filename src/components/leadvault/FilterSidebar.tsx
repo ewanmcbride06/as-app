@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import CountryMultiSelect from "./CountryMultiSelect";
+import SearchableMultiSelect from "./SearchableMultiSelect";
 
 interface FilterSectionProps {
   title: string;
@@ -232,7 +233,7 @@ export default function FilterSidebar({
           </div>
           
           <FilterSection title="Industry" activeCount={filters.industries.length} onClear={() => updateFilter('industries', [])}>
-            <MultiSelectFilter options={industryOptions} selected={filters.industries} onChange={(v) => updateFilter('industries', v)} />
+            <SearchableMultiSelect options={industryOptions} selected={filters.industries} onChange={(v) => updateFilter('industries', v)} placeholder="Search industries..." />
           </FilterSection>
 
           <FilterSection title="Employee Size" activeCount={filters.employeeSize.length} onClear={() => updateFilter('employeeSize', [])}>
