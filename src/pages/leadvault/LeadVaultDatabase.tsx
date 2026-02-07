@@ -238,8 +238,6 @@ export default function LeadVaultDatabase() {
                   </PopoverContent>
                 </Popover>
 
-                <div className="w-px h-5 bg-border" />
-
                 <Button 
                   size="sm" 
                   className="gap-2"
@@ -247,6 +245,8 @@ export default function LeadVaultDatabase() {
                   <Download className="h-4 w-4" />
                   Export
                 </Button>
+
+                <div className="w-px h-5 bg-border" />
 
                 <Button 
                   variant="outline" 
