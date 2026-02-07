@@ -47,7 +47,9 @@ function FilterSection({
         </div>
       </CollapsibleTrigger>
       <CollapsibleContent>
-        {children}
+        <div className="mx-[10px] mb-[10px] mt-[2px] rounded-[10px] border border-border bg-muted/30">
+          {children}
+        </div>
       </CollapsibleContent>
     </Collapsible>
   );
@@ -72,7 +74,7 @@ function MultiSelectFilter({
     }
   };
   return (
-    <div className="space-y-2 max-h-40 overflow-y-auto mx-4 my-4">
+    <div className="space-y-2 max-h-40 overflow-y-auto p-[10px]">
       {options.map(option => (
         <label key={option} className="flex items-center gap-2 text-sm cursor-pointer">
           <Checkbox checked={selected.includes(option)} onCheckedChange={() => toggleOption(option)} />
@@ -102,7 +104,7 @@ function ChipSelect({
     }
   };
   return (
-    <div className="flex flex-wrap gap-1.5 mx-4 my-4">
+    <div className="flex flex-wrap gap-1.5 p-[10px]">
       {options.map(option => (
         <Badge 
           key={option} 
@@ -245,7 +247,7 @@ export default function FilterSidebar({
               onFiltersChange({ ...filters, associatedMembersMin: "", associatedMembersMax: "" });
             }}
           >
-            <div className="px-4 pb-4 flex items-center gap-2">
+            <div className="p-[10px] flex items-center gap-2">
               <Input
                 type="number"
                 placeholder="Min"
@@ -279,7 +281,7 @@ export default function FilterSidebar({
             </div>
 
             <FilterSection title="Job Title" activeCount={filters.jobTitle.trim() ? 1 : 0} onClear={() => onFiltersChange({ ...filters, jobTitle: "", jobTitleMode: "contains" })}>
-              <div className="px-4 pb-4 space-y-2">
+              <div className="p-[10px] space-y-2">
                 <div className="flex rounded-md border p-0.5 bg-muted/30">
                   <button
                     onClick={() => updateFilter('jobTitleMode', 'contains')}
