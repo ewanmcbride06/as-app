@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { startOfDay, endOfDay, subDays } from "date-fns";
+import { useState, useMemo } from "react";
+import { startOfDay, endOfDay, subDays, isWithinInterval } from "date-fns";
 
 import { ArrowLeft, Download, Clock, Server } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -36,6 +36,24 @@ const Engagement = () => {
   const handleDayClick = (data: { day: string }) => {
     setSelectedDay(data.day);
   };
+
+  const filteredDailyReplyTypeData = useMemo(() => {
+    return dailyReplyTypeData.filter((d) =>
+      isWithinInterval(d.rawDate, { start: startOfDay(dateRange.from), end: endOfDay(dateRange.to) })
+    );
+  }, [dateRange]);
+
+  const filteredEspReplyRates = useMemo(() => {
+    return espReplyRates.map((esp) => {
+      const filtered = esp.data.filter((d) =>
+        isWithinInterval(d.rawDate, { start: startOfDay(dateRange.from), end: endOfDay(dateRange.to) })
+      );
+      const avg = filtered.length > 0
+        ? parseFloat((filtered.reduce((sum, d) => sum + d.rate, 0) / filtered.length).toFixed(1))
+        : 0;
+      return { ...esp, data: filtered, avgRate: avg };
+    });
+  }, [dateRange]);
 
   return (
     <>
@@ -96,7 +114,7 @@ const Engagement = () => {
                   </div>
                   <div className="h-[280px]">
                     <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={dailyReplyTypeData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                      <LineChart data={filteredDailyReplyTypeData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                         <XAxis dataKey="date" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
                         <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} width={40} />
@@ -205,7 +223,7 @@ const Engagement = () => {
 
             {activeTab === "provider" && (
               <div className="grid grid-cols-2 gap-6">
-                {[...espReplyRates]
+                {[...filteredEspReplyRates]
                   .sort((a, b) => b.avgRate - a.avgRate)
                   .map((esp, index) => {
                     const rank = index + 1;
