@@ -80,29 +80,37 @@ function FilterPopover({ label, active, onClear, children }: FilterPopoverProps)
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className={cn(
-            "h-9 px-3 text-xs gap-1.5 shrink-0",
-            active && "border-foreground/30"
-          )}
-        >
-          {label}
-          {active ? (
-            <X
-              className="h-3 w-3 ml-0.5 text-muted-foreground hover:text-foreground"
-              onClick={(e) => {
-                e.stopPropagation();
-                onClear();
-              }}
-            />
-          ) : (
-            <ChevronDown className="h-3 w-3 ml-0.5 text-muted-foreground" />
-          )}
-        </Button>
-      </PopoverTrigger>
+      <div className="relative flex items-center shrink-0">
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            className={cn(
+              "h-9 px-3 text-xs gap-1.5 shrink-0",
+              active && "border-foreground/30 pr-7"
+            )}
+          >
+            {label}
+            {!active && (
+              <ChevronDown className="h-3 w-3 ml-0.5 text-muted-foreground" />
+            )}
+          </Button>
+        </PopoverTrigger>
+        {active && (
+          <button
+            type="button"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 rounded-sm text-muted-foreground hover:text-foreground z-10"
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              onClear();
+              setOpen(false);
+            }}
+          >
+            <X className="h-3 w-3" />
+          </button>
+        )}
+      </div>
       <PopoverContent align="end" className="w-[220px] p-3" sideOffset={4}>
         {children}
       </PopoverContent>
