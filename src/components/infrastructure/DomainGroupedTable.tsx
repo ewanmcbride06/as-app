@@ -88,7 +88,7 @@ const DomainGroupedTable = ({ domains }: DomainGroupedTableProps) => {
       </div>
 
       {/* Table */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto scrollbar-hide">
         <Table>
           <TableHeader className="sticky top-0 bg-background z-10">
             <TableRow>
