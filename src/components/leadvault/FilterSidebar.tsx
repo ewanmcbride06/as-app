@@ -281,13 +281,10 @@ export default function FilterSidebar({
       </div>
 
       {/* Footer Actions */}
-      <div className="p-4 border-t space-y-2">
+      <div className="p-4 border-t">
         <Button variant="outline" size="sm" className="w-full" onClick={onClearFilters}>
           <X className="h-4 w-4 mr-2" />
           Clear All
-        </Button>
-        <Button size="sm" className="w-full">
-          Save Search
         </Button>
       </div>
     </div>
