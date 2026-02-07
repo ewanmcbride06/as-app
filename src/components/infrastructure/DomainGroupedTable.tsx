@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { ChevronRight, Search, SlidersHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -13,32 +14,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { type InfraDomain, getDomainAggregate } from "./mockData";
-
-const OutlookIcon = () => (
-  <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0" fill="none">
-    <path d="M22 8.5V17a2 2 0 0 1-2 2h-7V7h7a2 2 0 0 1 2 2v-.5Z" fill="#0078D4"/>
-    <path d="M15 7H9.5L4 10v8l5.5 1H15V7Z" fill="#0364B8"/>
-    <path d="M9.5 7L4 10v8l5.5 1V7Z" fill="#0078D4"/>
-    <path d="M9.5 11.5a3 3 0 1 1-3 3 3 3 0 0 1 3-3Z" fill="#28A8EA" opacity="0.5"/>
-    <ellipse cx="6.75" cy="14.5" rx="2.25" ry="2.25" fill="white"/>
-  </svg>
-);
-
-const GmailIcon = () => (
-  <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0" fill="none">
-    <path d="M2 6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6Z" fill="#F2F2F2"/>
-    <path d="M2 6l10 7 10-7" stroke="#EA4335" strokeWidth="1.5" fill="none"/>
-    <path d="M2 6v12l6-7L2 6Z" fill="#4285F4"/>
-    <path d="M22 6v12l-6-7 6-5Z" fill="#34A853"/>
-    <path d="M2 18l6-7 4 2.8L16 11l6 7H2Z" fill="#FBBC05"/>
-  </svg>
-);
+import gmailLogo from "@/assets/gmail-logo.png";
+import outlookLogo from "@/assets/outlook-logo.png";
 
 interface DomainGroupedTableProps {
   domains: InfraDomain[];
 }
 
 const DomainGroupedTable = ({ domains }: DomainGroupedTableProps) => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [expandedDomains, setExpandedDomains] = useState<Set<string>>(new Set());
 
@@ -161,11 +145,19 @@ const DomainGroupedTable = ({ domains }: DomainGroupedTableProps) => {
                   {/* Mailbox Rows */}
                   {expanded &&
                     domain.mailboxes.map((mailbox) => (
-                      <TableRow key={mailbox.id} className="bg-muted/20 hover:bg-muted/40">
+                      <TableRow
+                        key={mailbox.id}
+                        className="bg-muted/20 hover:bg-muted/40 cursor-pointer"
+                        onClick={() => navigate(`/infrastructure/mailbox/${mailbox.id}`)}
+                      >
                         <TableCell className="w-[40px]"></TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-2 pl-2">
-                            {mailbox.provider === "outlook" ? <OutlookIcon /> : <GmailIcon />}
+                          <div className="flex items-center gap-2">
+                            <img
+                              src={mailbox.provider === "outlook" ? outlookLogo : gmailLogo}
+                              alt={mailbox.provider}
+                              className="h-4 w-4 shrink-0 object-contain"
+                            />
                             <span className="text-sm">{mailbox.email}</span>
                           </div>
                         </TableCell>

@@ -16,7 +16,7 @@ const Infrastructure = () => {
     {
       label: "Active Emails / Domains",
       value: `${stats.totalAccounts} Accounts`,
-      subtitle: `${stats.totalDomains} Domains`,
+      valueSuffix: `${stats.totalDomains} Domains`,
     },
     {
       label: "Daily Sending Capacity",
