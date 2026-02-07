@@ -265,14 +265,12 @@ export default function LeadVaultDatabase() {
             <div className="flex-1 overflow-auto scrollbar-hide relative">
               {/* Floating Bulk Actions */}
               {selectedItems.length > 0 && (
-                <div className="sticky top-[52px] z-20 flex justify-end pr-3 pointer-events-none">
-                  <div className="flex items-center gap-2 rounded-[10px] border border-border bg-background shadow-md px-3 py-2 pointer-events-auto">
-                    <span className="text-xs font-medium">{selectedItems.length} selected</span>
-                    <div className="w-px h-4 bg-border" />
-                    <Button size="sm" variant="outline" className="h-7 text-xs">Add to List</Button>
-                    <Button size="sm" variant="outline" className="h-7 text-xs">Export CSV</Button>
-                    <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setSelectedItems([])}>Clear</Button>
-                  </div>
+                <div className="absolute top-[52px] right-3 z-20 flex items-center gap-2 rounded-[10px] border border-border bg-background shadow-md px-3 py-2">
+                  <span className="text-xs font-medium">{selectedItems.length} selected</span>
+                  <div className="w-px h-4 bg-border" />
+                  <Button size="sm" variant="outline" className="h-7 text-xs">Add to List</Button>
+                  <Button size="sm" className="h-7 text-xs">Export CSV</Button>
+                  <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setSelectedItems([])}>Clear</Button>
                 </div>
               )}
               {viewType === 'contacts' ? (
