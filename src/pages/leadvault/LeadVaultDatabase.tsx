@@ -40,6 +40,7 @@ export default function LeadVaultDatabase() {
   const [viewType, setViewType] = useState<'contacts' | 'companies'>('contacts');
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [allPagesSelected, setAllPagesSelected] = useState(false);
+  const [customSelectedTotal, setCustomSelectedTotal] = useState<number | null>(null);
   const [customSelectInput, setCustomSelectInput] = useState("");
   const [customSelectError, setCustomSelectError] = useState("");
   const [selectDropdownOpen, setSelectDropdownOpen] = useState(false);
@@ -133,11 +134,13 @@ export default function LeadVaultDatabase() {
   const selectCurrentPage = () => {
     setSelectedItems(items.map(item => item.id));
     setAllPagesSelected(false);
+    setCustomSelectedTotal(null);
   };
 
   const selectAllPages = () => {
     setSelectedItems(items.map(item => item.id));
     setAllPagesSelected(true);
+    setCustomSelectedTotal(null);
   };
 
   const handleCustomSelect = () => {
@@ -155,9 +158,12 @@ export default function LeadVaultDatabase() {
       return;
     }
     setCustomSelectError("");
+    // Select up to val from the loaded items
     const toSelect = items.slice(0, val);
     setSelectedItems(toSelect.map(item => item.id));
-    setAllPagesSelected(val > items.length);
+    // Track the requested amount separately for the pill display
+    setCustomSelectedTotal(val);
+    setAllPagesSelected(false);
     setCustomSelectInput("");
     setSelectDropdownOpen(false);
   };
@@ -165,6 +171,7 @@ export default function LeadVaultDatabase() {
   const clearSelection = () => {
     setSelectedItems([]);
     setAllPagesSelected(false);
+    setCustomSelectedTotal(null);
   };
 
   const toggleSelectAll = () => {
@@ -176,10 +183,12 @@ export default function LeadVaultDatabase() {
   };
 
   const toggleSelect = (id: string) => {
+    setCustomSelectedTotal(null);
+    setAllPagesSelected(false);
     if (selectedItems.includes(id)) {
-      setSelectedItems(selectedItems.filter(i => i !== id));
+      setSelectedItems(prev => prev.filter(i => i !== id));
     } else {
-      setSelectedItems([...selectedItems, id]);
+      setSelectedItems(prev => [...prev, id]);
     }
   };
 
@@ -300,7 +309,7 @@ export default function LeadVaultDatabase() {
               {/* Floating Bulk Actions - positioned over the table, outside scroll */}
               {selectedItems.length > 0 && (
                 <div className="absolute top-[50px] right-[7px] z-20 flex items-center gap-2 rounded-[10px] border border-border bg-background shadow-md px-3 py-2.5">
-                  <span className="text-xs font-medium">{allPagesSelected ? totalCount.toLocaleString() : selectedItems.length} selected</span>
+                  <span className="text-xs font-medium">{allPagesSelected ? totalCount.toLocaleString() : customSelectedTotal ? customSelectedTotal.toLocaleString() : selectedItems.length} selected</span>
                   <div className="w-px h-4 bg-border" />
                   <Button size="sm" variant="outline" className="h-8 text-xs">Add to List</Button>
                   <Button size="sm" className="h-8 text-xs">Export CSV</Button>
