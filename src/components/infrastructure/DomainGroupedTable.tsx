@@ -133,7 +133,16 @@ const DomainGroupedTable = ({ domains }: DomainGroupedTableProps) => {
                     </TableCell>
                     <TableCell className="text-muted-foreground">{agg.replyRate}%</TableCell>
                     <TableCell className="text-muted-foreground">{agg.bounceRate}%</TableCell>
-                    <TableCell className="text-muted-foreground">{agg.warmupDays} Days</TableCell>
+                    <TableCell>
+                      <span className={cn(
+                        "inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border",
+                        agg.warmupDays >= 14
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-300"
+                          : "bg-red-50 text-red-700 border-red-300"
+                      )}>
+                        {agg.warmupDays} Days
+                      </span>
+                    </TableCell>
                     <TableCell>
                       <WarmupCircle percent={agg.warmupPercent} />
                     </TableCell>
@@ -163,7 +172,16 @@ const DomainGroupedTable = ({ domains }: DomainGroupedTableProps) => {
                         </TableCell>
                         <TableCell className="text-sm text-muted-foreground">{mailbox.replyRate}%</TableCell>
                         <TableCell className="text-sm text-muted-foreground">{mailbox.bounceRate}%</TableCell>
-                        <TableCell className="text-sm text-muted-foreground">{mailbox.warmupDays} Days</TableCell>
+                        <TableCell>
+                          <span className={cn(
+                            "inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border",
+                            mailbox.warmupDays >= 14
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-300"
+                              : "bg-red-50 text-red-700 border-red-300"
+                          )}>
+                            {mailbox.warmupDays} Days
+                          </span>
+                        </TableCell>
                         <TableCell>
                           <WarmupCircle percent={mailbox.warmupPercent} />
                         </TableCell>
