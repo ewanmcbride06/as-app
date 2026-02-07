@@ -10,19 +10,38 @@ import { cn } from "@/lib/utils";
 interface FilterSectionProps {
   title: string;
   defaultOpen?: boolean;
+  activeCount?: number;
+  onClear?: () => void;
   children: React.ReactNode;
 }
 
 function FilterSection({
   title,
   defaultOpen = true,
+  activeCount = 0,
+  onClear,
   children
 }: FilterSectionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className="border-b">
       <CollapsibleTrigger className="flex items-center justify-between w-full py-3 px-4 text-sm font-medium hover:bg-muted/50">
-        {title}
+        <div className="flex items-center gap-2">
+          {title}
+          {activeCount > 0 && (
+            <span
+              role="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClear?.();
+              }}
+              className="inline-flex items-center gap-1 rounded bg-primary text-primary-foreground text-[11px] font-semibold px-1.5 py-0.5 leading-none hover:bg-primary/80 transition-colors"
+            >
+              <X className="h-3 w-3" />
+              {activeCount}
+            </span>
+          )}
+        </div>
         <ChevronDown className={cn("h-4 w-4 transition-transform", isOpen && "rotate-180")} />
       </CollapsibleTrigger>
       <CollapsibleContent className="px-0 py-0 pl-0 pt-0 pr-0 pb-0">
@@ -212,19 +231,19 @@ export default function FilterSidebar({
             <span className="text-xs font-semibold uppercase text-muted-foreground">Company</span>
           </div>
           
-          <FilterSection title="Industry">
+          <FilterSection title="Industry" activeCount={filters.industries.length} onClear={() => updateFilter('industries', [])}>
             <MultiSelectFilter options={industryOptions} selected={filters.industries} onChange={(v) => updateFilter('industries', v)} />
           </FilterSection>
 
-          <FilterSection title="Company Type">
+          <FilterSection title="Company Type" activeCount={filters.companyTypes.length} onClear={() => updateFilter('companyTypes', [])}>
             <MultiSelectFilter options={companyTypeOptions} selected={filters.companyTypes} onChange={(v) => updateFilter('companyTypes', v)} />
           </FilterSection>
 
-          <FilterSection title="Employee Range">
+          <FilterSection title="Employee Range" activeCount={filters.employeeRange.length} onClear={() => updateFilter('employeeRange', [])}>
             <ChipSelect options={employeeOptions} selected={filters.employeeRange} onChange={(v) => updateFilter('employeeRange', v)} />
           </FilterSection>
 
-          <FilterSection title="Location" defaultOpen={false}>
+          <FilterSection title="Location" defaultOpen={false} activeCount={filters.location.trim() ? 1 : 0} onClear={() => updateFilter('location', '')}>
             <div className="px-4 pb-4">
               <Input
                 placeholder="Country or city..."
@@ -235,7 +254,7 @@ export default function FilterSidebar({
             </div>
           </FilterSection>
 
-          <FilterSection title="Tech Stack" defaultOpen={false}>
+          <FilterSection title="Tech Stack" defaultOpen={false} activeCount={filters.techStack.trim() ? 1 : 0} onClear={() => updateFilter('techStack', '')}>
             <div className="px-4 pb-4">
               <Input
                 placeholder="Search technologies..."
@@ -254,7 +273,7 @@ export default function FilterSidebar({
               <span className="text-xs font-semibold uppercase text-muted-foreground">Contact</span>
             </div>
 
-            <FilterSection title="Title">
+            <FilterSection title="Title" activeCount={filters.title.trim() ? 1 : 0} onClear={() => updateFilter('title', '')}>
               <div className="px-4 pb-4">
                 <Input
                   placeholder="Contains..."
@@ -265,15 +284,15 @@ export default function FilterSidebar({
               </div>
             </FilterSection>
 
-            <FilterSection title="Seniority">
+            <FilterSection title="Seniority" activeCount={filters.seniority.length} onClear={() => updateFilter('seniority', [])}>
               <ChipSelect options={seniorityOptions} selected={filters.seniority} onChange={(v) => updateFilter('seniority', v)} />
             </FilterSection>
 
-            <FilterSection title="Department">
+            <FilterSection title="Department" activeCount={filters.department.length} onClear={() => updateFilter('department', [])}>
               <MultiSelectFilter options={departmentOptions} selected={filters.department} onChange={(v) => updateFilter('department', v)} />
             </FilterSection>
 
-            <FilterSection title="Email Status">
+            <FilterSection title="Email Status" activeCount={filters.emailStatus.length} onClear={() => updateFilter('emailStatus', [])}>
               <MultiSelectFilter options={emailStatusOptions} selected={filters.emailStatus} onChange={(v) => updateFilter('emailStatus', v)} />
             </FilterSection>
           </div>
