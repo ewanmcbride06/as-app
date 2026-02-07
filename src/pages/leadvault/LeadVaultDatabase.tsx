@@ -356,7 +356,7 @@ export default function LeadVaultDatabase() {
                                       min={1}
                                       max={totalContacts}
                                       placeholder={`1 – ${totalContacts.toLocaleString()}`}
-                                      className={cn("h-8 flex-1 text-xs", customSelectError && "border-destructive focus-visible:ring-destructive")}
+                                      className={cn("h-8 flex-1 text-xs", customSelectError && "border-red-500 focus-visible:ring-red-500")}
                                       value={customSelectInput}
                                       onChange={(e) => {
                                         setCustomSelectInput(e.target.value);
@@ -543,7 +543,7 @@ export default function LeadVaultDatabase() {
                                       min={1}
                                       max={totalCompanies}
                                       placeholder={`1 – ${totalCompanies.toLocaleString()}`}
-                                      className={cn("h-8 flex-1 text-xs", customSelectError && "border-destructive focus-visible:ring-destructive")}
+                                      className={cn("h-8 flex-1 text-xs", customSelectError && "border-red-500 focus-visible:ring-red-500")}
                                       value={customSelectInput}
                                       onChange={(e) => {
                                         setCustomSelectInput(e.target.value);
