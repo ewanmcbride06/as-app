@@ -197,7 +197,7 @@ export default function LeadVaultDatabase() {
   };
 
   const toggleSelectAll = () => {
-    if (selectedItems.length === items.length) {
+    if (selectedItems.length > 0) {
       clearSelection();
     } else {
       selectCurrentPage();
@@ -354,7 +354,7 @@ export default function LeadVaultDatabase() {
                         <TableHead className="w-14">
                           <div className="flex items-center gap-0.5">
                             <Checkbox 
-                              checked={selectedItems.length === paginatedItems.length && paginatedItems.length > 0}
+                              checked={allPagesSelected ? true : selectedItems.length > 0 ? "indeterminate" : false}
                               onCheckedChange={toggleSelectAll}
                             />
                             <DropdownMenu open={selectDropdownOpen} onOpenChange={setSelectDropdownOpen}>
