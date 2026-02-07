@@ -261,20 +261,19 @@ export default function LeadVaultDatabase() {
               </div>
             </div>
 
-            {/* Bulk Actions Bar */}
+            {/* Floating Bulk Actions */}
             {selectedItems.length > 0 && (
-              <div className="border-b p-3 bg-primary/5 flex items-center gap-3">
-                <span className="text-sm font-medium">{selectedItems.length} selected</span>
-                <Button size="sm" variant="outline">Add to List</Button>
-                <Button size="sm" variant="outline">Export CSV</Button>
-                <Button size="sm" variant="outline" disabled>Enrich</Button>
-                {viewType === 'contacts' && <Button size="sm" variant="outline" disabled>Push to CRM</Button>}
-                <Button size="sm" variant="ghost" onClick={() => setSelectedItems([])}>Clear</Button>
+              <div className="absolute top-3 right-3 z-20 flex items-center gap-2 rounded-[10px] border border-border bg-background shadow-md px-3 py-2">
+                <span className="text-xs font-medium">{selectedItems.length} selected</span>
+                <div className="w-px h-4 bg-border" />
+                <Button size="sm" variant="outline" className="h-7 text-xs">Add to List</Button>
+                <Button size="sm" variant="outline" className="h-7 text-xs">Export CSV</Button>
+                <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setSelectedItems([])}>Clear</Button>
               </div>
             )}
 
             {/* Table */}
-            <div className="flex-1 overflow-auto scrollbar-hide">
+            <div className="flex-1 overflow-auto scrollbar-hide relative">
               {viewType === 'contacts' ? (
                 viewMode === 'table' ? (
                   <Table>
