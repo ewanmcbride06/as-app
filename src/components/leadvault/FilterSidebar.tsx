@@ -185,7 +185,7 @@ export default function FilterSidebar({
   return (
     <div className="w-72 border-r bg-background flex flex-col h-full shrink-0">
       {/* Header with View Type Toggle */}
-      <div className="p-4 pb-[17px] border-b space-y-3">
+      <div className="p-4 pb-[16.5px] border-b space-y-3">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold text-sm">Filters</h3>
           <Badge variant="secondary" className={cn("text-xs", activeCount === 0 && "invisible")}>
