@@ -71,46 +71,48 @@ export default function CountryMultiSelect({ selected, onChange }: CountryMultiS
         </div>
       )}
 
-      {/* Search */}
+      {/* Search + dropdown container */}
       <div className="relative">
-        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-        <Input
-          placeholder="Search countries..."
-          className="pl-8 h-8 text-sm"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          onFocus={() => setIsFocused(true)}
-        />
-      </div>
-
-      {/* Country list - only show when focused */}
-      {isFocused && (
-        <div className="max-h-[200px] overflow-y-auto scrollbar-hide -mx-4 border-t border-border">
-          {filtered.length === 0 ? (
-            <div className="px-4 py-3 text-center text-xs text-muted-foreground">
-              No countries found
-            </div>
-          ) : (
-            filtered.map((country) => (
-              <button
-                key={country.code}
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => toggleCountry(country.name)}
-                className={cn(
-                  "w-full flex items-center gap-2.5 px-4 py-1.5 text-left text-sm hover:bg-muted transition-colors",
-                  selected.includes(country.name) && "bg-muted/50 font-medium"
-                )}
-              >
-                <span className="text-base leading-none">{country.flag}</span>
-                <span className="flex-1 truncate">{country.name}</span>
-                {selected.includes(country.name) && (
-                  <Check className="h-3.5 w-3.5 text-foreground shrink-0" />
-                )}
-              </button>
-            ))
-          )}
+        <div className="relative">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <Input
+            placeholder="Search countries..."
+            className="pl-8 h-8 text-sm"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+          />
         </div>
-      )}
+
+        {/* Country list - positioned as dropdown menu */}
+        {isFocused && (
+          <div className="absolute left-0 right-0 top-full mt-1 z-50 max-h-[200px] overflow-y-auto scrollbar-hide rounded-[10px] border border-border bg-popover shadow-md">
+            {filtered.length === 0 ? (
+              <div className="px-3 py-3 text-center text-xs text-muted-foreground">
+                No countries found
+              </div>
+            ) : (
+              filtered.map((country) => (
+                <button
+                  key={country.code}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => toggleCountry(country.name)}
+                  className={cn(
+                    "w-full flex items-center gap-2.5 px-3 py-1.5 text-left text-sm hover:bg-muted transition-colors",
+                    selected.includes(country.name) && "bg-muted/50 font-medium"
+                  )}
+                >
+                  <span className="text-base leading-none">{country.flag}</span>
+                  <span className="flex-1 truncate">{country.name}</span>
+                  {selected.includes(country.name) && (
+                    <Check className="h-3.5 w-3.5 text-foreground shrink-0" />
+                  )}
+                </button>
+              ))
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
