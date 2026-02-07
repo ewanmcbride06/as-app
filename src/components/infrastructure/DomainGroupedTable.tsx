@@ -144,7 +144,16 @@ const DomainGroupedTable = ({ domains }: DomainGroupedTableProps) => {
                       </span>
                     </TableCell>
                     <TableCell>
-                      <WarmupCircle percent={agg.warmupPercent} />
+                      <span className={cn(
+                        "inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border",
+                        agg.warmupPercent >= 95
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-300"
+                          : agg.warmupPercent >= 80
+                            ? "bg-orange-50 text-orange-700 border-orange-300"
+                            : "bg-red-50 text-red-700 border-red-300"
+                      )}>
+                        {agg.warmupPercent}%
+                      </span>
                     </TableCell>
                   </TableRow>
 
@@ -183,7 +192,16 @@ const DomainGroupedTable = ({ domains }: DomainGroupedTableProps) => {
                           </span>
                         </TableCell>
                         <TableCell>
-                          <WarmupCircle percent={mailbox.warmupPercent} />
+                          <span className={cn(
+                            "inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border",
+                            mailbox.warmupPercent >= 95
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-300"
+                              : mailbox.warmupPercent >= 80
+                                ? "bg-orange-50 text-orange-700 border-orange-300"
+                                : "bg-red-50 text-red-700 border-red-300"
+                          )}>
+                            {mailbox.warmupPercent}%
+                          </span>
                         </TableCell>
                       </TableRow>
                     ))}
