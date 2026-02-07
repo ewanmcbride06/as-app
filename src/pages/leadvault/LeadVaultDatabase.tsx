@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { MoreHorizontal, Columns, Linkedin, Globe, Plus, Search, Download, Maximize2, Minimize2, ChevronDown } from "lucide-react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import LeadVaultNav from "@/components/leadvault/LeadVaultNav";
@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Table,
   TableBody,
@@ -41,6 +42,7 @@ export default function LeadVaultDatabase() {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [allPagesSelected, setAllPagesSelected] = useState(false);
   const [customSelectInput, setCustomSelectInput] = useState("");
+  const [selectDropdownOpen, setSelectDropdownOpen] = useState(false);
   const [previewContact, setPreviewContact] = useState<Contact | null>(null);
   const [previewCompany, setPreviewCompany] = useState<Company | null>(null);
   const [viewMode, setViewMode] = useState<'table' | 'compact'>('table');
@@ -144,6 +146,7 @@ export default function LeadVaultDatabase() {
     setSelectedItems(toSelect.map(item => item.id));
     setAllPagesSelected(clamped > items.length);
     setCustomSelectInput("");
+    setSelectDropdownOpen(false);
   };
 
   const clearSelection = () => {
@@ -283,12 +286,14 @@ export default function LeadVaultDatabase() {
             <div className="flex-1 overflow-auto scrollbar-hide relative">
               {/* Floating Bulk Actions */}
               {selectedItems.length > 0 && (
-                <div className="absolute top-[50px] right-[7px] z-20 flex items-center gap-2 rounded-[10px] border border-border bg-background shadow-md px-3 py-2.5">
-                  <span className="text-xs font-medium">{allPagesSelected ? totalCount.toLocaleString() : selectedItems.length} selected</span>
-                  <div className="w-px h-4 bg-border" />
-                  <Button size="sm" variant="outline" className="h-8 text-xs">Add to List</Button>
-                  <Button size="sm" className="h-8 text-xs">Export CSV</Button>
-                  <Button size="sm" variant="ghost" className="h-8 text-xs" onClick={clearSelection}>Clear</Button>
+                <div className="sticky top-[50px] right-[7px] z-20 flex justify-end pr-[7px] pointer-events-none" style={{ marginBottom: '-44px' }}>
+                  <div className="flex items-center gap-2 rounded-[10px] border border-border bg-background shadow-md px-3 py-2.5 pointer-events-auto">
+                    <span className="text-xs font-medium">{allPagesSelected ? totalCount.toLocaleString() : selectedItems.length} selected</span>
+                    <div className="w-px h-4 bg-border" />
+                    <Button size="sm" variant="outline" className="h-8 text-xs">Add to List</Button>
+                    <Button size="sm" className="h-8 text-xs">Export CSV</Button>
+                    <Button size="sm" variant="ghost" className="h-8 text-xs" onClick={clearSelection}>Clear</Button>
+                  </div>
                 </div>
               )}
               {viewType === 'contacts' ? (
@@ -302,12 +307,21 @@ export default function LeadVaultDatabase() {
                               checked={selectedItems.length === filteredContacts.length && filteredContacts.length > 0}
                               onCheckedChange={toggleSelectAll}
                             />
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <button className="flex items-center focus:outline-none">
-                                  <ChevronDown className="h-3 w-3 text-muted-foreground" />
-                                </button>
-                              </DropdownMenuTrigger>
+                            <DropdownMenu open={selectDropdownOpen} onOpenChange={setSelectDropdownOpen}>
+                              <TooltipProvider delayDuration={300}>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <DropdownMenuTrigger asChild>
+                                      <button className="flex items-center focus:outline-none">
+                                        <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                                      </button>
+                                    </DropdownMenuTrigger>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="right" className="text-xs">
+                                    Selection options
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
                               <DropdownMenuContent align="start" className="bg-background z-50">
                                 <DropdownMenuItem onClick={selectAllPages}>
                                   Select all ({totalContacts.toLocaleString()})
@@ -315,33 +329,35 @@ export default function LeadVaultDatabase() {
                                 <DropdownMenuSub>
                                   <DropdownMenuSubTrigger>Select custom</DropdownMenuSubTrigger>
                                   <DropdownMenuSubContent className="bg-background z-50 p-2">
-                                    <div className="flex items-center gap-2">
-                                      <Input
-                                        type="number"
-                                        placeholder="Amount"
-                                        className="h-8 w-28 text-xs"
-                                        value={customSelectInput}
-                                        onChange={(e) => setCustomSelectInput(e.target.value)}
-                                        onKeyDown={(e) => {
-                                          e.stopPropagation();
-                                          if (e.key === 'Enter' && customSelectInput) {
-                                            selectCustomAmount(parseInt(customSelectInput, 10));
-                                          }
-                                        }}
-                                        onClick={(e) => e.stopPropagation()}
-                                      />
-                                      <Button
-                                        size="sm"
-                                        className="h-8 text-xs"
-                                        onClick={() => {
-                                          if (customSelectInput) {
-                                            selectCustomAmount(parseInt(customSelectInput, 10));
-                                          }
-                                        }}
-                                      >
-                                        Go
-                                      </Button>
-                                    </div>
+                                    <form
+                                      onSubmit={(e) => {
+                                        e.preventDefault();
+                                        if (customSelectInput) {
+                                          selectCustomAmount(parseInt(customSelectInput, 10));
+                                        }
+                                      }}
+                                    >
+                                      <div className="flex items-center gap-2">
+                                        <Input
+                                          type="number"
+                                          min={1}
+                                          placeholder="Amount"
+                                          className="h-8 w-28 text-xs"
+                                          value={customSelectInput}
+                                          onChange={(e) => setCustomSelectInput(e.target.value)}
+                                          onKeyDown={(e) => e.stopPropagation()}
+                                          onClick={(e) => e.stopPropagation()}
+                                          autoFocus
+                                        />
+                                        <Button
+                                          type="submit"
+                                          size="sm"
+                                          className="h-8 text-xs"
+                                        >
+                                          Go
+                                        </Button>
+                                      </div>
+                                    </form>
                                   </DropdownMenuSubContent>
                                 </DropdownMenuSub>
                               </DropdownMenuContent>
@@ -475,12 +491,21 @@ export default function LeadVaultDatabase() {
                               checked={selectedItems.length === filteredCompanies.length && filteredCompanies.length > 0}
                               onCheckedChange={toggleSelectAll}
                             />
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <button className="flex items-center focus:outline-none">
-                                  <ChevronDown className="h-3 w-3 text-muted-foreground" />
-                                </button>
-                              </DropdownMenuTrigger>
+                            <DropdownMenu open={selectDropdownOpen} onOpenChange={setSelectDropdownOpen}>
+                              <TooltipProvider delayDuration={300}>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <DropdownMenuTrigger asChild>
+                                      <button className="flex items-center focus:outline-none">
+                                        <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                                      </button>
+                                    </DropdownMenuTrigger>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="right" className="text-xs">
+                                    Selection options
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
                               <DropdownMenuContent align="start" className="bg-background z-50">
                                 <DropdownMenuItem onClick={selectAllPages}>
                                   Select all ({totalCompanies.toLocaleString()})
@@ -488,33 +513,35 @@ export default function LeadVaultDatabase() {
                                 <DropdownMenuSub>
                                   <DropdownMenuSubTrigger>Select custom</DropdownMenuSubTrigger>
                                   <DropdownMenuSubContent className="bg-background z-50 p-2">
-                                    <div className="flex items-center gap-2">
-                                      <Input
-                                        type="number"
-                                        placeholder="Amount"
-                                        className="h-8 w-28 text-xs"
-                                        value={customSelectInput}
-                                        onChange={(e) => setCustomSelectInput(e.target.value)}
-                                        onKeyDown={(e) => {
-                                          e.stopPropagation();
-                                          if (e.key === 'Enter' && customSelectInput) {
-                                            selectCustomAmount(parseInt(customSelectInput, 10));
-                                          }
-                                        }}
-                                        onClick={(e) => e.stopPropagation()}
-                                      />
-                                      <Button
-                                        size="sm"
-                                        className="h-8 text-xs"
-                                        onClick={() => {
-                                          if (customSelectInput) {
-                                            selectCustomAmount(parseInt(customSelectInput, 10));
-                                          }
-                                        }}
-                                      >
-                                        Go
-                                      </Button>
-                                    </div>
+                                    <form
+                                      onSubmit={(e) => {
+                                        e.preventDefault();
+                                        if (customSelectInput) {
+                                          selectCustomAmount(parseInt(customSelectInput, 10));
+                                        }
+                                      }}
+                                    >
+                                      <div className="flex items-center gap-2">
+                                        <Input
+                                          type="number"
+                                          min={1}
+                                          placeholder="Amount"
+                                          className="h-8 w-28 text-xs"
+                                          value={customSelectInput}
+                                          onChange={(e) => setCustomSelectInput(e.target.value)}
+                                          onKeyDown={(e) => e.stopPropagation()}
+                                          onClick={(e) => e.stopPropagation()}
+                                          autoFocus
+                                        />
+                                        <Button
+                                          type="submit"
+                                          size="sm"
+                                          className="h-8 text-xs"
+                                        >
+                                          Go
+                                        </Button>
+                                      </div>
+                                    </form>
                                   </DropdownMenuSubContent>
                                 </DropdownMenuSub>
                               </DropdownMenuContent>
