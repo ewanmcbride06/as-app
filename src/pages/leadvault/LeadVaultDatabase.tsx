@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { MoreHorizontal, Columns, Linkedin, Globe, Plus, Search, Download, Maximize2, Minimize2 } from "lucide-react";
+import { MoreHorizontal, Columns, Linkedin, Globe, Plus, Search, Download, Maximize2, Minimize2, ChevronDown } from "lucide-react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import LeadVaultNav from "@/components/leadvault/LeadVaultNav";
 import FilterSidebar from "@/components/leadvault/FilterSidebar";
@@ -36,6 +36,7 @@ import { cn } from "@/lib/utils";
 export default function LeadVaultDatabase() {
   const [viewType, setViewType] = useState<'contacts' | 'companies'>('contacts');
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [allPagesSelected, setAllPagesSelected] = useState(false);
   const [previewContact, setPreviewContact] = useState<Contact | null>(null);
   const [previewCompany, setPreviewCompany] = useState<Company | null>(null);
   const [viewMode, setViewMode] = useState<'table' | 'compact'>('table');
@@ -123,11 +124,26 @@ export default function LeadVaultDatabase() {
   const items = viewType === 'contacts' ? filteredContacts : filteredCompanies;
   const totalCount = viewType === 'contacts' ? totalContacts : totalCompanies;
 
+  const selectCurrentPage = () => {
+    setSelectedItems(items.map(item => item.id));
+    setAllPagesSelected(false);
+  };
+
+  const selectAllPages = () => {
+    setSelectedItems(items.map(item => item.id));
+    setAllPagesSelected(true);
+  };
+
+  const clearSelection = () => {
+    setSelectedItems([]);
+    setAllPagesSelected(false);
+  };
+
   const toggleSelectAll = () => {
     if (selectedItems.length === items.length) {
-      setSelectedItems([]);
+      clearSelection();
     } else {
-      setSelectedItems(items.map(item => item.id));
+      selectCurrentPage();
     }
   };
 
@@ -141,7 +157,7 @@ export default function LeadVaultDatabase() {
 
   const handleViewTypeChange = (type: 'contacts' | 'companies') => {
     setViewType(type);
-    setSelectedItems([]);
+    clearSelection();
     setPreviewContact(null);
     setPreviewCompany(null);
   };
@@ -256,11 +272,11 @@ export default function LeadVaultDatabase() {
               {/* Floating Bulk Actions */}
               {selectedItems.length > 0 && (
                 <div className="absolute top-[50px] right-[7px] z-20 flex items-center gap-2 rounded-[10px] border border-border bg-background shadow-md px-3 py-2.5">
-                  <span className="text-xs font-medium">{selectedItems.length} selected</span>
+                  <span className="text-xs font-medium">{allPagesSelected ? totalCount.toLocaleString() : selectedItems.length} selected</span>
                   <div className="w-px h-4 bg-border" />
                   <Button size="sm" variant="outline" className="h-8 text-xs">Add to List</Button>
                   <Button size="sm" className="h-8 text-xs">Export CSV</Button>
-                  <Button size="sm" variant="ghost" className="h-8 text-xs" onClick={() => setSelectedItems([])}>Clear</Button>
+                  <Button size="sm" variant="ghost" className="h-8 text-xs" onClick={clearSelection}>Clear</Button>
                 </div>
               )}
               {viewType === 'contacts' ? (
@@ -268,11 +284,27 @@ export default function LeadVaultDatabase() {
                   <Table>
                     <TableHeader className="sticky top-0 bg-background z-10 shadow-[inset_0_-1px_0_0_hsl(var(--border))]">
                       <TableRow>
-                        <TableHead className="w-10">
-                          <Checkbox 
-                            checked={selectedItems.length === filteredContacts.length && filteredContacts.length > 0}
-                            onCheckedChange={toggleSelectAll}
-                          />
+                        <TableHead className="w-14">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button className="flex items-center gap-0.5 focus:outline-none">
+                                <Checkbox 
+                                  checked={selectedItems.length === filteredContacts.length && filteredContacts.length > 0}
+                                  onCheckedChange={toggleSelectAll}
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="start" className="bg-background z-50">
+                              <DropdownMenuItem onClick={selectCurrentPage}>
+                                Select {filteredContacts.length}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={selectAllPages}>
+                                Select all {totalContacts.toLocaleString()}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableHead>
                         <TableHead>Name</TableHead>
                         <TableHead>Title</TableHead>
@@ -395,11 +427,27 @@ export default function LeadVaultDatabase() {
                   <Table>
                     <TableHeader className="sticky top-0 bg-background z-10 shadow-[inset_0_-1px_0_0_hsl(var(--border))]">
                       <TableRow>
-                        <TableHead className="w-10">
-                          <Checkbox 
-                            checked={selectedItems.length === filteredCompanies.length && filteredCompanies.length > 0}
-                            onCheckedChange={toggleSelectAll}
-                          />
+                        <TableHead className="w-14">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button className="flex items-center gap-0.5 focus:outline-none">
+                                <Checkbox 
+                                  checked={selectedItems.length === filteredCompanies.length && filteredCompanies.length > 0}
+                                  onCheckedChange={toggleSelectAll}
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="start" className="bg-background z-50">
+                              <DropdownMenuItem onClick={selectCurrentPage}>
+                                Select {filteredCompanies.length}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={selectAllPages}>
+                                Select all {totalCompanies.toLocaleString()}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableHead>
                         <TableHead>Company</TableHead>
                         <TableHead>Domain</TableHead>
