@@ -45,7 +45,7 @@ const Infrastructure = () => {
   ];
 
   const tabs = [
-    { key: "overview" as const, label: "Infrastructure Overview", icon: BarChart3 },
+    { key: "overview" as const, label: "Overview", icon: BarChart3 },
     { key: "replacements" as const, label: "Domain Replacements", icon: Replace },
     { key: "action-items" as const, label: "Action Items", icon: AlertTriangle },
   ];
