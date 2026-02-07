@@ -134,7 +134,7 @@ export default function LeadVaultDatabase() {
 
   const items = viewType === 'contacts' ? filteredContacts : filteredCompanies;
   const totalCount = viewType === 'contacts' ? totalContacts : totalCompanies;
-  const totalPages = Math.max(1, Math.ceil(items.length / pageSize));
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
   const paginatedItems = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
     return items.slice(start, start + pageSize);
@@ -737,7 +737,7 @@ export default function LeadVaultDatabase() {
             {/* Sticky Pagination Bar */}
             <div className="shrink-0 border-t border-border bg-background px-4 py-2 flex items-center justify-between">
               <span className="text-xs text-muted-foreground">
-                {((currentPage - 1) * pageSize) + 1}–{Math.min(currentPage * pageSize, items.length)} of {items.length.toLocaleString()} results
+                {((currentPage - 1) * pageSize) + 1}–{Math.min(currentPage * pageSize, totalCount)} of {totalCount.toLocaleString()} results
               </span>
               <div className="flex items-center gap-2">
                 <Button
