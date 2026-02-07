@@ -94,11 +94,11 @@ const DomainGroupedTable = ({ domains }: DomainGroupedTableProps) => {
             <TableRow>
               <TableHead className="w-[40px]"></TableHead>
               <TableHead>NAME</TableHead>
-              <TableHead>SENDING VOLUME</TableHead>
-              <TableHead>REPLY RATE</TableHead>
-              <TableHead>BOUNCE RATE</TableHead>
-              <TableHead>TIME IN WARMUP</TableHead>
-              <TableHead>WARMUP</TableHead>
+              <TableHead className="text-center">SENDING VOLUME</TableHead>
+              <TableHead className="text-center">REPLY RATE</TableHead>
+              <TableHead className="text-center">BOUNCE RATE</TableHead>
+              <TableHead className="text-center">TIME IN WARMUP</TableHead>
+              <TableHead className="text-center">WARMUP</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -128,12 +128,12 @@ const DomainGroupedTable = ({ domains }: DomainGroupedTableProps) => {
                         ({domain.mailboxes.length} accounts)
                       </span>
                     </TableCell>
-                    <TableCell className="text-muted-foreground">
+                    <TableCell className="text-center text-muted-foreground">
                       {agg.sendingVolumeCurrent} / {agg.sendingVolumeMax}
                     </TableCell>
-                    <TableCell className="text-muted-foreground">{agg.replyRate}%</TableCell>
-                    <TableCell className="text-muted-foreground">{agg.bounceRate}%</TableCell>
-                    <TableCell>
+                    <TableCell className="text-center text-muted-foreground">{agg.replyRate}%</TableCell>
+                    <TableCell className="text-center text-muted-foreground">{agg.bounceRate}%</TableCell>
+                    <TableCell className="text-center">
                       <span className={cn(
                         "inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border",
                         agg.warmupDays >= 14
@@ -143,7 +143,7 @@ const DomainGroupedTable = ({ domains }: DomainGroupedTableProps) => {
                         {agg.warmupDays} Days
                       </span>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-center">
                       <span className={cn(
                         "inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border",
                         agg.warmupPercent >= 95
@@ -176,12 +176,12 @@ const DomainGroupedTable = ({ domains }: DomainGroupedTableProps) => {
                             <span className="text-sm">{mailbox.email}</span>
                           </div>
                         </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
+                        <TableCell className="text-center text-sm text-muted-foreground">
                           {mailbox.sendingVolumeCurrent} / {mailbox.sendingVolumeMax}
                         </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">{mailbox.replyRate}%</TableCell>
-                        <TableCell className="text-sm text-muted-foreground">{mailbox.bounceRate}%</TableCell>
-                        <TableCell>
+                        <TableCell className="text-center text-sm text-muted-foreground">{mailbox.replyRate}%</TableCell>
+                        <TableCell className="text-center text-sm text-muted-foreground">{mailbox.bounceRate}%</TableCell>
+                        <TableCell className="text-center">
                           <span className={cn(
                             "inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border",
                             mailbox.warmupDays >= 14
@@ -191,7 +191,7 @@ const DomainGroupedTable = ({ domains }: DomainGroupedTableProps) => {
                             {mailbox.warmupDays} Days
                           </span>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="text-center">
                           <span className={cn(
                             "inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border",
                             mailbox.warmupPercent >= 95
