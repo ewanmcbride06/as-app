@@ -25,6 +25,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
 import {
   Popover,
@@ -37,6 +40,7 @@ export default function LeadVaultDatabase() {
   const [viewType, setViewType] = useState<'contacts' | 'companies'>('contacts');
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [allPagesSelected, setAllPagesSelected] = useState(false);
+  const [customSelectInput, setCustomSelectInput] = useState("");
   const [previewContact, setPreviewContact] = useState<Contact | null>(null);
   const [previewCompany, setPreviewCompany] = useState<Company | null>(null);
   const [viewMode, setViewMode] = useState<'table' | 'compact'>('table');
@@ -132,6 +136,14 @@ export default function LeadVaultDatabase() {
   const selectAllPages = () => {
     setSelectedItems(items.map(item => item.id));
     setAllPagesSelected(true);
+  };
+
+  const selectCustomAmount = (amount: number) => {
+    const clamped = Math.max(0, Math.min(amount, totalCount));
+    const toSelect = items.slice(0, clamped);
+    setSelectedItems(toSelect.map(item => item.id));
+    setAllPagesSelected(clamped > items.length);
+    setCustomSelectInput("");
   };
 
   const clearSelection = () => {
@@ -285,26 +297,56 @@ export default function LeadVaultDatabase() {
                     <TableHeader className="sticky top-0 bg-background z-10 shadow-[inset_0_-1px_0_0_hsl(var(--border))]">
                       <TableRow>
                         <TableHead className="w-14">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <button className="flex items-center gap-0.5 focus:outline-none">
-                                <Checkbox 
-                                  checked={selectedItems.length === filteredContacts.length && filteredContacts.length > 0}
-                                  onCheckedChange={toggleSelectAll}
-                                  onClick={(e) => e.stopPropagation()}
-                                />
-                                <ChevronDown className="h-3 w-3 text-muted-foreground" />
-                              </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start" className="bg-background z-50">
-                              <DropdownMenuItem onClick={selectCurrentPage}>
-                                Select {filteredContacts.length}
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={selectAllPages}>
-                                Select all {totalContacts.toLocaleString()}
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <div className="flex items-center gap-0.5">
+                            <Checkbox 
+                              checked={selectedItems.length === filteredContacts.length && filteredContacts.length > 0}
+                              onCheckedChange={toggleSelectAll}
+                            />
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <button className="flex items-center focus:outline-none">
+                                  <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                                </button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="start" className="bg-background z-50">
+                                <DropdownMenuItem onClick={selectAllPages}>
+                                  Select all ({totalContacts.toLocaleString()})
+                                </DropdownMenuItem>
+                                <DropdownMenuSub>
+                                  <DropdownMenuSubTrigger>Select custom</DropdownMenuSubTrigger>
+                                  <DropdownMenuSubContent className="bg-background z-50 p-2">
+                                    <div className="flex items-center gap-2">
+                                      <Input
+                                        type="number"
+                                        placeholder="Amount"
+                                        className="h-8 w-28 text-xs"
+                                        value={customSelectInput}
+                                        onChange={(e) => setCustomSelectInput(e.target.value)}
+                                        onKeyDown={(e) => {
+                                          e.stopPropagation();
+                                          if (e.key === 'Enter' && customSelectInput) {
+                                            selectCustomAmount(parseInt(customSelectInput, 10));
+                                          }
+                                        }}
+                                        onClick={(e) => e.stopPropagation()}
+                                      />
+                                      <Button
+                                        size="sm"
+                                        className="h-8 text-xs"
+                                        onClick={() => {
+                                          if (customSelectInput) {
+                                            selectCustomAmount(parseInt(customSelectInput, 10));
+                                          }
+                                        }}
+                                      >
+                                        Go
+                                      </Button>
+                                    </div>
+                                  </DropdownMenuSubContent>
+                                </DropdownMenuSub>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
                         </TableHead>
                         <TableHead>Name</TableHead>
                         <TableHead>Title</TableHead>
@@ -428,26 +470,56 @@ export default function LeadVaultDatabase() {
                     <TableHeader className="sticky top-0 bg-background z-10 shadow-[inset_0_-1px_0_0_hsl(var(--border))]">
                       <TableRow>
                         <TableHead className="w-14">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <button className="flex items-center gap-0.5 focus:outline-none">
-                                <Checkbox 
-                                  checked={selectedItems.length === filteredCompanies.length && filteredCompanies.length > 0}
-                                  onCheckedChange={toggleSelectAll}
-                                  onClick={(e) => e.stopPropagation()}
-                                />
-                                <ChevronDown className="h-3 w-3 text-muted-foreground" />
-                              </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start" className="bg-background z-50">
-                              <DropdownMenuItem onClick={selectCurrentPage}>
-                                Select {filteredCompanies.length}
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={selectAllPages}>
-                                Select all {totalCompanies.toLocaleString()}
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <div className="flex items-center gap-0.5">
+                            <Checkbox 
+                              checked={selectedItems.length === filteredCompanies.length && filteredCompanies.length > 0}
+                              onCheckedChange={toggleSelectAll}
+                            />
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <button className="flex items-center focus:outline-none">
+                                  <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                                </button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="start" className="bg-background z-50">
+                                <DropdownMenuItem onClick={selectAllPages}>
+                                  Select all ({totalCompanies.toLocaleString()})
+                                </DropdownMenuItem>
+                                <DropdownMenuSub>
+                                  <DropdownMenuSubTrigger>Select custom</DropdownMenuSubTrigger>
+                                  <DropdownMenuSubContent className="bg-background z-50 p-2">
+                                    <div className="flex items-center gap-2">
+                                      <Input
+                                        type="number"
+                                        placeholder="Amount"
+                                        className="h-8 w-28 text-xs"
+                                        value={customSelectInput}
+                                        onChange={(e) => setCustomSelectInput(e.target.value)}
+                                        onKeyDown={(e) => {
+                                          e.stopPropagation();
+                                          if (e.key === 'Enter' && customSelectInput) {
+                                            selectCustomAmount(parseInt(customSelectInput, 10));
+                                          }
+                                        }}
+                                        onClick={(e) => e.stopPropagation()}
+                                      />
+                                      <Button
+                                        size="sm"
+                                        className="h-8 text-xs"
+                                        onClick={() => {
+                                          if (customSelectInput) {
+                                            selectCustomAmount(parseInt(customSelectInput, 10));
+                                          }
+                                        }}
+                                      >
+                                        Go
+                                      </Button>
+                                    </div>
+                                  </DropdownMenuSubContent>
+                                </DropdownMenuSub>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
                         </TableHead>
                         <TableHead>Company</TableHead>
                         <TableHead>Domain</TableHead>
