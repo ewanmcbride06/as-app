@@ -356,7 +356,7 @@ export default function LeadVaultDatabase() {
                                       min={1}
                                       max={totalContacts}
                                       placeholder={`1 – ${totalContacts.toLocaleString()}`}
-                                      className="h-8 flex-1 text-xs"
+                                      className={cn("h-8 flex-1 text-xs", customSelectError && "border-destructive focus-visible:ring-destructive")}
                                       value={customSelectInput}
                                       onChange={(e) => {
                                         setCustomSelectInput(e.target.value);
@@ -383,9 +383,6 @@ export default function LeadVaultDatabase() {
                                       Go
                                     </Button>
                                   </div>
-                                  {customSelectError && (
-                                    <p className="text-xs text-destructive mt-1">{customSelectError}</p>
-                                  )}
                                 </div>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -546,7 +543,7 @@ export default function LeadVaultDatabase() {
                                       min={1}
                                       max={totalCompanies}
                                       placeholder={`1 – ${totalCompanies.toLocaleString()}`}
-                                      className="h-8 flex-1 text-xs"
+                                      className={cn("h-8 flex-1 text-xs", customSelectError && "border-destructive focus-visible:ring-destructive")}
                                       value={customSelectInput}
                                       onChange={(e) => {
                                         setCustomSelectInput(e.target.value);
@@ -573,9 +570,6 @@ export default function LeadVaultDatabase() {
                                       Go
                                     </Button>
                                   </div>
-                                  {customSelectError && (
-                                    <p className="text-xs text-destructive mt-1">{customSelectError}</p>
-                                  )}
                                 </div>
                               </DropdownMenuContent>
                             </DropdownMenu>
