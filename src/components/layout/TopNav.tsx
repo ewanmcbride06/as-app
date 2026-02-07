@@ -45,7 +45,9 @@ const TopNav = () => {
             <Separator orientation="vertical" className="h-6" />
             <div className="flex items-center gap-1">
               {navItems.map((item) => {
-                const isActive = location.pathname === item.path;
+                const isActive = item.path === "/"
+                  ? location.pathname === "/"
+                  : location.pathname.startsWith(item.path);
                 return (
                   <Link
                     key={item.name}

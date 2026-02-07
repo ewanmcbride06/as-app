@@ -92,7 +92,7 @@ All colors MUST be HSL.
   }
   
   .nav-tab-active {
-    @apply bg-foreground text-background rounded-[10px];
+    @apply bg-foreground text-background rounded-[10px] hover:text-background;
   }
   
   .stat-card {
