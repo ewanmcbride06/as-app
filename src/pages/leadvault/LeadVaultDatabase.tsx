@@ -278,7 +278,7 @@ export default function LeadVaultDatabase() {
               {viewType === 'contacts' ? (
                 viewMode === 'table' ? (
                   <Table>
-                    <TableHeader className="sticky top-0 bg-background z-10 border-b border-border">
+                    <TableHeader className="sticky top-0 bg-background z-10 shadow-[inset_0_-1px_0_0_hsl(var(--border))]">
                       <TableRow>
                         <TableHead className="w-10">
                           <Checkbox 
@@ -405,7 +405,7 @@ export default function LeadVaultDatabase() {
               ) : (
                 viewMode === 'table' ? (
                   <Table>
-                    <TableHeader className="sticky top-0 bg-background z-10 border-b border-border">
+                    <TableHeader className="sticky top-0 bg-background z-10 shadow-[inset_0_-1px_0_0_hsl(var(--border))]">
                       <TableRow>
                         <TableHead className="w-10">
                           <Checkbox 
