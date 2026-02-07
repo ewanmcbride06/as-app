@@ -150,13 +150,13 @@ export function getGlobalStats(domains: InfraDomain[]) {
   const googlePct = totalAccounts > 0 ? Math.round((googleCount / totalAccounts) * 100) : 0;
 
   const totalVolume = allMailboxes.reduce((sum, m) => sum + m.sendingVolumeCurrent, 0);
+  const totalSent = totalVolume;
   const avgReplyRate = totalVolume > 0
     ? Math.round((allMailboxes.reduce((sum, m) => sum + m.replyRate * m.sendingVolumeCurrent, 0) / totalVolume) * 10) / 10
     : 0;
   const avgBounceRate = totalVolume > 0
     ? Math.round((allMailboxes.reduce((sum, m) => sum + m.bounceRate * m.sendingVolumeCurrent, 0) / totalVolume) * 10) / 10
     : 0;
-  const avgWarmupHealth = Math.round(allMailboxes.reduce((sum, m) => sum + m.warmupPercent, 0) / totalAccounts);
 
   return {
     totalAccounts,
@@ -164,8 +164,8 @@ export function getGlobalStats(domains: InfraDomain[]) {
     dailyCapacity,
     outlookPct,
     googlePct,
+    totalSent,
     avgReplyRate,
     avgBounceRate,
-    avgWarmupHealth,
   };
 }
