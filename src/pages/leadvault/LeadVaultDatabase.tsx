@@ -239,17 +239,7 @@ export default function LeadVaultDatabase() {
                   </PopoverContent>
                 </Popover>
 
-                <Button 
-                  size="sm" 
-                  className="gap-2"
-                >
-                  <Download className="h-4 w-4" />
-                  Export
-                </Button>
-
-                <div className="w-px h-5 bg-border" />
-
-                <Button 
+                <Button
                   variant="outline" 
                   size="sm" 
                   className="gap-2"
@@ -265,12 +255,12 @@ export default function LeadVaultDatabase() {
             <div className="flex-1 overflow-auto scrollbar-hide relative">
               {/* Floating Bulk Actions */}
               {selectedItems.length > 0 && (
-                <div className="absolute top-[52px] right-3 z-20 flex items-center gap-2 rounded-[10px] border border-border bg-background shadow-md px-3 py-2">
+                <div className="absolute top-[52px] right-3 z-20 flex items-center gap-2 rounded-[10px] border border-border bg-background shadow-md px-3 py-2.5">
                   <span className="text-xs font-medium">{selectedItems.length} selected</span>
                   <div className="w-px h-4 bg-border" />
-                  <Button size="sm" variant="outline" className="h-7 text-xs">Add to List</Button>
-                  <Button size="sm" className="h-7 text-xs">Export CSV</Button>
-                  <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setSelectedItems([])}>Clear</Button>
+                  <Button size="sm" variant="outline" className="h-8 text-xs">Add to List</Button>
+                  <Button size="sm" className="h-8 text-xs">Export CSV</Button>
+                  <Button size="sm" variant="ghost" className="h-8 text-xs" onClick={() => setSelectedItems([])}>Clear</Button>
                 </div>
               )}
               {viewType === 'contacts' ? (
